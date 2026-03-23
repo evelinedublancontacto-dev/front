@@ -1,39 +1,14 @@
-import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Brain, Heart, Music, Sparkles, Flower2, PawPrint } from "lucide-react";
 
 const services = [
-  {
-    icon: Brain,
-    title: "Psicoterapia",
-    description: "Acompañamiento terapéutico profesional para tu bienestar emocional y mental.",
-  },
-  {
-    icon: Sparkles,
-    title: "Sanación Energética",
-    description: "Restaura el flujo de energía en tu cuerpo y libera bloqueos emocionales.",
-  },
-  {
-    icon: Music,
-    title: "Cuencos Tibetanos",
-    description: "Armoniza tu ser a través de las vibraciones sanadores de los cuencos sagrados.",
-  },
-  {
-    icon: Heart,
-    title: "Meditaciones",
-    description: "Meditaciones guiadas para conectar con tu esencia y encontrar paz interior.",
-  },
-  {
-    icon: Flower2,
-    title: "Sanación Uterina",
-    description: "Reconecta con tu energía femenina y sana tu útero energéticamente.",
-  },
-  {
-    icon: PawPrint,
-    title: "Sanación para Animales",
-    description: "Terapia holística especializada para el bienestar de tus compañeros animales.",
-  },
+  { icon: Brain, title: "Psicoterapia", description: "Acompañamiento terapéutico profesional para tu bienestar emocional y mental." },
+  { icon: Sparkles, title: "Sanación Energética", description: "Restaura el flujo de energía en tu cuerpo y libera bloqueos emocionales." },
+  { icon: Music, title: "Cuencos Tibetanos", description: "Armoniza tu ser a través de las vibraciones sanadoras de los cuencos sagrados." },
+  { icon: Heart, title: "Meditaciones", description: "Meditaciones guiadas para conectar con tu esencia y encontrar paz interior." },
+  { icon: Flower2, title: "Sanación Uterina", description: "Reconecta con tu energía femenina y sana tu útero energéticamente." },
+  { icon: PawPrint, title: "Sanación para Animales", description: "Terapia holística especializada para el bienestar de tus compañeros animales." },
 ];
 
 const ServicesSection = () => {
@@ -41,18 +16,14 @@ const ServicesSection = () => {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section id="servicios" className="py-24 relative">
+    <section id="servicios" className="py-24 bg-gradient-section relative">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
-          <p className="text-accent font-body text-sm tracking-[0.2em] uppercase mb-3">
-            Mis Servicios
-          </p>
+          <p className="text-primary font-body text-sm tracking-[0.2em] uppercase mb-3">Mis Servicios</p>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
             Caminos de <span className="text-gradient-gold">Sanación</span>
           </h2>
-          <p className="text-muted-foreground font-body max-w-2xl mx-auto">
-            Cada servicio está diseñado para acompañarte en tu proceso de transformación y crecimiento espiritual.
-          </p>
+          <p className="text-muted-foreground font-body max-w-2xl mx-auto">Cada servicio está diseñado para acompañarte en tu proceso de transformación y crecimiento espiritual.</p>
         </div>
 
         <div ref={ref} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -64,15 +35,11 @@ const ServicesSection = () => {
               transition={{ duration: 0.6, delay: i * 0.1 }}
               className="group bg-gradient-card rounded-xl p-8 border-glow hover:scale-[1.02] transition-all duration-500 cursor-pointer"
             >
-              <div className="w-14 h-14 rounded-lg bg-primary/20 flex items-center justify-center mb-5 group-hover:bg-primary/30 transition-colors">
-                <service.icon className="w-7 h-7 text-accent" />
+              <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+                <service.icon className="w-7 h-7 text-primary" />
               </div>
-              <h3 className="font-display text-xl font-semibold text-foreground mb-3">
-                {service.title}
-              </h3>
-              <p className="text-muted-foreground font-body text-sm leading-relaxed">
-                {service.description}
-              </p>
+              <h3 className="font-display text-xl font-semibold text-foreground mb-3">{service.title}</h3>
+              <p className="text-muted-foreground font-body text-sm leading-relaxed">{service.description}</p>
             </motion.div>
           ))}
         </div>

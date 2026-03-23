@@ -14,22 +14,21 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border">
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <a href="#inicio" className="flex items-center gap-2">
-          <Moon className="w-6 h-6 text-accent" />
-          <span className="font-display text-xl font-semibold text-gradient-gold">
+          <Moon className="w-6 h-6 text-primary" />
+          <span className="font-display text-xl font-semibold text-gradient-purple">
             Eveline Dublán
           </span>
         </a>
 
-        {/* Desktop */}
         <ul className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <li key={link.href}>
               <a
                 href={link.href}
-                className="text-sm font-body font-medium text-muted-foreground hover:text-accent transition-colors duration-300"
+                className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300"
               >
                 {link.label}
               </a>
@@ -37,16 +36,11 @@ const Navbar = () => {
           ))}
         </ul>
 
-        {/* Mobile toggle */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-foreground"
-        >
+        <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-foreground">
           {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -61,7 +55,7 @@ const Navbar = () => {
                   <a
                     href={link.href}
                     onClick={() => setIsOpen(false)}
-                    className="text-base font-body text-muted-foreground hover:text-accent transition-colors"
+                    className="text-base font-body text-muted-foreground hover:text-primary transition-colors"
                   >
                     {link.label}
                   </a>

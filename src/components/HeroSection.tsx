@@ -4,19 +4,13 @@ import heroBg from "@/assets/hero-bg.jpg";
 const HeroSection = () => {
   return (
     <section id="inicio" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background image */}
+      {/* Background image - hero keeps dark/mystical */}
       <div className="absolute inset-0">
-        <img
-          src={heroBg}
-          alt="Fondo celestial místico"
-          width={1920}
-          height={1080}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-background/50" />
+        <img src={heroBg} alt="Fondo celestial místico" width={1920} height={1080} className="w-full h-full object-cover" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, hsla(270,30%,12%,0.55) 0%, hsla(270,30%,12%,0.7) 100%)" }} />
       </div>
 
-      {/* Stars overlay */}
+      {/* Stars */}
       <div className="absolute inset-0 pointer-events-none">
         {[...Array(20)].map((_, i) => (
           <div
@@ -38,7 +32,8 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-accent font-body text-sm tracking-[0.3em] uppercase mb-4"
+          className="font-body text-sm tracking-[0.3em] uppercase mb-4"
+          style={{ color: "hsl(42 70% 62%)" }}
         >
           Psicoterapeuta & Terapeuta Holística
         </motion.p>
@@ -50,14 +45,15 @@ const HeroSection = () => {
           className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-6"
         >
           <span className="text-gradient-gold">Eveline</span>{" "}
-          <span className="text-foreground">Dublán</span>
+          <span style={{ color: "hsl(0 0% 100%)" }}>Dublán</span>
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="font-body text-lg md:text-xl text-lavender max-w-2xl mx-auto mb-10 leading-relaxed"
+          className="font-body text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
+          style={{ color: "hsl(270 30% 85%)" }}
         >
           Sanación y Florecimiento para Humanos y Animales. 
           Descubre el camino hacia tu equilibrio interior.
@@ -77,20 +73,18 @@ const HeroSection = () => {
           </a>
           <a
             href="#contacto"
-            className="px-8 py-4 border border-accent/50 text-accent hover:bg-accent/10 font-body font-semibold rounded-lg transition-all duration-300"
+            className="px-8 py-4 font-body font-semibold rounded-lg transition-all duration-300"
+            style={{ border: "1px solid hsla(42,70%,62%,0.5)", color: "hsl(42 70% 62%)" }}
           >
             Contacto
           </a>
         </motion.div>
       </div>
 
-      {/* Wave divider */}
+      {/* Wave divider to white */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-          <path
-            d="M0 60C240 120 480 0 720 60C960 120 1200 0 1440 60V120H0V60Z"
-            fill="hsl(270 30% 6%)"
-          />
+          <path d="M0 60C240 120 480 0 720 60C960 120 1200 0 1440 60V120H0V60Z" fill="hsl(270 20% 98%)" />
         </svg>
       </div>
     </section>
