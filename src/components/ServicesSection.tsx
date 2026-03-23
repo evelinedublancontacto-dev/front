@@ -4,7 +4,7 @@ import { Brain, Heart, Music, Sparkles, Flower2, PawPrint } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const services = [
-  { icon: Brain, title: "Psicoterapia", description: "Acompañamiento terapéutico profesional para tu bienestar emocional y mental." },
+  { icon: Brain, title: "Psicoterapia", description: "Acompañamiento terapéutico profesional para tu bienestar emocional y mental.", href: "/servicios/psicoterapia" },
   { icon: Sparkles, title: "Sanación Energética", description: "Restaura el flujo de energía en tu cuerpo y libera bloqueos emocionales." },
   { icon: Music, title: "Cuencos Tibetanos", description: "Armoniza tu ser a través de las vibraciones sanadoras de los cuencos sagrados." },
   { icon: Heart, title: "Meditaciones", description: "Meditaciones guiadas para conectar con tu esencia y encontrar paz interior." },
