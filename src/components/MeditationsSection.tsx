@@ -14,18 +14,14 @@ const MeditationsSection = () => {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section id="meditaciones" className="py-24 bg-gradient-mystical relative">
+    <section id="meditaciones" className="py-24 bg-background relative">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
-          <p className="text-accent font-body text-sm tracking-[0.2em] uppercase mb-3">
-            Meditaciones
-          </p>
+          <p className="text-primary font-body text-sm tracking-[0.2em] uppercase mb-3">Meditaciones</p>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
             Luz de <span className="text-gradient-purple">Luna</span>
           </h2>
-          <p className="text-muted-foreground font-body max-w-2xl mx-auto">
-            Meditaciones guiadas para nutrir tu alma y conectar con la energía universal.
-          </p>
+          <p className="text-muted-foreground font-body max-w-2xl mx-auto">Meditaciones guiadas para nutrir tu alma y conectar con la energía universal.</p>
         </div>
 
         <div ref={ref} className="grid sm:grid-cols-2 gap-5 max-w-4xl mx-auto">
@@ -35,22 +31,16 @@ const MeditationsSection = () => {
               initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.6, delay: i * 0.15 }}
-              className="flex items-center gap-5 bg-card/60 backdrop-blur-sm rounded-xl p-6 border border-border hover:border-accent/30 transition-all duration-300 group cursor-pointer"
+              className="flex items-center gap-5 bg-card rounded-xl p-6 border border-border hover:border-primary/30 transition-all duration-300 group cursor-pointer shadow-sm"
             >
-              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/40 transition-colors">
-                <Play className="w-5 h-5 text-accent ml-0.5" />
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                <Play className="w-5 h-5 text-primary ml-0.5" />
               </div>
               <div className="flex-1">
-                <h3 className="font-display text-lg font-semibold text-foreground mb-1">
-                  {med.title}
-                </h3>
+                <h3 className="font-display text-lg font-semibold text-foreground mb-1">{med.title}</h3>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground font-body">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> {med.duration}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Star className="w-3 h-3" /> {med.level}
-                  </span>
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {med.duration}</span>
+                  <span className="flex items-center gap-1"><Star className="w-3 h-3" /> {med.level}</span>
                 </div>
               </div>
             </motion.div>

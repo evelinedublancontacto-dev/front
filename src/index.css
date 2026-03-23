@@ -6,51 +6,53 @@
 
 @layer base {
   :root {
-    --background: 270 30% 6%;
-    --foreground: 270 20% 95%;
+    --background: 270 20% 98%;
+    --foreground: 270 40% 15%;
 
-    --card: 270 25% 12%;
-    --card-foreground: 270 20% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 270 40% 15%;
 
-    --popover: 270 25% 12%;
-    --popover-foreground: 270 20% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 270 40% 15%;
 
-    --primary: 275 60% 50%;
+    --primary: 275 55% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 30% 18%;
-    --secondary-foreground: 270 20% 90%;
+    --secondary: 270 30% 94%;
+    --secondary-foreground: 270 40% 20%;
 
-    --muted: 270 20% 15%;
-    --muted-foreground: 270 15% 60%;
+    --muted: 270 15% 92%;
+    --muted-foreground: 270 10% 45%;
 
-    --accent: 42 70% 58%;
-    --accent-foreground: 270 30% 6%;
+    --accent: 42 70% 48%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 270 20% 20%;
-    --input: 270 20% 20%;
-    --ring: 275 60% 50%;
+    --border: 270 15% 88%;
+    --input: 270 15% 88%;
+    --ring: 275 55% 45%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 270 25% 10%;
-    --sidebar-foreground: 270 20% 90%;
-    --sidebar-primary: 275 60% 50%;
+    --sidebar-background: 270 20% 96%;
+    --sidebar-foreground: 270 40% 15%;
+    --sidebar-primary: 275 55% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 270 25% 15%;
-    --sidebar-accent-foreground: 270 20% 90%;
-    --sidebar-border: 270 20% 18%;
-    --sidebar-ring: 275 60% 50%;
+    --sidebar-accent: 270 20% 92%;
+    --sidebar-accent-foreground: 270 40% 15%;
+    --sidebar-border: 270 15% 88%;
+    --sidebar-ring: 275 55% 45%;
 
     /* Custom tokens */
-    --gold: 42 70% 58%;
-    --gold-light: 42 80% 72%;
-    --purple-deep: 270 50% 15%;
-    --purple-glow: 275 80% 65%;
-    --lavender: 270 40% 80%;
+    --gold: 42 70% 48%;
+    --gold-light: 42 80% 62%;
+    --purple-deep: 275 55% 35%;
+    --purple-glow: 275 60% 55%;
+    --lavender: 270 30% 40%;
+    --hero-bg: 270 30% 12%;
+    --hero-fg: 0 0% 100%;
   }
 }
 
@@ -71,29 +73,29 @@
 @layer utilities {
   .text-gradient-gold {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(42 70% 58%), hsl(42 80% 72%), hsl(42 70% 58%));
+    background-image: linear-gradient(135deg, hsl(42 70% 48%), hsl(42 80% 62%), hsl(42 70% 48%));
   }
 
   .text-gradient-purple {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(275 60% 50%), hsl(275 80% 65%), hsl(270 40% 80%));
+    background-image: linear-gradient(135deg, hsl(275 55% 45%), hsl(275 60% 55%), hsl(270 40% 65%));
   }
 
-  .bg-gradient-mystical {
-    background: linear-gradient(180deg, hsl(270 30% 6%) 0%, hsl(270 50% 15%) 50%, hsl(270 30% 6%) 100%);
+  .bg-gradient-section {
+    background: linear-gradient(180deg, hsl(270 20% 96%) 0%, hsl(270 25% 93%) 50%, hsl(270 20% 96%) 100%);
   }
 
   .bg-gradient-card {
-    background: linear-gradient(145deg, hsl(270 25% 14%), hsl(270 30% 10%));
+    background: linear-gradient(145deg, hsl(0 0% 100%), hsl(270 20% 97%));
   }
 
   .border-glow {
-    border: 1px solid hsl(42 70% 58% / 0.3);
-    box-shadow: 0 0 20px hsl(275 60% 50% / 0.15), inset 0 0 20px hsl(275 60% 50% / 0.05);
+    border: 1px solid hsl(275 55% 45% / 0.2);
+    box-shadow: 0 0 20px hsl(275 55% 45% / 0.08), inset 0 0 20px hsl(275 55% 45% / 0.03);
   }
 
   .shadow-mystical {
-    box-shadow: 0 10px 40px -10px hsl(275 60% 50% / 0.3), 0 0 60px -20px hsl(42 70% 58% / 0.1);
+    box-shadow: 0 10px 40px -10px hsl(275 55% 45% / 0.2), 0 0 60px -20px hsl(42 70% 48% / 0.08);
   }
 
   .animate-float {
@@ -120,6 +122,6 @@
 }
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 20px hsl(275 60% 50% / 0.2); }
-  50% { box-shadow: 0 0 40px hsl(275 60% 50% / 0.4), 0 0 60px hsl(42 70% 58% / 0.1); }
+  0%, 100% { box-shadow: 0 0 20px hsl(275 55% 45% / 0.15); }
+  50% { box-shadow: 0 0 40px hsl(275 55% 45% / 0.3), 0 0 60px hsl(42 70% 48% / 0.08); }
 }
