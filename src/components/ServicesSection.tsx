@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Brain, Heart, Music, Sparkles, Flower2, PawPrint } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const services = [
   { icon: Brain, title: "Psicoterapia", description: "Acompañamiento terapéutico profesional para tu bienestar emocional y mental." },
