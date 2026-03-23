@@ -34,13 +34,24 @@ const ServicesSection = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="group bg-gradient-card rounded-xl p-8 border-glow hover:scale-[1.02] transition-all duration-500 cursor-pointer"
             >
-              <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
-                <service.icon className="w-7 h-7 text-primary" />
-              </div>
-              <h3 className="font-display text-xl font-semibold text-foreground mb-3">{service.title}</h3>
-              <p className="text-muted-foreground font-body text-sm leading-relaxed">{service.description}</p>
+              {service.href ? (
+                <Link to={service.href} className="block group bg-gradient-card rounded-xl p-8 border-glow hover:scale-[1.02] transition-all duration-500 cursor-pointer h-full">
+                  <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+                    <service.icon className="w-7 h-7 text-primary" />
+                  </div>
+                  <h3 className="font-display text-xl font-semibold text-foreground mb-3">{service.title}</h3>
+                  <p className="text-muted-foreground font-body text-sm leading-relaxed">{service.description}</p>
+                </Link>
+              ) : (
+                <div className="group bg-gradient-card rounded-xl p-8 border-glow hover:scale-[1.02] transition-all duration-500 cursor-pointer h-full">
+                  <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+                    <service.icon className="w-7 h-7 text-primary" />
+                  </div>
+                  <h3 className="font-display text-xl font-semibold text-foreground mb-3">{service.title}</h3>
+                  <p className="text-muted-foreground font-body text-sm leading-relaxed">{service.description}</p>
+                </div>
+              )}
             </motion.div>
           ))}
         </div>
