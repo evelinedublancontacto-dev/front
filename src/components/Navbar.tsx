@@ -63,13 +63,23 @@ const Navbar = () => {
             <ul className="flex flex-col items-center py-6 gap-4">
               {navLinks.map((link) => (
                 <li key={link.href}>
-                  <a
-                    href={link.href}
-                    onClick={() => setIsOpen(false)}
-                    className="text-base font-body text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {link.label}
-                  </a>
+                  {link.href.startsWith("/") ? (
+                    <Link
+                      to={link.href}
+                      onClick={() => setIsOpen(false)}
+                      className="text-base font-body text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      onClick={() => setIsOpen(false)}
+                      className="text-base font-body text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
