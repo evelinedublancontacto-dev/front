@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 const services = [
   { icon: Brain, title: "Psicoterapia", description: "Acompañamiento terapéutico profesional para tu bienestar emocional y mental.", href: "/servicios/psicoterapia" },
   { icon: Sparkles, title: "Sanación Energética", description: "Restaura el flujo de energía en tu cuerpo y libera bloqueos emocionales.", href: "/servicios/sanacion-energetica" },
-  { icon: Music, title: "Cuencos Tibetanos", description: "Armoniza tu ser a través de las vibraciones sanadoras de los cuencos sagrados." },
+  { icon: Music, title: "Cuencos Tibetanos", description: "Armoniza tu ser a través de las vibraciones sanadoras de los cuencos sagrados.", href: "/servicios/cuencos-tibetanos" },
   { icon: Heart, title: "Meditaciones", description: "Meditaciones guiadas para conectar con tu esencia y encontrar paz interior." },
   { icon: Flower2, title: "Sanación Uterina", description: "Reconecta con tu energía femenina y sana tu útero energéticamente." },
   { icon: PawPrint, title: "Sanación para Animales", description: "Terapia holística especializada para el bienestar de tus compañeros animales." },
