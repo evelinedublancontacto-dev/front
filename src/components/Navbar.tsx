@@ -8,6 +8,7 @@ const navLinks = [
   { label: "Servicios", href: "#servicios" },
   { label: "Meditaciones", href: "#meditaciones" },
   { label: "Contacto", href: "#contacto" },
+  { label: "Blog", href: "/blog" },
 ];
 
 const Navbar = () => {
