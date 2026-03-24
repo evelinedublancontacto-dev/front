@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Brain, Video, Clock, Headphones, CalendarCheck, DollarSign, ArrowLeft, Phone } from "lucide-react";
+import heroBg from "@/assets/hero-bg.jpg";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
@@ -16,15 +17,130 @@ const Psicoterapia = () => {
       <Navbar />
 
       {/* Hero Banner */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-deep/90 via-primary/80 to-purple-glow/70" />
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-gold/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-10 right-20 w-96 h-96 bg-lavender/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "2s" }} />
+      <section className="relative pt-32 pb-24 overflow-hidden">
+        {/* Background with hero image */}
+        <div className="absolute inset-0">
+          <img src={heroBg} alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsla(275,55%,25%,0.88) 0%, hsla(270,30%,12%,0.82) 50%, hsla(275,60%,35%,0.85) 100%)" }} />
         </div>
+
+        {/* Floating geometric shapes */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Circles */}
+          <motion.div
+            animate={{ y: [-10, 10, -10], rotate: [0, 180, 360] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-16 left-[8%] w-16 h-16 rounded-full border-2"
+            style={{ borderColor: "hsla(42, 70%, 62%, 0.3)" }}
+          />
+          <motion.div
+            animate={{ y: [8, -12, 8] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute top-28 right-[12%] w-10 h-10 rounded-full"
+            style={{ background: "hsla(275, 60%, 55%, 0.2)" }}
+          />
+
+          {/* Brain outline shapes */}
+          <motion.div
+            animate={{ y: [-6, 6, -6], x: [-4, 4, -4] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            className="absolute top-20 right-[25%] w-20 h-20 rounded-2xl border rotate-12"
+            style={{ borderColor: "hsla(0, 0%, 100%, 0.1)" }}
+          />
+
+          {/* Diamond */}
+          <motion.div
+            animate={{ rotate: [45, 225, 45], scale: [1, 1.1, 1] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-24 left-[15%] w-12 h-12 border-2"
+            style={{ borderColor: "hsla(42, 70%, 62%, 0.25)", transform: "rotate(45deg)" }}
+          />
+
+          {/* Plus signs */}
+          <motion.div
+            animate={{ rotate: [0, 90, 0], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            className="absolute top-36 left-[30%]"
+            style={{ color: "hsla(42, 80%, 62%, 0.35)" }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </motion.div>
+          <motion.div
+            animate={{ rotate: [0, -90, 0], opacity: [0.2, 0.5, 0.2] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+            className="absolute bottom-20 right-[20%]"
+            style={{ color: "hsla(0, 0%, 100%, 0.25)" }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </motion.div>
+
+          {/* Dotted circle */}
+          <motion.div
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+            className="absolute bottom-16 right-[8%] w-28 h-28 rounded-full border-2 border-dashed"
+            style={{ borderColor: "hsla(270, 30%, 65%, 0.2)" }}
+          />
+
+          {/* Small filled circles */}
+          <motion.div
+            animate={{ scale: [1, 1.5, 1], opacity: [0.4, 0.8, 0.4] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute top-24 left-[50%] w-3 h-3 rounded-full"
+            style={{ background: "hsl(42, 70%, 62%)" }}
+          />
+          <motion.div
+            animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 2.5 }}
+            className="absolute bottom-32 left-[40%] w-2 h-2 rounded-full"
+            style={{ background: "hsl(275, 60%, 65%)" }}
+          />
+
+          {/* Triangle */}
+          <motion.div
+            animate={{ y: [-5, 8, -5], rotate: [0, 15, 0] }}
+            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+            className="absolute top-16 left-[65%]"
+          >
+            <svg width="32" height="28" viewBox="0 0 32 28" fill="none">
+              <path d="M16 2L30 26H2L16 2Z" stroke="hsla(42, 70%, 62%, 0.25)" strokeWidth="2" />
+            </svg>
+          </motion.div>
+
+          {/* Wavy line */}
+          <motion.div
+            animate={{ x: [-10, 10, -10] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-36 left-[5%]"
+          >
+            <svg width="80" height="20" viewBox="0 0 80 20" fill="none">
+              <path d="M0 10C10 0 20 20 30 10C40 0 50 20 60 10C70 0 80 20 80 10" stroke="hsla(275, 55%, 55%, 0.2)" strokeWidth="2" />
+            </svg>
+          </motion.div>
+
+          {/* Stars */}
+          {[...Array(12)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 rounded-full bg-gold-light animate-twinkle"
+              style={{
+                top: `${10 + Math.random() * 80}%`,
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${2 + Math.random() * 3}s`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Content */}
         <div className="container mx-auto px-6 relative z-10 text-center">
           <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
-            <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mx-auto mb-6 border border-white/20">
+            <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mx-auto mb-6 border border-white/20 shadow-mystical">
               <Brain className="w-10 h-10 text-gold" />
             </div>
           </motion.div>
@@ -32,7 +148,8 @@ const Psicoterapia = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="font-display text-5xl md:text-6xl font-bold text-white mb-4"
+            className="font-display text-5xl md:text-7xl font-bold mb-4"
+            style={{ color: "hsl(0 0% 100%)" }}
           >
             Psicoterapia
           </motion.h1>
@@ -40,10 +157,18 @@ const Psicoterapia = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
-            className="font-body text-white/80 text-lg max-w-2xl mx-auto"
+            className="font-body text-lg md:text-xl max-w-2xl mx-auto"
+            style={{ color: "hsl(270 30% 85%)" }}
           >
             Psicoterapia Ericksoniana · Modelo centrado en soluciones · Terapia breve
           </motion.p>
+        </div>
+
+        {/* Wave divider */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+            <path d="M0 40C360 80 720 0 1080 40C1260 60 1380 50 1440 40V80H0V40Z" fill="hsl(270 20% 98%)" />
+          </svg>
         </div>
       </section>
 
