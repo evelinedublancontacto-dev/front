@@ -1,15 +1,99 @@
-import { Moon } from "lucide-react";
+import { Moon, Mail, Phone, MapPin, Instagram, Facebook } from "lucide-react";
+import footerBg from "@/assets/footer-bg.jpg";
 
 const Footer = () => (
-  <footer className="py-10 border-t border-border bg-card">
-    <div className="container mx-auto px-6 text-center">
-      <div className="flex items-center justify-center gap-2 mb-4">
-        <Moon className="w-5 h-5 text-primary" />
-        <span className="font-display text-lg text-gradient-purple">Eveline Dublán</span>
+  <footer className="relative overflow-hidden">
+    {/* Wave divider from white to footer */}
+    <div className="relative -mb-1">
+      <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+        <path d="M0 60C240 0 480 120 720 60C960 0 1200 120 1440 60V120H0V60Z" fill="hsl(270 30% 12%)" />
+      </svg>
+    </div>
+
+    {/* Background image with overlay */}
+    <div className="absolute inset-0">
+      <img src={footerBg} alt="" loading="lazy" width={1920} height={600} className="w-full h-full object-cover" />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, hsla(270,30%,12%,0.85) 0%, hsla(270,30%,12%,0.75) 50%, hsla(270,30%,12%,0.9) 100%)" }} />
+    </div>
+
+    {/* Twinkling stars */}
+    <div className="absolute inset-0 pointer-events-none">
+      {[...Array(15)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-1 h-1 rounded-full bg-gold-light animate-twinkle"
+          style={{
+            top: `${20 + Math.random() * 70}%`,
+            left: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 5}s`,
+            animationDuration: `${2 + Math.random() * 3}s`,
+          }}
+        />
+      ))}
+    </div>
+
+    {/* Content */}
+    <div className="relative z-10 py-16 px-6">
+      <div className="container mx-auto">
+        <div className="grid md:grid-cols-3 gap-12 mb-12">
+          {/* Brand */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <Moon className="w-6 h-6" style={{ color: "hsl(42 70% 62%)" }} />
+              <span className="font-display text-2xl text-gradient-gold">Eveline Dublán</span>
+            </div>
+            <p className="font-body text-sm leading-relaxed" style={{ color: "hsl(270 30% 75%)" }}>
+              Psicoterapeuta & Terapeuta Holística. Sanación y florecimiento para humanos y animales.
+            </p>
+          </div>
+
+          {/* Links */}
+          <div>
+            <h4 className="font-display text-lg mb-4" style={{ color: "hsl(0 0% 100%)" }}>Servicios</h4>
+            <ul className="space-y-2 font-body text-sm" style={{ color: "hsl(270 30% 75%)" }}>
+              <li><a href="/servicios/psicoterapia" className="hover:text-gold-light transition-colors">Psicoterapia</a></li>
+              <li><a href="#servicios" className="hover:text-gold-light transition-colors">Sanación Energética</a></li>
+              <li><a href="#servicios" className="hover:text-gold-light transition-colors">Cuencos Tibetanos</a></li>
+              <li><a href="#servicios" className="hover:text-gold-light transition-colors">Meditaciones</a></li>
+              <li><a href="#servicios" className="hover:text-gold-light transition-colors">Sanación para Animales</a></li>
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4 className="font-display text-lg mb-4" style={{ color: "hsl(0 0% 100%)" }}>Contacto</h4>
+            <ul className="space-y-3 font-body text-sm" style={{ color: "hsl(270 30% 75%)" }}>
+              <li className="flex items-center gap-2">
+                <Mail className="w-4 h-4" style={{ color: "hsl(42 70% 62%)" }} />
+                <span>contacto@evelinedublan.com</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Phone className="w-4 h-4" style={{ color: "hsl(42 70% 62%)" }} />
+                <span>WhatsApp disponible</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" style={{ color: "hsl(42 70% 62%)" }} />
+                <span>Sesiones en línea</span>
+              </li>
+            </ul>
+            <div className="flex gap-4 mt-4">
+              <a href="#" className="hover:scale-110 transition-transform" style={{ color: "hsl(42 70% 62%)" }}>
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a href="#" className="hover:scale-110 transition-transform" style={{ color: "hsl(42 70% 62%)" }}>
+                <Facebook className="w-5 h-5" />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t mb-6" style={{ borderColor: "hsla(270, 30%, 50%, 0.3)" }} />
+
+        <p className="text-center font-body text-sm" style={{ color: "hsl(270 30% 65%)" }}>
+          © {new Date().getFullYear()} Eveline Dublán — Psicoterapeuta & Terapeuta Holística. Todos los derechos reservados.
+        </p>
       </div>
-      <p className="text-muted-foreground font-body text-sm">
-        © {new Date().getFullYear()} Eveline Dublán — Psicoterapeuta & Terapeuta Holística
-      </p>
     </div>
   </footer>
 );
