@@ -9,7 +9,7 @@ const services = [
   { icon: Music, title: "Cuencos Tibetanos", description: "Armoniza tu ser a través de las vibraciones sanadoras de los cuencos sagrados.", href: "/servicios/cuencos-tibetanos" },
   { icon: Heart, title: "Meditaciones", description: "Meditaciones guiadas para conectar con tu esencia y encontrar paz interior." },
   { icon: Flower2, title: "Sanación Uterina", description: "Reconecta con tu energía femenina y sana tu útero energéticamente." },
-  { icon: PawPrint, title: "Sanación para Animales", description: "Terapia holística especializada para el bienestar de tus compañeros animales." },
+  { icon: PawPrint, title: "Sanación para Animales", description: "Terapia holística especializada para el bienestar de tus compañeros animales.", href: "/servicios/sanacion-para-animales" },
 ];
 
 const ServicesSection = () => {
