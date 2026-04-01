@@ -14,6 +14,8 @@ import Blog from "./pages/Blog.tsx";
 import BlogPost from "./pages/BlogPost.tsx";
 import LuzDeLuna from "./pages/LuzDeLuna.tsx";
 import CuarzosYCristales from "./pages/CuarzosYCristales.tsx";
+import Cursos from "./pages/Cursos.tsx";
+import CursoDetalle from "./pages/CursoDetalle.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -34,6 +36,8 @@ const App = () => (
           <Route path="/meditaciones" element={<Meditaciones />} />
           <Route path="/luz-de-luna" element={<LuzDeLuna />} />
           <Route path="/luz-de-luna/cuarzos-y-cristales" element={<CuarzosYCristales />} />
+          <Route path="/cursos" element={<Cursos />} />
+          <Route path="/cursos/:slug" element={<CursoDetalle />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -15,6 +15,7 @@ const navLinks = [
       { label: "Cuarzos y Cristales", href: "/luz-de-luna/cuarzos-y-cristales" },
     ],
   },
+  { label: "Cursos", href: "/cursos" },
   { label: "Contacto", href: "#contacto" },
   { label: "Blog", href: "/blog" },
 ];
