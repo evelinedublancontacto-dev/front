@@ -143,13 +143,9 @@ const PostFormDialog = ({ open, onOpenChange, post, onSave }: PostFormDialogProp
 
           <div className="space-y-2">
             <Label htmlFor="content">Contenido</Label>
-            <Textarea
-              id="content"
-              value={form.content}
-              onChange={(e) => setForm((prev) => ({ ...prev, content: e.target.value }))}
-              placeholder="Contenido del post (HTML o texto)"
-              rows={8}
-              maxLength={50000}
+            <RichTextEditor
+              content={form.content}
+              onChange={(html) => setForm((prev) => ({ ...prev, content: html }))}
             />
           </div>
 
