@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Gift, Sparkles, Sun, Heart, DollarSign, ArrowLeft, Phone, Star } from "lucide-react";
-import heroBg from "@/assets/hero-bg.jpg";
+import cumpleanosHero from "@/assets/sesion-cumpleanos-hero.jpg";
 import sesionImg from "@/assets/sesion-cumpleanos.jpg";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";

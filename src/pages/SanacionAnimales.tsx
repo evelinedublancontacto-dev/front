@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { PawPrint, Video, Clock, CalendarCheck, Camera, DollarSign, ArrowLeft, Phone, AlertTriangle } from "lucide-react";
-import heroBg from "@/assets/hero-bg.jpg";
+import animalesHero from "@/assets/sanacion-animales-hero.jpg";
 import sanacionAnimalesImg from "@/assets/sanacion-animales.jpg";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";

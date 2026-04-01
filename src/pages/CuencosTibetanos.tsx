@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Music, Users, User, Hand, MapPin, DollarSign, ArrowLeft, Phone } from "lucide-react";
-import heroBg from "@/assets/hero-bg.jpg";
+import cuencosHero from "@/assets/cuencos-tibetanos-hero.jpg";
 import cuencoImg from "@/assets/cuencos-tibetanos.jpg";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
