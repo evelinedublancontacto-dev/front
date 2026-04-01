@@ -1,6 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Brain, Heart, Music, Sparkles, Flower2, PawPrint } from "lucide-react";
+import { Brain, Heart, Music, Sparkles, Gift, PawPrint } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const services = [
