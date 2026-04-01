@@ -62,6 +62,7 @@ const PostFormDialog = ({ open, onOpenChange, post, onSave }: PostFormDialogProp
         excerpt: post.excerpt || '',
         content: post.content || '',
         image: post.image || '',
+        category: post.category || '',
         published: post.published || false,
       });
       setAutoSlug(false);
