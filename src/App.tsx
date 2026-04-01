@@ -26,6 +26,7 @@ const App = () => (
           <Route path="/servicios/psicoterapia" element={<Psicoterapia />} />
           <Route path="/servicios/sanacion-energetica" element={<SanacionEnergetica />} />
           <Route path="/servicios/cuencos-tibetanos" element={<CuencosTibetanos />} />
+          <Route path="/servicios/sanacion-para-animales" element={<SanacionAnimales />} />
           <Route path="/meditaciones" element={<Meditaciones />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
