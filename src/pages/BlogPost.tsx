@@ -153,12 +153,30 @@ const BlogPost = () => {
         </div>
       </section>
 
+      {/* Featured image */}
+      {post.image && (
+        <section className="container mx-auto px-6 -mt-10 relative z-20 max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className="rounded-2xl overflow-hidden shadow-2xl border border-border"
+          >
+            <img
+              src={post.image}
+              alt={post.title}
+              className="w-full h-[300px] md:h-[420px] object-cover"
+            />
+          </motion.div>
+        </section>
+      )}
+
       {/* Content — render HTML from Tiptap */}
       <section className="container mx-auto px-6 py-12 max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
           className="prose prose-lg max-w-none
             prose-headings:font-display prose-headings:text-foreground
             prose-p:font-body prose-p:text-muted-foreground prose-p:leading-relaxed
