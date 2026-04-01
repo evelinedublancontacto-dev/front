@@ -16,12 +16,20 @@ interface PostFormDialogProps {
   onSave: (data: PostFormData) => Promise<void>;
 }
 
+export const POST_CATEGORIES = [
+  { value: 'psicoterapia', label: 'Psicoterapia' },
+  { value: 'meditacion', label: 'Meditación' },
+  { value: 'sanacion-energetica', label: 'Sanación Energética' },
+  { value: 'cristales-y-cuarzos', label: 'Cristales y Cuarzos' },
+] as const;
+
 export interface PostFormData {
   title: string;
   slug: string;
   excerpt: string;
   content: string;
   image: string;
+  category: string;
   published: boolean;
 }
 
