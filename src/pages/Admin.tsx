@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LogOut, Users, FileText, LayoutDashboard, RefreshCw, Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import PostFormDialog, { type PostFormData } from '@/components/admin/PostFormDialog';
+import PostFormDialog, { type PostFormData, POST_CATEGORIES } from '@/components/admin/PostFormDialog';
 import DeletePostDialog from '@/components/admin/DeletePostDialog';
 
 const Admin = () => {
@@ -252,7 +252,7 @@ const Admin = () => {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Título</TableHead>
-                          <TableHead>Slug</TableHead>
+                          <TableHead>Categoría</TableHead>
                           <TableHead>Estado</TableHead>
                           <TableHead>Fecha</TableHead>
                           <TableHead className="text-right">Acciones</TableHead>
@@ -262,7 +262,11 @@ const Admin = () => {
                         {posts.map((post) => (
                           <TableRow key={post.id}>
                             <TableCell className="font-medium">{post.title}</TableCell>
-                            <TableCell className="text-muted-foreground">{post.slug}</TableCell>
+                            <TableCell>
+                              <Badge variant="secondary">
+                                {POST_CATEGORIES.find((c) => c.value === post.category)?.label || post.category || '—'}
+                              </Badge>
+                            </TableCell>
                             <TableCell>
                               <Badge variant={post.published ? 'default' : 'outline'}>
                                 {post.published ? 'Publicado' : 'Borrador'}

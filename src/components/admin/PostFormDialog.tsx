@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import type { RecordModel } from 'pocketbase';
@@ -15,12 +16,20 @@ interface PostFormDialogProps {
   onSave: (data: PostFormData) => Promise<void>;
 }
 
+export const POST_CATEGORIES = [
+  { value: 'psicoterapia', label: 'Psicoterapia' },
+  { value: 'meditacion', label: 'Meditación' },
+  { value: 'sanacion-energetica', label: 'Sanación Energética' },
+  { value: 'cristales-y-cuarzos', label: 'Cristales y Cuarzos' },
+] as const;
+
 export interface PostFormData {
   title: string;
   slug: string;
   excerpt: string;
   content: string;
   image: string;
+  category: string;
   published: boolean;
 }
 
@@ -39,6 +48,7 @@ const PostFormDialog = ({ open, onOpenChange, post, onSave }: PostFormDialogProp
     excerpt: '',
     content: '',
     image: '',
+    category: '',
     published: false,
   });
   const [saving, setSaving] = useState(false);
@@ -52,11 +62,12 @@ const PostFormDialog = ({ open, onOpenChange, post, onSave }: PostFormDialogProp
         excerpt: post.excerpt || '',
         content: post.content || '',
         image: post.image || '',
+        category: post.category || '',
         published: post.published || false,
       });
       setAutoSlug(false);
     } else {
-      setForm({ title: '', slug: '', excerpt: '', content: '', image: '', published: false });
+      setForm({ title: '', slug: '', excerpt: '', content: '', image: '', category: '', published: false });
       setAutoSlug(true);
     }
   }, [post, open]);
@@ -141,15 +152,35 @@ const PostFormDialog = ({ open, onOpenChange, post, onSave }: PostFormDialogProp
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="image">URL de Imagen</Label>
-            <Input
-              id="image"
-              value={form.image}
-              onChange={(e) => setForm((prev) => ({ ...prev, image: e.target.value }))}
-              placeholder="https://ejemplo.com/imagen.jpg"
-              maxLength={500}
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="category">Categoría</Label>
+              <Select
+                value={form.category}
+                onValueChange={(value) => setForm((prev) => ({ ...prev, category: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona una categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  {POST_CATEGORIES.map((cat) => (
+                    <SelectItem key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="image">URL de Imagen</Label>
+              <Input
+                id="image"
+                value={form.image}
+                onChange={(e) => setForm((prev) => ({ ...prev, image: e.target.value }))}
+                placeholder="https://ejemplo.com/imagen.jpg"
+                maxLength={500}
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
