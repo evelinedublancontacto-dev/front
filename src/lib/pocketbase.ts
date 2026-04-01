@@ -1,7 +1,6 @@
 import PocketBase from 'pocketbase';
 
-// Cambia esta URL cuando tengas tu instancia de PocketBase desplegada
-const PB_URL = import.meta.env.VITE_POCKETBASE_URL || 'http://127.0.0.1:8090';
+const PB_URL = import.meta.env.VITE_POCKETBASE_URL || 'https://eveline-dublan.pockethost.io';
 
 const pb = new PocketBase(PB_URL);
 
