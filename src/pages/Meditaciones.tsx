@@ -191,7 +191,7 @@ const Meditaciones = () => {
       {/* Hero Banner */}
       <section className="relative pt-32 pb-24 overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroBg} alt="" className="w-full h-full object-cover" />
+          <img src={meditacionesHero} alt="Meditaciones" className="w-full h-full object-cover" width={1920} height={1080} />
           <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsla(275,55%,25%,0.88) 0%, hsla(270,30%,12%,0.82) 50%, hsla(275,60%,35%,0.85) 100%)" }} />
         </div>
 
