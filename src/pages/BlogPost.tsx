@@ -1,22 +1,72 @@
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calendar, Clock, ArrowLeft, Sparkles } from "lucide-react";
+import { Calendar, ArrowLeft, Sparkles, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { blogPosts } from "@/data/blogPosts";
+import pb from "@/lib/pocketbase";
+import type { RecordModel } from "pocketbase";
 import heroBg from "@/assets/hero-bg.jpg";
+
+const CATEGORY_MAP: Record<string, string> = {
+  psicoterapia: "Psicoterapia",
+  meditacion: "Meditación",
+  "sanacion-energetica": "Sanación Energética",
+  "cristales-y-cuarzos": "Cristales y Cuarzos",
+};
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
-  const post = blogPosts.find((p) => p.slug === slug);
+  const [post, setPost] = useState<RecordModel | null>(null);
+  const [related, setRelated] = useState<RecordModel[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  if (!post) {
+  useEffect(() => {
+    const fetchPost = async () => {
+      setLoading(true);
+      try {
+        const result = await pb.collection("posts").getFullList({
+          filter: `slug = "${slug}" && published = true`,
+        });
+        if (result.length === 0) {
+          setNotFound(true);
+          return;
+        }
+        const found = result[0];
+        setPost(found);
+
+        // Fetch related posts
+        try {
+          const relatedResult = await pb.collection("posts").getFullList({
+            filter: `category = "${found.category}" && id != "${found.id}" && published = true`,
+            sort: "-created",
+          });
+          setRelated(relatedResult.slice(0, 2));
+        } catch {}
+      } catch (err) {
+        console.error("Error fetching post:", err);
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPost();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (notFound || !post) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="font-display text-3xl text-foreground mb-4">
-            Artículo no encontrado
-          </h1>
+          <h1 className="font-display text-3xl text-foreground mb-4">Artículo no encontrado</h1>
           <Link to="/blog" className="text-primary font-body hover:underline">
             Volver al blog
           </Link>
@@ -25,72 +75,7 @@ const BlogPost = () => {
     );
   }
 
-  // Simple markdown-like rendering
-  const renderContent = (content: string) => {
-    return content.split("\n\n").map((block, i) => {
-      if (block.startsWith("### ")) {
-        return (
-          <h3
-            key={i}
-            className="font-display text-xl font-semibold text-foreground mt-8 mb-3"
-          >
-            {block.replace("### ", "")}
-          </h3>
-        );
-      }
-      if (block.startsWith("## ")) {
-        return (
-          <h2
-            key={i}
-            className="font-display text-2xl font-semibold text-foreground mt-10 mb-4"
-          >
-            {block.replace("## ", "")}
-          </h2>
-        );
-      }
-      if (block.startsWith("- ")) {
-        const items = block.split("\n").filter((l) => l.startsWith("- "));
-        return (
-          <ul key={i} className="space-y-2 my-4">
-            {items.map((item, j) => (
-              <li
-                key={j}
-                className="font-body text-muted-foreground leading-relaxed flex items-start gap-2"
-              >
-                <span
-                  className="mt-2 w-1.5 h-1.5 rounded-full shrink-0"
-                  style={{ background: "hsl(var(--primary))" }}
-                />
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: item
-                      .replace("- ", "")
-                      .replace(/\*\*(.*?)\*\*/g, "<strong class='text-foreground'>$1</strong>"),
-                  }}
-                />
-              </li>
-            ))}
-          </ul>
-        );
-      }
-      return (
-        <p
-          key={i}
-          className="font-body text-muted-foreground leading-relaxed my-4"
-          dangerouslySetInnerHTML={{
-            __html: block.replace(
-              /\*\*(.*?)\*\*/g,
-              "<strong class='text-foreground'>$1</strong>"
-            ),
-          }}
-        />
-      );
-    });
-  };
-
-  const related = blogPosts
-    .filter((p) => p.id !== post.id && p.category === post.category)
-    .slice(0, 2);
+  const catLabel = CATEGORY_MAP[post.category] || post.category;
 
   return (
     <div className="min-h-screen bg-background">
@@ -99,12 +84,15 @@ const BlogPost = () => {
       {/* Hero */}
       <section className="relative pt-24 pb-28 overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroBg} alt="" width={1920} height={600} className="w-full h-full object-cover" />
+          {post.image ? (
+            <img src={post.image} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <img src={heroBg} alt="" width={1920} height={600} className="w-full h-full object-cover" />
+          )}
           <div
             className="absolute inset-0"
             style={{
-              background:
-                "linear-gradient(180deg, hsla(270,30%,12%,0.75) 0%, hsla(270,30%,12%,0.9) 100%)",
+              background: "linear-gradient(180deg, hsla(270,30%,12%,0.75) 0%, hsla(270,30%,12%,0.9) 100%)",
             }}
           />
         </div>
@@ -125,11 +113,7 @@ const BlogPost = () => {
         </div>
 
         <div className="relative z-10 container mx-auto px-6 max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <Link
               to="/blog"
               className="inline-flex items-center gap-2 font-body text-sm mb-6 transition-colors"
@@ -140,12 +124,9 @@ const BlogPost = () => {
 
             <span
               className="inline-block px-3 py-1 rounded-full text-xs font-body font-semibold mb-4"
-              style={{
-                background: "hsla(275,55%,45%,0.2)",
-                color: "hsl(270 60% 75%)",
-              }}
+              style={{ background: "hsla(275,55%,45%,0.2)", color: "hsl(270 60% 75%)" }}
             >
-              {post.category}
+              {catLabel}
             </span>
 
             <h1 className="font-display text-3xl md:text-5xl font-bold mb-4" style={{ color: "hsl(0 0% 100%)" }}>
@@ -155,15 +136,11 @@ const BlogPost = () => {
             <div className="flex items-center gap-4 font-body text-sm" style={{ color: "hsl(270 30% 70%)" }}>
               <span className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                {new Date(post.date).toLocaleDateString("es-MX", {
+                {new Date(post.created).toLocaleDateString("es-MX", {
                   day: "numeric",
                   month: "long",
                   year: "numeric",
                 })}
-              </span>
-              <span className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                {post.readTime} de lectura
               </span>
             </div>
           </motion.div>
@@ -176,15 +153,23 @@ const BlogPost = () => {
         </div>
       </section>
 
-      {/* Content */}
+      {/* Content — render HTML from Tiptap */}
       <section className="container mx-auto px-6 py-12 max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          {renderContent(post.content)}
-        </motion.div>
+          className="prose prose-lg max-w-none
+            prose-headings:font-display prose-headings:text-foreground
+            prose-p:font-body prose-p:text-muted-foreground prose-p:leading-relaxed
+            prose-strong:text-foreground
+            prose-ul:font-body prose-ul:text-muted-foreground
+            prose-ol:font-body prose-ol:text-muted-foreground
+            prose-li:text-muted-foreground
+            prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+            prose-img:rounded-xl prose-img:shadow-lg"
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
 
         {/* CTA */}
         <div className="mt-16 p-8 rounded-2xl border-glow bg-gradient-card text-center">
@@ -206,9 +191,7 @@ const BlogPost = () => {
         {/* Related */}
         {related.length > 0 && (
           <div className="mt-16">
-            <h3 className="font-display text-2xl font-semibold text-foreground mb-6">
-              Artículos relacionados
-            </h3>
+            <h3 className="font-display text-2xl font-semibold text-foreground mb-6">Artículos relacionados</h3>
             <div className="grid sm:grid-cols-2 gap-6">
               {related.map((r) => (
                 <Link
@@ -219,9 +202,7 @@ const BlogPost = () => {
                   <h4 className="font-display text-base font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
                     {r.title}
                   </h4>
-                  <p className="font-body text-sm text-muted-foreground line-clamp-2">
-                    {r.excerpt}
-                  </p>
+                  <p className="font-body text-sm text-muted-foreground line-clamp-2">{r.excerpt}</p>
                 </Link>
               ))}
             </div>
