@@ -48,6 +48,7 @@ const PostFormDialog = ({ open, onOpenChange, post, onSave }: PostFormDialogProp
     excerpt: '',
     content: '',
     image: '',
+    category: '',
     published: false,
   });
   const [saving, setSaving] = useState(false);
