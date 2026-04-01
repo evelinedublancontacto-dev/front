@@ -67,7 +67,7 @@ const PostFormDialog = ({ open, onOpenChange, post, onSave }: PostFormDialogProp
       });
       setAutoSlug(false);
     } else {
-      setForm({ title: '', slug: '', excerpt: '', content: '', image: '', published: false });
+      setForm({ title: '', slug: '', excerpt: '', content: '', image: '', category: '', published: false });
       setAutoSlug(true);
     }
   }, [post, open]);
