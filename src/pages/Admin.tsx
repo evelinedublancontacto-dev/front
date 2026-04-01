@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LogOut, Users, FileText, LayoutDashboard, RefreshCw, Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import PostFormDialog, { type PostFormData } from '@/components/admin/PostFormDialog';
+import PostFormDialog, { type PostFormData, POST_CATEGORIES } from '@/components/admin/PostFormDialog';
 import DeletePostDialog from '@/components/admin/DeletePostDialog';
 
 const Admin = () => {
