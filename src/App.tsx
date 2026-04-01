@@ -7,6 +7,7 @@ import Index from "./pages/Index.tsx";
 import Psicoterapia from "./pages/Psicoterapia.tsx";
 import SanacionEnergetica from "./pages/SanacionEnergetica.tsx";
 import CuencosTibetanos from "./pages/CuencosTibetanos.tsx";
+import Meditaciones from "./pages/Meditaciones.tsx";
 import Blog from "./pages/Blog.tsx";
 import BlogPost from "./pages/BlogPost.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/servicios/psicoterapia" element={<Psicoterapia />} />
           <Route path="/servicios/sanacion-energetica" element={<SanacionEnergetica />} />
           <Route path="/servicios/cuencos-tibetanos" element={<CuencosTibetanos />} />
+          <Route path="/meditaciones" element={<Meditaciones />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
