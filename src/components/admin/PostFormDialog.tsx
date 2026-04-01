@@ -152,15 +152,35 @@ const PostFormDialog = ({ open, onOpenChange, post, onSave }: PostFormDialogProp
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="image">URL de Imagen</Label>
-            <Input
-              id="image"
-              value={form.image}
-              onChange={(e) => setForm((prev) => ({ ...prev, image: e.target.value }))}
-              placeholder="https://ejemplo.com/imagen.jpg"
-              maxLength={500}
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="category">Categoría</Label>
+              <Select
+                value={form.category}
+                onValueChange={(value) => setForm((prev) => ({ ...prev, category: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona una categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  {POST_CATEGORIES.map((cat) => (
+                    <SelectItem key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="image">URL de Imagen</Label>
+              <Input
+                id="image"
+                value={form.image}
+                onChange={(e) => setForm((prev) => ({ ...prev, image: e.target.value }))}
+                placeholder="https://ejemplo.com/imagen.jpg"
+                maxLength={500}
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
