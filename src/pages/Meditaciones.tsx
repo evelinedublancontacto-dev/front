@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Play, Pause, Volume2, Headphones, Heart, Sparkles, Moon } from "lucide-react";
+import heroBg from "@/assets/hero-bg.jpg";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
