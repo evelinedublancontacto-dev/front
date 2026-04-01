@@ -9,6 +9,7 @@ import SanacionEnergetica from "./pages/SanacionEnergetica.tsx";
 import CuencosTibetanos from "./pages/CuencosTibetanos.tsx";
 import Meditaciones from "./pages/Meditaciones.tsx";
 import SanacionAnimales from "./pages/SanacionAnimales.tsx";
+import SesionCumpleanos from "./pages/SesionCumpleanos.tsx";
 import Blog from "./pages/Blog.tsx";
 import BlogPost from "./pages/BlogPost.tsx";
 import NotFound from "./pages/NotFound.tsx";
