@@ -1,54 +1,140 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Moon } from "lucide-react";
+import { Menu, X, Moon, ChevronDown } from "lucide-react";
 
 const navLinks = [
   { label: "Inicio", href: "#inicio" },
   { label: "Sobre Mí", href: "#sobre-mi" },
   { label: "Servicios", href: "#servicios" },
   { label: "Meditaciones", href: "/meditaciones" },
+  {
+    label: "Luz de Luna",
+    children: [
+      { label: "Luz de Luna", href: "/luz-de-luna" },
+      { label: "Cuarzos y Cristales", href: "/luz-de-luna/cuarzos-y-cristales" },
+    ],
+  },
   { label: "Contacto", href: "#contacto" },
   { label: "Blog", href: "/blog" },
 ];
 
-const NavItem = ({ link, onClick }: { link: { label: string; href: string }; onClick?: () => void }) => {
+type SimpleLink = { label: string; href: string };
+type DropdownLink = { label: string; children: SimpleLink[] };
+type NavLink = SimpleLink | DropdownLink;
+
+const isDropdown = (link: NavLink): link is DropdownLink => "children" in link;
+
+const NavItemLink = ({ link, onClick }: { link: SimpleLink; onClick?: () => void }) => {
   const location = useLocation();
   const isHome = location.pathname === "/";
 
   if (link.href.startsWith("/")) {
     return (
-      <Link
-        to={link.href}
-        onClick={onClick}
-        className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300"
-      >
+      <Link to={link.href} onClick={onClick} className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300">
         {link.label}
       </Link>
     );
   }
 
-  // On home page, use anchor links; on other pages, navigate to /#section
   if (isHome) {
     return (
-      <a
-        href={link.href}
-        onClick={onClick}
-        className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300"
-      >
+      <a href={link.href} onClick={onClick} className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300">
         {link.label}
       </a>
     );
   }
 
   return (
-    <Link
-      to={`/${link.href}`}
-      onClick={onClick}
-      className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300"
-    >
+    <Link to={`/${link.href}`} onClick={onClick} className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300">
       {link.label}
     </Link>
+  );
+};
+
+const DesktopDropdown = ({ link }: { link: DropdownLink }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1 text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300"
+      >
+        {link.label}
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 bg-background/95 backdrop-blur-xl border border-border rounded-lg shadow-lg py-2 overflow-hidden"
+          >
+            {link.children.map((child) => (
+              <Link
+                key={child.href}
+                to={child.href}
+                onClick={() => setOpen(false)}
+                className="block px-4 py-2.5 text-sm font-body text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors duration-200"
+              >
+                {child.label}
+              </Link>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+const MobileDropdown = ({ link, onNavigate }: { link: DropdownLink; onNavigate: () => void }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="flex flex-col items-center">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1 text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300"
+      >
+        {link.label}
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="flex flex-col items-center gap-2 mt-2 overflow-hidden"
+          >
+            {link.children.map((child) => (
+              <Link
+                key={child.href}
+                to={child.href}
+                onClick={onNavigate}
+                className="text-sm font-body text-muted-foreground hover:text-primary transition-colors duration-200"
+              >
+                {child.label}
+              </Link>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
@@ -74,8 +160,12 @@ const Navbar = () => {
 
         <ul className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            <li key={link.href}>
-              <NavItem link={link} />
+            <li key={link.label}>
+              {isDropdown(link) ? (
+                <DesktopDropdown link={link} />
+              ) : (
+                <NavItemLink link={link} />
+              )}
             </li>
           ))}
         </ul>
@@ -95,8 +185,12 @@ const Navbar = () => {
           >
             <ul className="flex flex-col items-center py-6 gap-4">
               {navLinks.map((link) => (
-                <li key={link.href}>
-                  <NavItem link={link} onClick={() => setIsOpen(false)} />
+                <li key={link.label}>
+                  {isDropdown(link) ? (
+                    <MobileDropdown link={link} onNavigate={() => setIsOpen(false)} />
+                  ) : (
+                    <NavItemLink link={link} onClick={() => setIsOpen(false)} />
+                  )}
                 </li>
               ))}
             </ul>
