@@ -8,7 +8,7 @@ const services = [
   { icon: Sparkles, title: "Sanación Energética", description: "Restaura el flujo de energía en tu cuerpo y libera bloqueos emocionales.", href: "/servicios/sanacion-energetica" },
   { icon: Music, title: "Cuencos Tibetanos", description: "Armoniza tu ser a través de las vibraciones sanadoras de los cuencos sagrados.", href: "/servicios/cuencos-tibetanos" },
   { icon: Heart, title: "Meditaciones", description: "Meditaciones guiadas para conectar con tu esencia y encontrar paz interior." },
-  { icon: Flower2, title: "Sanación Uterina", description: "Reconecta con tu energía femenina y sana tu útero energéticamente." },
+  { icon: Sparkles, title: "Sesión de Cumpleaños", description: "Aprovecha el portal luminoso de tu cumpleaños para sanar y comenzar tu año con la mejor energía.", href: "/servicios/sesion-de-cumpleanos" },
   { icon: PawPrint, title: "Sanación para Animales", description: "Terapia holística especializada para el bienestar de tus compañeros animales.", href: "/servicios/sanacion-para-animales" },
 ];
 
