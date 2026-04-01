@@ -252,7 +252,7 @@ const Admin = () => {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Título</TableHead>
-                          <TableHead>Slug</TableHead>
+                          <TableHead>Categoría</TableHead>
                           <TableHead>Estado</TableHead>
                           <TableHead>Fecha</TableHead>
                           <TableHead className="text-right">Acciones</TableHead>
@@ -262,7 +262,11 @@ const Admin = () => {
                         {posts.map((post) => (
                           <TableRow key={post.id}>
                             <TableCell className="font-medium">{post.title}</TableCell>
-                            <TableCell className="text-muted-foreground">{post.slug}</TableCell>
+                            <TableCell>
+                              <Badge variant="secondary">
+                                {POST_CATEGORIES.find((c) => c.value === post.category)?.label || post.category || '—'}
+                              </Badge>
+                            </TableCell>
                             <TableCell>
                               <Badge variant={post.published ? 'default' : 'outline'}>
                                 {post.published ? 'Publicado' : 'Borrador'}
