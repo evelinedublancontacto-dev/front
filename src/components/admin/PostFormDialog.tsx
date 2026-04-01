@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import RichTextEditor from '@/components/admin/RichTextEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -142,13 +143,9 @@ const PostFormDialog = ({ open, onOpenChange, post, onSave }: PostFormDialogProp
 
           <div className="space-y-2">
             <Label htmlFor="content">Contenido</Label>
-            <Textarea
-              id="content"
-              value={form.content}
-              onChange={(e) => setForm((prev) => ({ ...prev, content: e.target.value }))}
-              placeholder="Contenido del post (HTML o texto)"
-              rows={8}
-              maxLength={50000}
+            <RichTextEditor
+              content={form.content}
+              onChange={(html) => setForm((prev) => ({ ...prev, content: html }))}
             />
           </div>
 
