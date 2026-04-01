@@ -8,17 +8,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, Users, FileText, LayoutDashboard, RefreshCw } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { LogOut, Users, FileText, LayoutDashboard, RefreshCw, Plus, Pencil, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import PostFormDialog, { type PostFormData } from '@/components/admin/PostFormDialog';
+import DeletePostDialog from '@/components/admin/DeletePostDialog';
 
 const Admin = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [users, setUsers] = useState<RecordModel[]>([]);
   const [posts, setPosts] = useState<RecordModel[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingPosts, setLoadingPosts] = useState(false);
+
+  // CRUD state
+  const [formOpen, setFormOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<RecordModel | null>(null);
+  const [deletingPost, setDeletingPost] = useState<RecordModel | null>(null);
 
   const fetchUsers = async () => {
     setLoadingUsers(true);
@@ -27,11 +34,7 @@ const Admin = () => {
       setUsers(result);
     } catch (err) {
       console.error('Error fetching users:', err);
-      toast({
-        title: 'Error',
-        description: 'No se pudieron cargar los usuarios. Verifica que la colección "users" exista en PocketBase.',
-        variant: 'destructive',
-      });
+      toast.error('No se pudieron cargar los usuarios.');
     } finally {
       setLoadingUsers(false);
     }
@@ -44,10 +47,7 @@ const Admin = () => {
       setPosts(result);
     } catch (err) {
       console.error('Error fetching posts:', err);
-      toast({
-        title: 'Info',
-        description: 'No se encontró la colección "posts". Créala en tu panel de PocketBase.',
-      });
+      toast.info('No se encontró la colección "posts". Créala en tu panel de PocketBase.');
     } finally {
       setLoadingPosts(false);
     }
@@ -63,9 +63,53 @@ const Admin = () => {
     navigate('/login');
   };
 
+  const handleNewPost = () => {
+    setEditingPost(null);
+    setFormOpen(true);
+  };
+
+  const handleEditPost = (post: RecordModel) => {
+    setEditingPost(post);
+    setFormOpen(true);
+  };
+
+  const handleDeletePost = (post: RecordModel) => {
+    setDeletingPost(post);
+    setDeleteOpen(true);
+  };
+
+  const handleSavePost = async (data: PostFormData) => {
+    try {
+      if (editingPost) {
+        await pb.collection('posts').update(editingPost.id, data);
+        toast.success('Post actualizado correctamente.');
+      } else {
+        await pb.collection('posts').create(data);
+        toast.success('Post creado correctamente.');
+      }
+      fetchPosts();
+    } catch (err) {
+      console.error('Error saving post:', err);
+      toast.error('Error al guardar el post. Verifica que la colección "posts" exista con los campos correctos.');
+      throw err;
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingPost) return;
+    try {
+      await pb.collection('posts').delete(deletingPost.id);
+      toast.success('Post eliminado correctamente.');
+      fetchPosts();
+    } catch (err) {
+      console.error('Error deleting post:', err);
+      toast.error('Error al eliminar el post.');
+      throw err;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border bg-card shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -73,9 +117,7 @@ const Admin = () => {
             <h1 className="text-xl font-serif font-bold text-foreground">Panel Administrativo</h1>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground hidden sm:inline">
-              {user?.email}
-            </span>
+            <span className="text-sm text-muted-foreground hidden sm:inline">{user?.email}</span>
             <Button variant="outline" size="sm" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-1" />
               Salir
@@ -84,9 +126,7 @@ const Admin = () => {
         </div>
       </header>
 
-      {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           <Card>
             <CardContent className="flex items-center gap-4 p-6">
@@ -112,8 +152,7 @@ const Admin = () => {
           </Card>
         </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="users" className="space-y-4">
+        <Tabs defaultValue="posts" className="space-y-4">
           <TabsList className="grid w-full grid-cols-2 max-w-md">
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
@@ -141,9 +180,7 @@ const Admin = () => {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
                   </div>
                 ) : users.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">
-                    No hay usuarios registrados aún.
-                  </p>
+                  <p className="text-center text-muted-foreground py-8">No hay usuarios registrados aún.</p>
                 ) : (
                   <div className="overflow-x-auto">
                     <Table>
@@ -183,10 +220,16 @@ const Admin = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-lg">Posts del Blog</CardTitle>
-                <Button variant="outline" size="sm" onClick={fetchPosts} disabled={loadingPosts}>
-                  <RefreshCw className={`w-4 h-4 mr-1 ${loadingPosts ? 'animate-spin' : ''}`} />
-                  Actualizar
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={fetchPosts} disabled={loadingPosts}>
+                    <RefreshCw className={`w-4 h-4 mr-1 ${loadingPosts ? 'animate-spin' : ''}`} />
+                    Actualizar
+                  </Button>
+                  <Button size="sm" onClick={handleNewPost}>
+                    <Plus className="w-4 h-4 mr-1" />
+                    Nuevo Post
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 {loadingPosts ? (
@@ -194,9 +237,15 @@ const Admin = () => {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
                   </div>
                 ) : posts.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">
-                    No hay posts aún. Crea la colección "posts" en PocketBase con campos como: title, slug, content, excerpt, image, published.
-                  </p>
+                  <div className="text-center py-8 space-y-3">
+                    <p className="text-muted-foreground">
+                      No hay posts aún. Crea la colección "posts" en PocketBase con campos: title, slug, content, excerpt, image, published.
+                    </p>
+                    <Button onClick={handleNewPost}>
+                      <Plus className="w-4 h-4 mr-1" />
+                      Crear Primer Post
+                    </Button>
+                  </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <Table>
@@ -206,6 +255,7 @@ const Admin = () => {
                           <TableHead>Slug</TableHead>
                           <TableHead>Estado</TableHead>
                           <TableHead>Fecha</TableHead>
+                          <TableHead className="text-right">Acciones</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -221,6 +271,16 @@ const Admin = () => {
                             <TableCell className="text-muted-foreground">
                               {new Date(post.created).toLocaleDateString('es-ES')}
                             </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-1">
+                                <Button variant="ghost" size="icon" onClick={() => handleEditPost(post)} title="Editar">
+                                  <Pencil className="w-4 h-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={() => handleDeletePost(post)} title="Eliminar" className="text-destructive hover:text-destructive">
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -232,6 +292,10 @@ const Admin = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Dialogs */}
+      <PostFormDialog open={formOpen} onOpenChange={setFormOpen} post={editingPost} onSave={handleSavePost} />
+      <DeletePostDialog open={deleteOpen} onOpenChange={setDeleteOpen} post={deletingPost} onConfirm={handleConfirmDelete} />
     </div>
   );
 };
