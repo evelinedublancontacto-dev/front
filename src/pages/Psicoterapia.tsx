@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Brain, Video, Clock, Headphones, CalendarCheck, DollarSign, ArrowLeft, Phone } from "lucide-react";
-import heroBg from "@/assets/hero-bg.jpg";
+import psicoterapiaHero from "@/assets/psicoterapia-hero.jpg";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
