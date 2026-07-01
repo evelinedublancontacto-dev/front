@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import TwinkleStars from "@/components/TwinkleStars";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -90,18 +91,7 @@ const SanacionAnimales = () => {
           />
 
           {/* Stars */}
-          {[...Array(15)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 rounded-full bg-gold-light animate-twinkle"
-              style={{
-                top: `${10 + Math.random() * 80}%`,
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${2 + Math.random() * 3}s`,
-              }}
-            />
-          ))}
+          <TwinkleStars count={15} topMin={10} topRange={80} />
         </div>
 
         {/* Content */}

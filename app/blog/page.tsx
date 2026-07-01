@@ -7,6 +7,7 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import pb from "@/lib/pocketbase";
+import TwinkleStars from "@/components/TwinkleStars";
 import type { RecordModel } from "pocketbase";
 import Link from "next/link";
 
@@ -88,18 +89,7 @@ const Blog = () => {
             className="absolute top-32 right-[12%] w-20 h-20 rounded-full"
             style={{ background: "hsla(275,55%,45%,0.08)" }}
           />
-          {[...Array(12)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 rounded-full bg-gold-light animate-twinkle"
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${2 + Math.random() * 3}s`,
-              }}
-            />
-          ))}
+          <TwinkleStars count={12} />
         </div>
         <div className="relative z-10 container mx-auto px-6 text-center">
           <motion.div

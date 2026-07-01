@@ -1,6 +1,8 @@
 "use client";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import TwinkleStars from "@/components/TwinkleStars";
+import { logos } from "@/lib/brand";
 
 const HeroSection = () => {
   return (
@@ -26,21 +28,7 @@ const HeroSection = () => {
         />
       </div>
 
-      {/* Stars */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 rounded-full bg-gold-light animate-twinkle"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${2 + Math.random() * 3}s`,
-            }}
-          />
-        ))}
-      </div>
+      <TwinkleStars count={20} />
 
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
@@ -71,11 +59,12 @@ const HeroSection = () => {
           className="flex justify-center mb-8"
         >
           <Image
-            src="/assets/logos/imago-logo.png"
+            src={logos.imago}
             alt="Imago"
             width={200}
             height={64}
             className="h-16 w-auto object-contain"
+            style={{ width: "auto" }}
           />
         </motion.div>
 

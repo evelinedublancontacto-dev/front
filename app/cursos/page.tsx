@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import MotionStars from "@/components/MotionStars";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -33,9 +34,7 @@ const Cursos = () => {
           <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsla(275,55%,25%,0.90) 0%, hsla(270,30%,12%,0.85) 50%, hsla(275,60%,35%,0.88) 100%)" }} />
         </div>
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {[...Array(8)].map((_, i) => (
-            <motion.div key={i} className="absolute w-1 h-1 bg-white/30 rounded-full" style={{ top: `${15 + Math.random() * 70}%`, left: `${5 + Math.random() * 90}%` }} animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }} transition={{ duration: 2 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 2 }} />
-          ))}
+          <MotionStars count={8} />
         </div>
         <div className="container mx-auto px-6 relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-6">

@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logos } from "@/lib/brand";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Moon, ChevronDown } from "lucide-react";
 import Image from "next/image";
@@ -23,7 +24,7 @@ const navLinks = [
     ],
   },
   { label: "Cursos", href: "/cursos" },
-  { label: "Contacto", href: "#contacto" },
+  { label: "Contacto", href: "/contacto" },
   { label: "Blog", href: "/blog" },
 ];
 
@@ -32,6 +33,9 @@ type DropdownLink = { label: string; children: SimpleLink[] };
 type NavLink = SimpleLink | DropdownLink;
 
 const isDropdown = (link: NavLink): link is DropdownLink => "children" in link;
+
+const navLinkClass =
+  "text-sm font-body font-medium text-white/75 hover:text-[hsl(42,70%,62%)] transition-colors duration-300";
 
 const NavItemLink = ({
   link,
@@ -48,7 +52,7 @@ const NavItemLink = ({
       <Link
         href={link.href}
         onClick={onClick}
-        className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300"
+        className={navLinkClass}
       >
         {link.label}
       </Link>
@@ -60,7 +64,7 @@ const NavItemLink = ({
       <a
         href={link.href}
         onClick={onClick}
-        className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300"
+        className={navLinkClass}
       >
         {link.label}
       </a>
@@ -71,7 +75,7 @@ const NavItemLink = ({
     <Link
       href={`/${link.href}`}
       onClick={onClick}
-      className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300"
+      className={navLinkClass}
     >
       {link.label}
     </Link>
@@ -100,7 +104,7 @@ const DesktopDropdown = ({ link }: { link: DropdownLink }) => {
     >
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300"
+        className="flex items-center gap-1 text-sm font-body font-medium text-white/75 hover:text-[hsl(42,70%,62%)] transition-colors duration-300"
       >
         {link.label}
         <ChevronDown
@@ -115,14 +119,14 @@ const DesktopDropdown = ({ link }: { link: DropdownLink }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 bg-background/95 backdrop-blur-xl border border-border rounded-lg shadow-lg py-2 overflow-hidden"
+            className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 rounded-lg border border-white/10 bg-[hsl(270,30%,14%)]/98 py-2 shadow-lg backdrop-blur-xl overflow-hidden"
           >
             {link.children.map((child) => (
               <Link
                 key={child.href}
                 href={child.href}
                 onClick={() => setOpen(false)}
-                className="block px-4 py-2.5 text-sm font-body text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors duration-200"
+                className="block px-4 py-2.5 text-sm font-body text-white/75 hover:text-[hsl(42,70%,62%)] hover:bg-white/5 transition-colors duration-200"
               >
                 {child.label}
               </Link>
@@ -147,7 +151,7 @@ const MobileDropdown = ({
     <div className="flex flex-col items-center">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 text-sm font-body font-medium text-muted-foreground hover:text-primary transition-colors duration-300"
+        className="flex items-center gap-1 text-sm font-body font-medium text-white/75 hover:text-[hsl(42,70%,62%)] transition-colors duration-300"
       >
         {link.label}
         <ChevronDown
@@ -168,7 +172,7 @@ const MobileDropdown = ({
                 key={child.href}
                 href={child.href}
                 onClick={onNavigate}
-                className="text-sm font-body text-muted-foreground hover:text-primary transition-colors duration-200"
+                className="text-sm font-body text-white/75 hover:text-[hsl(42,70%,62%)] transition-colors duration-200"
               >
                 {child.label}
               </Link>
@@ -180,33 +184,39 @@ const MobileDropdown = ({
   );
 };
 
+const BrandMarkContent = () => (
+  <>
+    <Image
+      src={logos.imago}
+      alt=""
+      aria-hidden
+      width={40}
+      height={40}
+      className="h-9 w-9 object-contain"
+      priority
+    />
+    <span className="font-display text-lg font-bold leading-none tracking-tight sm:text-xl">
+      <span className="text-gradient-gold">Eveline</span>{" "}
+      <span className="text-white">Dublán</span>
+    </span>
+  </>
+);
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = usePathname();
   const isHome = location === "/";
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border">
-      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[hsl(270,30%,12%)]/90 backdrop-blur-xl">
+      <div className="container mx-auto px-6 py-3 flex items-center justify-between">
         {isHome ? (
-          <a href="#inicio" className="flex items-center gap-3">
-            <Image
-              src="/assets/logos/eveline-logo.png"
-              alt="Eveline Dublán"
-              className="h-10 w-auto object-contain"
-              width={160}
-              height={40}
-            />
+          <a href="#inicio" className="flex shrink-0 items-center gap-3">
+            <BrandMarkContent />
           </a>
         ) : (
-          <Link href="/#inicio" className="flex items-center gap-3">
-            <Image
-              src="/assets/logos/eveline-logo.png"
-              alt="Eveline Dublán"
-              className="h-10 w-auto object-contain"
-              width={160}
-              height={40}
-            />
+          <Link href="/#inicio" className="flex shrink-0 items-center gap-3">
+            <BrandMarkContent />
           </Link>
         )}
 
@@ -224,7 +234,7 @@ const Navbar = () => {
 
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-foreground"
+          className="md:hidden text-white"
         >
           {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -236,7 +246,7 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border"
+            className="md:hidden border-b border-white/10 bg-[hsl(270,30%,12%)]/98 backdrop-blur-xl"
           >
             <ul className="flex flex-col items-center py-6 gap-4">
               {navLinks.map((link) => (

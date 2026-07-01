@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import TwinkleStars from "@/components/TwinkleStars";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -28,9 +29,7 @@ const CuencosTibetanos = () => {
           <motion.div animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }} className="absolute top-32 left-[35%]" />
           <motion.div animate={{ x: [-15, 15, -15] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} className="absolute bottom-28 right-[10%]" />
           <motion.div animate={{ rotate: [45, 225, 45], scale: [1, 1.1, 1] }} transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }} className="absolute bottom-20 left-[40%] w-10 h-10 border-2" style={{ borderColor: "hsla(42, 70%, 62%, 0.2)", transform: "rotate(45deg)" }} />
-          {[...Array(12)].map((_, i) => (
-            <div key={i} className="absolute w-1 h-1 rounded-full bg-gold-light animate-twinkle" style={{ top: `${10 + Math.random() * 80}%`, left: `${Math.random() * 100}%`, animationDelay: `${Math.random() * 5}s`, animationDuration: `${2 + Math.random() * 3}s` }} />
-          ))}
+          <TwinkleStars count={12} topMin={10} topRange={80} />
         </div>
         <div className="container mx-auto px-6 relative z-10 text-center">
           <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>

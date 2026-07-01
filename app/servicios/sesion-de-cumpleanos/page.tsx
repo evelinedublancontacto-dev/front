@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import MotionStars from "@/components/MotionStars";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -32,9 +33,7 @@ const SesionCumpleanos = () => {
           <motion.div animate={{ rotate: [0, -360] }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} className="absolute bottom-28 right-[25%]">
             <Star className="w-5 h-5 text-accent/20" />
           </motion.div>
-          {[...Array(8)].map((_, i) => (
-            <motion.div key={i} className="absolute w-1 h-1 bg-white/30 rounded-full" style={{ top: `${15 + Math.random() * 70}%`, left: `${5 + Math.random() * 90}%` }} animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }} transition={{ duration: 2 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 2 }} />
-          ))}
+          <MotionStars count={8} />
         </div>
         <div className="container mx-auto px-6 relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-6">

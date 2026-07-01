@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import MotionStars from "@/components/MotionStars";
+import { logos } from "@/lib/brand";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -38,9 +40,7 @@ const LuzDeLuna = () => {
           </motion.div>
           <motion.div animate={{ y: [-10, 10, -10], scale: [1, 1.3, 1] }} transition={{ duration: 5, repeat: Infinity }} className="absolute top-32 left-[15%] w-3 h-3 bg-primary/30 rounded-full blur-sm" />
           <motion.div animate={{ scale: [1, 1.5, 1], opacity: [0.2, 0.5, 0.2] }} transition={{ duration: 4, repeat: Infinity }} className="absolute bottom-36 right-[30%] w-2 h-2 bg-accent/40 rounded-full" />
-          {[...Array(10)].map((_, i) => (
-            <motion.div key={i} className="absolute w-1 h-1 bg-white/30 rounded-full" style={{ top: `${10 + Math.random() * 75}%`, left: `${5 + Math.random() * 90}%` }} animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }} transition={{ duration: 2 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 2 }} />
-          ))}
+          <MotionStars count={10} topMin={10} topRange={75} />
         </div>
         <div className="container mx-auto px-6 relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-6">
@@ -50,7 +50,7 @@ const LuzDeLuna = () => {
           </motion.div>
           <div className="max-w-4xl mx-auto text-center">
             <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }}>
-              <Image src="/assets/logos/luz-de-luna-dorado.png" alt="Luz de Luna" className="w-48 h-auto mx-auto mb-8 drop-shadow-2xl" width={192} height={128} />
+              <Image src={logos.luzDeLuna.dorado} alt="Luz de Luna" className="w-48 h-auto mx-auto mb-8 drop-shadow-2xl" width={192} height={128} style={{ height: "auto" }} />
             </motion.div>
             <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3 }} className="font-display text-4xl md:text-6xl font-bold text-white mb-6">
               Luz de <span className="text-gradient-gold">Luna</span>

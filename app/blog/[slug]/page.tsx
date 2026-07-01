@@ -1,10 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Calendar, ArrowLeft, Sparkles, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import TwinkleStars from "@/components/TwinkleStars";
 import pb from "@/lib/pocketbase";
 import type { RecordModel } from "pocketbase";
 import Link from "next/link";
@@ -16,7 +17,8 @@ const CATEGORY_MAP: Record<string, string> = {
   "cristales-y-cuarzos": "Cristales y Cuarzos",
 };
 
-export default function BlogPost({ params }: { params: { slug: string } }) {
+export default function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
   const [post, setPost] = useState<RecordModel | null>(null);
   const [related, setRelated] = useState<RecordModel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +29,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
       setLoading(true);
       try {
         const result = await pb.collection("posts").getFullList({
-          filter: `slug = "${params.slug}" && published = true`,
+          filter: `slug = "${slug}" && published = true`,
         });
         if (result.length === 0) {
           setNotFound(true);
@@ -50,7 +52,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
       }
     };
     fetchPost();
-  }, [params.slug]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -85,11 +87,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
           )}
           <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, hsla(270,30%,12%,0.75) 0%, hsla(270,30%,12%,0.9) 100%)" }} />
         </div>
-        <div className="absolute inset-0 pointer-events-none">
-          {[...Array(10)].map((_, i) => (
-            <div key={i} className="absolute w-1 h-1 rounded-full bg-gold-light animate-twinkle" style={{ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%`, animationDelay: `${Math.random() * 5}s`, animationDuration: `${2 + Math.random() * 3}s` }} />
-          ))}
-        </div>
+        <TwinkleStars count={10} />
         <div className="relative z-10 container mx-auto px-6 max-w-3xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <Link href="/blog" className="inline-flex items-center gap-2 font-body text-sm mb-6 transition-colors" style={{ color: "hsl(42 70% 62%)" }}>

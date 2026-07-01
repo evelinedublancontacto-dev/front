@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description:
     "Eveline Dublán, Psicoterapeuta y Terapeuta Holística. Sanación energética, cuencos tibetanos, meditaciones y psicoterapia.",
   authors: [{ name: "Eveline Dublán" }],
+  icons: {
+    icon: "/assets/logos/imago-logo.png",
+  },
 };
 
 // Force dynamic rendering to prevent static serialization of AuthContext

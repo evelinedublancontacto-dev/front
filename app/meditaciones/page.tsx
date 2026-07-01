@@ -5,6 +5,7 @@ import { Play, Pause, Volume2, Headphones, Heart, Sparkles, Moon } from "lucide-
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import TwinkleStars from "@/components/TwinkleStars";
 
 interface Meditation {
   title: string;
@@ -203,9 +204,7 @@ const Meditaciones = () => {
             </svg>
           </motion.div>
           <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }} className="absolute bottom-16 right-[8%] w-28 h-28 rounded-full border-2 border-dashed" style={{ borderColor: "hsla(270, 30%, 65%, 0.2)" }} />
-          {[...Array(12)].map((_, i) => (
-            <div key={i} className="absolute w-1 h-1 rounded-full bg-gold-light animate-twinkle" style={{ top: `${10 + Math.random() * 80}%`, left: `${Math.random() * 100}%`, animationDelay: `${Math.random() * 5}s`, animationDuration: `${2 + Math.random() * 3}s` }} />
-          ))}
+          <TwinkleStars count={12} topMin={10} topRange={80} />
         </div>
         <div className="container mx-auto px-6 relative z-10 text-center">
           <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>

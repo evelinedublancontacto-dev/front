@@ -1,6 +1,8 @@
 "use client";
-import { Moon, Mail, Phone, MapPin, Instagram, Facebook } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, Facebook } from "lucide-react";
 import Image from "next/image";
+import TwinkleStars from "@/components/TwinkleStars";
+import { logos } from "@/lib/brand";
 
 const Footer = () => (
   <footer className="relative overflow-hidden">
@@ -37,21 +39,7 @@ const Footer = () => (
       />
     </div>
 
-    {/* Twinkling stars */}
-    <div className="absolute inset-0 pointer-events-none">
-      {[...Array(15)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute w-1 h-1 rounded-full bg-gold-light animate-twinkle"
-          style={{
-            top: `${20 + Math.random() * 70}%`,
-            left: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 5}s`,
-            animationDuration: `${2 + Math.random() * 3}s`,
-          }}
-        />
-      ))}
-    </div>
+    <TwinkleStars count={15} topMin={20} topRange={70} />
 
     {/* Content */}
     <div className="relative z-10 py-16 px-6">
@@ -60,11 +48,12 @@ const Footer = () => (
           {/* Brand */}
           <div>
             <Image
-              src="/assets/logos/eveline-logo.png"
+              src={logos.eveline.vertical}
               alt="Eveline Dublán"
-              width={192}
-              height={48}
-              className="h-12 w-auto object-contain mb-4"
+              width={180}
+              height={72}
+              className="h-20 w-auto object-contain mb-4"
+              style={{ width: "auto" }}
             />
             <p
               className="font-body text-sm leading-relaxed"
