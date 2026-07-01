@@ -88,28 +88,26 @@ export default function AdminCitasPage() {
         expand: "servicio",
       });
 
-      const citasConServicio = records.items.map((cita) => {
+      const citasConServicio: Cita[] = records.items.map((cita) => {
         const c = cita as Record<string, unknown>;
+        const servicioExpand = (
+          c.expand as Record<string, unknown> | undefined
+        )?.servicio as Record<string, unknown> | undefined;
+
         return {
-          id: c.id,
-          nombre: c.nombre,
-          email: c.email,
-          telefono: c.telefono || "",
-          servicio: c.servicio || "",
-          servicioNombre: (c.expand as Record<string, unknown> | undefined)
-            ?.servicio
-            ? (
-                (c.expand as Record<string, unknown>).servicio as Record<
-                  string,
-                  unknown
-                >
-              )?.titulo || "Sin servicio"
+          id: String(c.id),
+          nombre: String(c.nombre),
+          email: String(c.email),
+          telefono: String(c.telefono ?? ""),
+          servicio: String(c.servicio ?? ""),
+          servicioNombre: servicioExpand?.titulo
+            ? String(servicioExpand.titulo)
             : "Sin servicio",
-          fecha: c.fecha,
-          hora: c.hora,
-          estado: c.estado,
-          notas: c.notas || "",
-          created: c.created,
+          fecha: String(c.fecha),
+          hora: String(c.hora),
+          estado: c.estado as Cita["estado"],
+          notas: String(c.notas ?? ""),
+          created: String(c.created),
         };
       });
 

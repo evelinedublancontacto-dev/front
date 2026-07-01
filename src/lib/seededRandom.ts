@@ -42,6 +42,6 @@ export function getMotionStarTransition(index: number) {
   return {
     duration: 2 + seededRandom(base + 2) * 3,
     delay: seededRandom(base + 3) * 2,
-    repeat: Infinity as const,
+    repeat: Infinity,
   };
 }
