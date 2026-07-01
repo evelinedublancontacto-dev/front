@@ -1,3 +1,4 @@
+"use client";
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import pb from '@/lib/pocketbase';
 import type { RecordModel } from 'pocketbase';
@@ -17,7 +18,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Escuchar cambios en la autenticación
     const unsubscribe = pb.authStore.onChange((_token, record) => {
       setUser(record);
     });

@@ -1,13 +1,29 @@
+"use client";
 import { motion } from "framer-motion";
-import heroBg from "@/assets/hero-bg.jpg";
+import Image from "next/image";
 
 const HeroSection = () => {
   return (
-    <section id="inicio" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section
+      id="inicio"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+    >
       {/* Background image - hero keeps dark/mystical */}
       <div className="absolute inset-0">
-        <img src={heroBg} alt="Fondo celestial místico" width={1920} height={1080} className="w-full h-full object-cover" />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, hsla(270,30%,12%,0.55) 0%, hsla(270,30%,12%,0.7) 100%)" }} />
+        <Image
+          src="/assets/hero-bg.jpg"
+          alt="Fondo celestial místico"
+          width={1920}
+          height={1080}
+          className="w-full h-full object-cover"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, hsla(270,30%,12%,0.55) 0%, hsla(270,30%,12%,0.7) 100%)",
+          }}
+        />
       </div>
 
       {/* Stars */}
@@ -48,6 +64,21 @@ const HeroSection = () => {
           <span style={{ color: "hsl(0 0% 100%)" }}>Dublán</span>
         </motion.h1>
 
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="flex justify-center mb-8"
+        >
+          <Image
+            src="/assets/logos/imago-logo.png"
+            alt="Imago"
+            width={200}
+            height={64}
+            className="h-16 w-auto object-contain"
+          />
+        </motion.div>
+
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -55,8 +86,8 @@ const HeroSection = () => {
           className="font-body text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
           style={{ color: "hsl(270 30% 85%)" }}
         >
-          Sanación y Florecimiento para Humanos y Animales. 
-          Descubre el camino hacia tu equilibrio interior.
+          Sanación y Florecimiento para Humanos y Animales. Descubre el camino
+          hacia tu equilibrio interior.
         </motion.p>
 
         <motion.div
@@ -74,7 +105,10 @@ const HeroSection = () => {
           <a
             href="#contacto"
             className="px-8 py-4 font-body font-semibold rounded-lg transition-all duration-300"
-            style={{ border: "1px solid hsla(42,70%,62%,0.5)", color: "hsl(42 70% 62%)" }}
+            style={{
+              border: "1px solid hsla(42,70%,62%,0.5)",
+              color: "hsl(42 70% 62%)",
+            }}
           >
             Contacto
           </a>
@@ -83,8 +117,16 @@ const HeroSection = () => {
 
       {/* Wave divider to white */}
       <div className="absolute bottom-0 left-0 right-0">
-        <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-          <path d="M0 60C240 120 480 0 720 60C960 120 1200 0 1440 60V120H0V60Z" fill="hsl(270 20% 98%)" />
+        <svg
+          viewBox="0 0 1440 120"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full"
+        >
+          <path
+            d="M0 60C240 120 480 0 720 60C960 120 1200 0 1440 60V120H0V60Z"
+            fill="hsl(270 20% 98%)"
+          />
         </svg>
       </div>
     </section>
