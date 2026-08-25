@@ -7,8 +7,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TwinkleStars from "@/components/TwinkleStars";
 import pb from "@/lib/pocketbase";
-import type { RecordModel } from "pocketbase";
 import Link from "next/link";
+import {
+  findLegacyPost,
+  getLegacyRelated,
+  mergeBlogPosts,
+  toBlogPost,
+  type BlogPostRecord,
+} from "@/lib/blogPosts";
 
 const CATEGORY_MAP: Record<string, string> = {
   psicoterapia: "Psicoterapia",
@@ -19,31 +25,55 @@ const CATEGORY_MAP: Record<string, string> = {
 
 export default function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-  const [post, setPost] = useState<RecordModel | null>(null);
-  const [related, setRelated] = useState<RecordModel[]>([]);
+  const [post, setPost] = useState<BlogPostRecord | null>(null);
+  const [related, setRelated] = useState<BlogPostRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
       setLoading(true);
+      setNotFound(false);
       try {
-        const result = await pb.collection("posts").getFullList({
-          filter: `slug = "${slug}" && published = true`,
-        });
-        if (result.length === 0) {
+        let found: BlogPostRecord | null = null;
+        try {
+          const result = await pb.collection("posts").getFullList({
+            filter: `slug = "${slug}" && published = true`,
+          });
+          if (result.length > 0) {
+            found = toBlogPost(result[0] as unknown as Record<string, unknown>);
+          }
+        } catch {
+          /* PocketBase unavailable — fall back to migration seed */
+        }
+
+        if (!found) {
+          found = findLegacyPost(slug) ?? null;
+        }
+
+        if (!found) {
           setNotFound(true);
           return;
         }
-        const found = result[0];
+
         setPost(found);
+
         try {
-          const relatedResult = await pb.collection("posts").getFullList({
-            filter: `category = "${found.category}" && id != "${found.id}" && published = true`,
+          const allPb = await pb.collection("posts").getFullList({
+            filter: "published = true",
             sort: "-created",
           });
-          setRelated(relatedResult.slice(0, 2));
-        } catch {}
+          const merged = mergeBlogPosts(
+            allPb as unknown as Record<string, unknown>[],
+          );
+          setRelated(
+            merged
+              .filter((p) => p.category === found!.category && p.slug !== slug)
+              .slice(0, 2),
+          );
+        } catch {
+          setRelated(getLegacyRelated(found.category, slug, 2));
+        }
       } catch (err) {
         console.error("Error fetching post:", err);
         setNotFound(true);
@@ -96,7 +126,7 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
             <span className="inline-block px-3 py-1 rounded-full text-xs font-body font-semibold mb-4" style={{ background: "hsla(275,55%,45%,0.2)", color: "hsl(270 60% 75%)" }}>{catLabel}</span>
             <h1 className="font-display text-3xl md:text-5xl font-bold mb-4" style={{ color: "hsl(0 0% 100%)" }}>{post.title}</h1>
             <div className="flex items-center gap-4 font-body text-sm" style={{ color: "hsl(270 30% 70%)" }}>
-              <span className="flex items-center gap-1"><Calendar className="w-4 h-4" />{new Date(post.created).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</span>
+              <span className="flex items-center gap-1"><Calendar className="w-4 h-4" />{new Date(post.created || post.date || Date.now()).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</span>
             </div>
           </motion.div>
         </div>

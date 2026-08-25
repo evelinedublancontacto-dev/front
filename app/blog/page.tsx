@@ -2,14 +2,16 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Calendar, ArrowRight, Sparkles, Loader2 } from "lucide-react";
-import heroBg from "/assets/hero-bg.jpg";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import pb from "@/lib/pocketbase";
 import TwinkleStars from "@/components/TwinkleStars";
-import type { RecordModel } from "pocketbase";
 import Link from "next/link";
+import {
+  mergeBlogPosts,
+  type BlogPostRecord,
+} from "@/lib/blogPosts";
 
 export const dynamic = "force-dynamic";
 
@@ -31,19 +33,23 @@ const categoryColors: Record<string, string> = {
 
 const Blog = () => {
   const [activeCategory, setActiveCategory] = useState("Todos");
-  const [posts, setPosts] = useState<RecordModel[]>([]);
+  const [posts, setPosts] = useState<BlogPostRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const result = await pb.collection("posts").getFullList({
-          sort: "-created",
-          filter: "published = true",
-        });
-        setPosts(result);
-      } catch (err) {
-        console.error("Error fetching posts:", err);
+        let pbPosts: Record<string, unknown>[] = [];
+        try {
+          const result = await pb.collection("posts").getFullList({
+            sort: "-created",
+            filter: "published = true",
+          });
+          pbPosts = result as unknown as Record<string, unknown>[];
+        } catch (err) {
+          console.error("Error fetching PocketBase posts:", err);
+        }
+        setPosts(mergeBlogPosts(pbPosts));
       } finally {
         setLoading(false);
       }
@@ -219,7 +225,9 @@ const Blog = () => {
                       <div className="flex items-center gap-4 mb-3 font-body text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3.5 h-3.5" />
-                          {new Date(post.created).toLocaleDateString("es-MX", {
+                          {new Date(
+                            post.created || post.date || Date.now(),
+                          ).toLocaleDateString("es-MX", {
                             day: "numeric",
                             month: "short",
                             year: "numeric",
