@@ -16,8 +16,8 @@ const fadeUp = {
 
 const spaces = [
   { icon: BookOpen, title: "Espacio de Lectura, Oráculos y Meditación", desc: "Libros mágicos, oráculos de distintas autoras, cojines suaves y zafus. Consulta literatura, realiza preguntas a los oráculos y canaliza el diseño de tus objetos mágicos." },
-  { icon: Gem, title: "Cuarzos", desc: "Selección de cuarzos limpios y energizados, listos para vibrar contigo de forma individual, unirse a un grupo de piedras, integrarse a tus brisas o formar parte de tu nueva Crystal Grid." },
-  { icon: Leaf, title: "Hierbas Mágicas", desc: "Conviértete en bruja o brujo verde. Hierbas y esencias herbales listas para crear resguardos energéticos, baños de limpieza, sanación, abundancia, coronas y escobas para el hogar." },
+  { icon: Gem, title: "Cuarzos", desc: "Selección de cuarzos limpios y energizados, listos para vibrar contigo de forma individual, unirse a un grupo de piedras, integrarse a tus brisas o formar parte de tu nueva Crystal Grid.", href: "/luz-de-luna/cuarzos-y-cristales" },
+  { icon: Leaf, title: "Hierbas Mágicas", desc: "Conviértete en bruja o brujo verde. Hierbas y esencias herbales listas para crear resguardos energéticos, baños de limpieza, sanación, abundancia, coronas y escobas para el hogar.", href: "/luz-de-luna/hierbas-magicas" },
   { icon: Sparkles, title: "Crystal Grids", desc: "Rejillas de madera, símbolos sagrados, cuarzos, aceites e inciensos dan vida a tu práctica para sanar, limpiar, proteger y abrir caminos." },
   { icon: Star, title: "Brisas y Pociones", desc: "La alquimia y la magia se unen para crear brisas de protección, sanación, armonización, limpieza energética, amor propio, creatividad y concentración." },
   { icon: Flame, title: "Velas", desc: "De miel, cera de miel, soya y coco. Vístelas con hierbas y miel, dibuja símbolos, báñalas en aceite, envuélvelas en hojas y corta cordones con el trabajo del fuego." },
@@ -78,21 +78,42 @@ const LuzDeLuna = () => {
               Espacios de la <span className="text-gradient-gold">Tienda</span>
             </motion.h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {spaces.map((space, i) => (
-                <motion.div key={space.title} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp} className="bg-gradient-card rounded-xl p-6 border-glow hover:scale-[1.02] transition-all duration-500">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                    <space.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="font-display text-base font-semibold text-foreground mb-2">{space.title}</h3>
-                  <p className="text-muted-foreground font-body text-sm leading-relaxed">{space.desc}</p>
-                </motion.div>
-              ))}
+              {spaces.map((space, i) => {
+                const card = (
+                  <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    custom={i}
+                    variants={fadeUp}
+                    className="bg-gradient-card rounded-xl p-6 border-glow hover:scale-[1.02] transition-all duration-500 h-full"
+                  >
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                      <space.icon className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="font-display text-base font-semibold text-foreground mb-2">{space.title}</h3>
+                    <p className="text-muted-foreground font-body text-sm leading-relaxed">{space.desc}</p>
+                  </motion.div>
+                );
+                return "href" in space && space.href ? (
+                  <Link key={space.title} href={space.href} className="block">
+                    {card}
+                  </Link>
+                ) : (
+                  <div key={space.title}>{card}</div>
+                );
+              })}
             </div>
           </div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-center mt-16">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="text-center mt-16 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/luz-de-luna/cuarzos-y-cristales">
               <Button size="lg" className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
                 <Gem className="w-5 h-5" /> Ver Guía de Cuarzos y Cristales
+              </Button>
+            </Link>
+            <Link href="/luz-de-luna/hierbas-magicas">
+              <Button size="lg" variant="outline" className="gap-2">
+                <Leaf className="w-5 h-5" /> Ver Guía de Hierbas Mágicas
               </Button>
             </Link>
           </motion.div>

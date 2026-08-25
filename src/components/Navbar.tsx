@@ -21,6 +21,10 @@ const navLinks = [
         label: "Cuarzos y Cristales",
         href: "/luz-de-luna/cuarzos-y-cristales",
       },
+      {
+        label: "Hierbas Mágicas",
+        href: "/luz-de-luna/hierbas-magicas",
+      },
     ],
   },
   { label: "Cursos", href: "/cursos" },
