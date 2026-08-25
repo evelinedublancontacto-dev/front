@@ -1,11 +1,19 @@
 "use client";
 import { useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { Play, Pause, Volume2, Headphones, Heart, Sparkles, Moon } from "lucide-react";
+import { Play, Pause, Volume2, Headphones, Heart, Sparkles, Moon, ArrowLeft, Clock, Star } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TwinkleStars from "@/components/TwinkleStars";
+
+const luzDeLunaMeditations = [
+  { title: "Meditación de Protección", duration: "15 min", level: "Todos los niveles" },
+  { title: "Conexión con tu Ser Interior", duration: "20 min", level: "Intermedio" },
+  { title: "Sanación del Corazón", duration: "25 min", level: "Todos los niveles" },
+  { title: "Limpieza Energética", duration: "18 min", level: "Principiante" },
+];
 
 interface Meditation {
   title: string;
@@ -224,18 +232,63 @@ const Meditaciones = () => {
         </div>
       </section>
       <section className="py-12">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-card border border-border rounded-2xl p-8 md:p-10 text-center">
+        <div className="container mx-auto px-6 max-w-5xl">
+          <Link href="/#servicios" className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-body text-sm mb-10 transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            Volver a servicios
+          </Link>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-card border border-border rounded-2xl p-8 md:p-10 text-center mb-16">
             <h2 className="font-display text-xl md:text-2xl font-bold text-foreground mb-4">🙏 Reciprocidad Sagrada</h2>
             <p className="text-muted-foreground font-body leading-relaxed">
               Esta sección se trabaja por <strong className="text-foreground">"Reciprocidad sagrada"</strong>, eso significa que al realizar el ejercicio te pido que continúes con el flujo de energía y ofrezcas, a la causa que elijas, una bendición. Por ejemplo: donar una hora de tu tiempo a una fundación, donar dinero a una asociación, regalar ropa, tiempo, etc. Es muy importante que este flujo de energía vaya más allá de tu círculo conocido.
             </p>
             <p className="text-muted-foreground font-body mt-4 italic">¡Disfruta los ejercicios y buen viaje al interior!</p>
           </motion.div>
-        </div>
-      </section>
-      <section className="py-12 pb-24">
-        <div className="container mx-auto px-6 max-w-5xl">
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-16"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-primary/20 flex items-center justify-center text-primary">
+                <Moon className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-primary font-body text-xs tracking-[0.2em] uppercase">Luz de Luna</p>
+                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Meditaciones Luz de Luna</h2>
+              </div>
+            </div>
+            <p className="text-muted-foreground font-body mb-8 max-w-2xl">
+              Meditaciones guiadas para nutrir tu alma y conectar con la energía universal. Pronto también podrás escuchar aquí los audios de SoundCloud.
+            </p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {luzDeLunaMeditations.map((med, i) => (
+                <motion.div
+                  key={med.title}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="flex items-center gap-4 bg-card rounded-xl p-5 border border-border"
+                >
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Play className="w-5 h-5 text-primary ml-0.5" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-display text-lg font-semibold text-foreground mb-1">{med.title}</h3>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground font-body">
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {med.duration}</span>
+                      <span className="flex items-center gap-1"><Star className="w-3 h-3" /> {med.level}</span>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
           {sections.map((section, i) => (
             <MeditationSectionBlock key={section.title} section={section} sectionIndex={i} />
           ))}
