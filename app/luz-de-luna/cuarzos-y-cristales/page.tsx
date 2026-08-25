@@ -6,31 +6,16 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
 import MotionStars from "@/components/MotionStars";
+import { crystals } from "@/data/crystals";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({ opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.15 } }),
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, delay: i * 0.08 },
+  }),
 };
-
-const crystals = [
-  { name: "Cuarzo Maestro", props: "Amplifica la energía, claridad mental, conexión con el universo, potencia la intención" },
-  { name: "Cuarzo Cristal", props: "Amplifica la energía, claridad mental, conexión con el universo, potencia la intención" },
-  { name: "Cuarzo Rosa", props: "Amor incondicional, sanación emocional, armonía en las relaciones, calma y serenidad" },
-  { name: "Cuarzo Citrino", props: "Abundancia, prosperidad, confianza en sí mismo, energía positiva" },
-  { name: "Cuarzo Amatista", props: "Protección, intuición, conexión con el subconsciente, calma y tranquilidad" },
-  { name: "Turmalina Negra", props: "Protección contra la negatividad, absorbe la energía negativa, conexión con la tierra, estabilidad emocional" },
-  { name: "Selenita", props: "Limpieza energética, conexión con la luna, intuición, claridad mental" },
-  { name: "Cuarzo Lapislázuli", props: "Sabiduría, intuición, conexión con el universo, amplifica la percepción" },
-  { name: "Ágata", props: "Estabilidad emocional, calma, protección, conexión con la tierra" },
-  { name: "Fluorita", props: "Claridad mental, conexión con el universo, absorbe la energía negativa, calma y serenidad" },
-  { name: "Ojo de Tigre", props: "Confianza en sí mismo, energía, pasión, protección y claridad mental" },
-  { name: "Obsidiana", props: "Protección, conexión con la tierra, absorbe la energía negativa, claridad mental" },
-  { name: "Acerina", props: "Calma, serenidad, conexión con la naturaleza, absorbe la energía negativa" },
-  { name: "Turquesa Roja", props: "Pasión, energía, confianza en sí mismo, conexión con el corazón y la tierra" },
-  { name: "Aventurina Azul", props: "Calma, serenidad, conexión con la naturaleza, claridad mental y protección" },
-  { name: "Aventurina Café", props: "Estabilidad emocional, calma, protección, conexión con la tierra y la naturaleza" },
-  { name: "Piedra Luna", props: "Conexión con el sagrado femenino, sanación de útero, amplificación de intuición" },
-];
 
 const CuarzosYCristales = () => {
   return (
@@ -38,53 +23,130 @@ const CuarzosYCristales = () => {
       <Navbar />
       <section className="relative pt-32 pb-24 overflow-hidden">
         <div className="absolute inset-0">
-          <Image src="/assets/hero-bg.jpg" alt="" className="w-full h-full object-cover" width={1920} height={1080} />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsla(280,45%,20%,0.92) 0%, hsla(270,30%,10%,0.88) 50%, hsla(290,50%,25%,0.90) 100%)" }} />
+          <Image
+            src="/assets/cuarzos-y-cristales-hero-bg.jpg"
+            alt=""
+            className="w-full h-full object-cover"
+            width={1920}
+            height={1080}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(135deg, hsla(280,45%,20%,0.45) 0%, hsla(270,30%,10%,0.55) 50%, hsla(290,50%,25%,0.50) 100%)",
+            }}
+          />
         </div>
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <MotionStars count={8} />
         </div>
         <div className="container mx-auto px-6 relative z-10">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-6">
-            <Link href="/luz-de-luna" className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors font-body text-sm">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-6"
+          >
+            <Link
+              href="/luz-de-luna"
+              className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors font-body text-sm"
+            >
               <ArrowLeft className="w-4 h-4" /> Volver a Luz de Luna
             </Link>
           </motion.div>
           <div className="max-w-4xl mx-auto text-center">
-            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 mb-8">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+              className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 mb-8"
+            >
               <Gem className="w-10 h-10 text-white" />
             </motion.div>
-            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3 }} className="font-display text-4xl md:text-6xl font-bold text-white mb-6">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="font-display text-4xl md:text-6xl font-bold text-white mb-6"
+            >
               Cuarzos y <span className="text-gradient-gold">Cristales</span>
             </motion.h1>
-            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="text-lg text-white/80 font-body max-w-2xl mx-auto leading-relaxed">
-              Propiedades mágicas de los cristales y cuarzos para tu práctica espiritual.
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-lg text-white/80 font-body max-w-2xl mx-auto leading-relaxed"
+            >
+              Propiedades mágicas de los cristales y cuarzos para tu práctica
+              espiritual.
             </motion.p>
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-            <path d="M0,64 C480,120 960,0 1440,64 L1440,120 L0,120 Z" fill="hsl(var(--background))" />
+          <svg
+            viewBox="0 0 1440 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full"
+          >
+            <path
+              d="M0,64 C480,120 960,0 1440,64 L1440,120 L0,120 Z"
+              fill="hsl(var(--background))"
+            />
           </svg>
         </div>
       </section>
       <section className="py-20">
         <div className="container mx-auto px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={fadeUp} className="max-w-4xl mx-auto text-center mb-12">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            variants={fadeUp}
+            className="max-w-4xl mx-auto text-center mb-12"
+          >
             <p className="text-muted-foreground font-body text-lg leading-relaxed">
-              Aquí te presento las propiedades de los cristales y cuarzos para que puedas hacer uso de su poder y conectar con ellos para realizar tus Crystal Grids, tubos canalizadores, resguardos y Spell Jars. Recuerda limpiarlos, intencionarlos y retirarlos a la tierra con agradecimiento cuando hayan cumplido con su misión.
+              Aquí te presento las propiedades de los cristales y cuarzos para
+              que puedas hacer uso de su poder y conectar con ellos para
+              realizar tus Crystal Grids, tubos canalizadores, resguardos y Spell
+              Jars. Recuerda limpiarlos, intencionarlos y retirarlos a la tierra
+              con agradecimiento cuando hayan cumplido con su misión.
             </p>
           </motion.div>
           <div className="max-w-5xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {crystals.map((crystal, i) => (
-              <motion.div key={crystal.name} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i % 6} variants={fadeUp} className="bg-gradient-card rounded-xl p-6 border-glow hover:scale-[1.02] transition-all duration-500">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Gem className="w-5 h-5 text-primary" />
-                  </div>
-                  <h3 className="font-display text-base font-semibold text-foreground">{crystal.name}</h3>
+              <motion.div
+                key={crystal.name}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                custom={i % 6}
+                variants={fadeUp}
+                className="bg-gradient-card rounded-xl p-6 border-glow hover:scale-[1.02] transition-all duration-500"
+              >
+                <div className="mb-4 overflow-hidden rounded-lg aspect-[4/3] bg-primary/10 relative">
+                  {crystal.image ? (
+                    <Image
+                      src={crystal.image}
+                      alt={crystal.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Gem className="w-10 h-10 text-primary/40" />
+                    </div>
+                  )}
                 </div>
-                <p className="text-muted-foreground font-body text-sm leading-relaxed">{crystal.props}</p>
+                <h3 className="font-display text-base font-semibold text-foreground mb-2">
+                  {crystal.name}
+                </h3>
+                <p className="text-muted-foreground font-body text-sm leading-relaxed">
+                  {crystal.props}
+                </p>
               </motion.div>
             ))}
           </div>
