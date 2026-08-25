@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { Music, Video, Clock, CalendarCheck, DollarSign, ArrowLeft, Phone, Sparkles } from "lucide-react";
+import { Music, MapPin, Clock, CalendarCheck, DollarSign, ArrowLeft, Phone, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
@@ -70,7 +70,7 @@ const CuencosTibetanos = () => {
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid md:grid-cols-2 gap-6 mb-12">
             {[
-              { icon: Video, title: "Modalidad", desc: "Video llamada o presencial" },
+              { icon: MapPin, title: "Modalidad", desc: "Presencial (únicamente viernes)" },
               { icon: Clock, title: "Duración", desc: "45-60 minutos por sesión" },
               { icon: Sparkles, title: "Beneficios", desc: "Reducción de estrés, mejor sueño, equilibrio energético" },
               { icon: CalendarCheck, title: "¿Quién puede tomarla?", desc: "Cualquier persona, no se requiere experiencia previa" },

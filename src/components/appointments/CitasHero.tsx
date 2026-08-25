@@ -94,10 +94,12 @@ const CitasHero = () => {
           className="font-body text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-8"
           style={{ color: "hsla(0, 0%, 100%, 0.78)" }}
         >
-          Selecciona el servicio, fecha y hora que mejor se adapte a ti.{" "}
+          Selecciona el servicio, fecha y hora que mejor se adapte a ti. Todos
+          los horarios están en{" "}
           <span className="text-gold font-medium">
-            Estamos aquí para acompañarte en tu camino de sanación.
+            hora del centro de México (CDMX)
           </span>
+          , porque acompañamos pacientes en distintos países.
         </motion.p>
 
         <motion.div

@@ -48,7 +48,9 @@ export default function AppointmentCalendar() {
     fetchServicios();
   }, []);
 
-  // Cargar disponibilidad cuando cambia la fecha
+  const isCuencos = servicioId === 'cuencos-tibetanos';
+
+  // Cargar disponibilidad cuando cambia la fecha o el servicio
   useEffect(() => {
     if (!selectedDate) {
       setSlots([]);
@@ -60,7 +62,11 @@ export default function AppointmentCalendar() {
       setSelectedSlot(null);
       try {
         const fechaStr = format(selectedDate, 'yyyy-MM-dd');
-        const response = await fetch(`/api/disponibilidad?fecha=${fechaStr}`);
+        const params = new URLSearchParams({
+          fecha: fechaStr,
+          ...(servicioId ? { servicioId } : {}),
+        });
+        const response = await fetch(`/api/disponibilidad?${params}`);
         const data = await response.json();
         setSlots(data.slots || []);
       } catch (error) {
@@ -72,7 +78,15 @@ export default function AppointmentCalendar() {
     };
 
     fetchDisponibilidad();
-  }, [selectedDate]);
+  }, [selectedDate, servicioId]);
+
+  // Si cambian a cuencos y la fecha no es viernes, resetear
+  useEffect(() => {
+    if (isCuencos && selectedDate && selectedDate.getDay() !== 5) {
+      setSelectedDate(undefined);
+      setSelectedSlot(null);
+    }
+  }, [isCuencos, selectedDate]);
 
   const handleDateSelect = useCallback((date: Date | undefined) => {
     setSelectedDate(date);
@@ -211,12 +225,18 @@ export default function AppointmentCalendar() {
               </h2>
               <p className="text-gray-500 mt-1">
                 {step === 'servicio' && 'Elige el tipo de sesión que necesitas'}
-                {step === 'fecha' && 'Selecciona el día que prefieras'}
+                {step === 'fecha' &&
+                  (isCuencos
+                    ? 'Los cuencos tibetanos solo se agendan los viernes'
+                    : 'Selecciona el día que prefieras')}
                 {step === 'hora' && 'Elige el horario disponible'}
                 {step === 'confirmacion' &&
                   (bookingSuccess
                     ? 'Tu cita ha sido reservada exitosamente'
                     : 'Completa tus datos para reservar')}
+              </p>
+              <p className="text-xs text-primary mt-2 font-medium">
+                Horarios en hora del centro de México (CDMX)
               </p>
             </div>
           </div>
@@ -277,6 +297,12 @@ export default function AppointmentCalendar() {
                 selectedDate={selectedDate}
                 onSelectDate={handleDateSelect}
                 className="max-w-md"
+                onlyWeekday={isCuencos ? 5 : undefined}
+                helperText={
+                  isCuencos
+                    ? 'Disponible únicamente los viernes · Hora del centro de México (CDMX)'
+                    : 'Horarios en hora del centro de México (CDMX)'
+                }
               />
             </div>
           )}
@@ -284,7 +310,7 @@ export default function AppointmentCalendar() {
           {/* Step: Hora */}
           {step === 'hora' && (
             <div>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-500 mb-1">
                 Horarios para el{' '}
                 <span className="font-medium text-primary">
                   {selectedDate
@@ -295,6 +321,9 @@ export default function AppointmentCalendar() {
                       })
                     : ''}
                 </span>
+              </p>
+              <p className="text-xs text-primary mb-4 font-medium">
+                Hora del centro de México (CDMX)
               </p>
               <TimeSlotPicker
                 slots={slots}

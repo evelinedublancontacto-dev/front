@@ -39,6 +39,17 @@ export async function GET(request: NextRequest) {
     const date = new Date(fecha + "T00:00:00");
     const diaSemana = date.getDay();
 
+    // Cuencos tibetanos: solo viernes (presencial en el espacio)
+    if (servicioId === "cuencos-tibetanos" && diaSemana !== 5) {
+      return NextResponse.json({
+        slots: [],
+        disponible: false,
+        fecha,
+        mensaje:
+          "Los cuencos tibetanos solo se agendan los viernes (hora del centro de México).",
+      });
+    }
+
     // Intentar obtener horarios configurados, si no usar los por defecto
     let horarios = HORARIOS_POR_DEFECTO.filter((h) => h.dia === diaSemana);
 

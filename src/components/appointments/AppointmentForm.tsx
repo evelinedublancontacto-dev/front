@@ -123,7 +123,12 @@ export default function AppointmentForm({
           </div>
           <div>
             <span className="text-gray-500">Hora:</span>
-            <p className="font-medium text-gray-900">{hora}</p>
+            <p className="font-medium text-gray-900">
+              {hora}{" "}
+              <span className="text-xs font-normal text-gray-500">
+                (centro de México)
+              </span>
+            </p>
           </div>
           {servicioSeleccionado && (
             <>

@@ -2,7 +2,7 @@
 
 import { DayPicker } from "react-day-picker";
 import { es } from "date-fns/locale";
-import { isBefore, startOfToday } from "date-fns";
+import { startOfToday } from "date-fns";
 import { ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +11,9 @@ interface CalendarProps {
   onSelectDate: (date: Date | undefined) => void;
   markedDates?: Date[];
   className?: string;
+  /** When set, only that weekday is selectable (0=Sun … 5=Fri) */
+  onlyWeekday?: number;
+  helperText?: string;
 }
 
 export default function Calendar({
@@ -18,9 +21,17 @@ export default function Calendar({
   onSelectDate,
   markedDates = [],
   className,
+  onlyWeekday,
+  helperText,
 }: CalendarProps) {
   const today = startOfToday();
-  const disabledDays = { before: today };
+  const disabledDays =
+    onlyWeekday === undefined
+      ? { before: today }
+      : [
+          { before: today },
+          (date: Date) => date.getDay() !== onlyWeekday,
+        ];
 
   return (
     <div
@@ -35,6 +46,10 @@ export default function Calendar({
           Selecciona una fecha
         </h2>
       </div>
+
+      {helperText && (
+        <p className="text-sm text-gray-500 mb-3">{helperText}</p>
+      )}
 
       <DayPicker
         mode="single"
