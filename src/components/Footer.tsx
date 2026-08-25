@@ -86,7 +86,7 @@ const Footer = () => (
               </li>
               <li>
                 <a
-                  href="#servicios"
+                  href="/servicios/sanacion-energetica"
                   className="hover:text-gold-light transition-colors"
                 >
                   Sanación Energética
@@ -94,7 +94,7 @@ const Footer = () => (
               </li>
               <li>
                 <a
-                  href="#servicios"
+                  href="/servicios/cuencos-tibetanos"
                   className="hover:text-gold-light transition-colors"
                 >
                   Cuencos Tibetanos
@@ -102,7 +102,7 @@ const Footer = () => (
               </li>
               <li>
                 <a
-                  href="#servicios"
+                  href="/meditaciones"
                   className="hover:text-gold-light transition-colors"
                 >
                   Meditaciones
@@ -110,7 +110,15 @@ const Footer = () => (
               </li>
               <li>
                 <a
-                  href="#servicios"
+                  href="/servicios/sanacion-con-velas"
+                  className="hover:text-gold-light transition-colors"
+                >
+                  Sanación con Velas
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/servicios/sanacion-para-animales"
                   className="hover:text-gold-light transition-colors"
                 >
                   Sanación para Animales

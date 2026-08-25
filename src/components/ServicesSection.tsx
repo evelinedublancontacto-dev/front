@@ -1,7 +1,7 @@
 "use client";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Brain, Heart, Music, Sparkles, Gift, PawPrint } from "lucide-react";
+import { Brain, Heart, Music, Sparkles, Gift, PawPrint, Flame } from "lucide-react";
 import Link from "next/link";
 
 const services = [
@@ -32,6 +32,13 @@ const services = [
     description:
       "Meditaciones guiadas para conectar con tu esencia y encontrar paz interior.",
     href: "/meditaciones",
+  },
+  {
+    icon: Flame,
+    title: "Sanación con Velas",
+    description:
+      "Rituales de fuego a distancia para transmutar lo denso y acompañar tu proceso de sanación.",
+    href: "/servicios/sanacion-con-velas",
   },
   {
     icon: Gift,
