@@ -117,7 +117,7 @@ const SanacionEnergetica = () => {
             className="font-body text-lg md:text-xl max-w-2xl mx-auto"
             style={{ color: "hsl(270 30% 85%)" }}
           >
-            Reiki · Flores de Bach · Ángeles · Oráculos · Chamanismo y Magia
+            Ángeles · Oráculos · Chamanismo y Magia
           </motion.p>
         </div>
 
@@ -150,7 +150,7 @@ const SanacionEnergetica = () => {
               En este servicio encontrarás un conjunto de técnicas de <strong className="text-primary">sanación energética</strong>, todas ellas luminosas, que te permitirán sanar profundamente.
             </motion.p>
             <motion.p variants={fadeUp} custom={1} className="font-body text-muted-foreground leading-relaxed">
-              De forma particular, trabajo con <strong className="text-foreground">Reiki</strong>, <strong className="text-foreground">Flores de Bach</strong>, <strong className="text-foreground">Ángeles</strong>, <strong className="text-foreground">Oráculos</strong>, <strong className="text-foreground">Técnicas de Chamanismo</strong> y <strong className="text-foreground">Magia</strong>.
+              De forma particular, trabajo con <strong className="text-foreground">Ángeles</strong>, <strong className="text-foreground">Oráculos</strong>, <strong className="text-foreground">Técnicas de Chamanismo</strong> y <strong className="text-foreground">Magia</strong>.
             </motion.p>
           </motion.div>
 
