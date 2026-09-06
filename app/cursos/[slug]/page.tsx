@@ -489,7 +489,13 @@ export default function CursoDetalle({
                       className="w-full gap-2.5 font-body font-semibold text-white text-sm shadow-md transition-all duration-300 hover:scale-[1.02] hover:brightness-110"
                       style={{ backgroundColor: "#25D366" }}
                     >
-                      <MessageCircle className="w-5 h-5" />
+                      <Image
+                        src="/assets/icons/whatsapp.png"
+                        alt="WhatsApp"
+                        width={20}
+                        height={20}
+                        className="w-5 h-5 object-contain"
+                      />
                       Inscribirme por WhatsApp
                     </Button>
                   </a>

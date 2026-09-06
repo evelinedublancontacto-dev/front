@@ -329,7 +329,13 @@ export default function SobreMiContent() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full border border-gold/40 text-foreground font-body font-medium transition-all duration-300 hover:bg-gold/10 hover:border-gold"
                 >
-                  <MessageCircle className="w-4 h-4 text-gold" />
+                  <Image
+                    src="/assets/icons/whatsapp.png"
+                    alt="WhatsApp"
+                    width={18}
+                    height={18}
+                    className="w-4.5 h-4.5 object-contain"
+                  />
                   <span>Escríbeme por WhatsApp</span>
                 </a>
               </div>

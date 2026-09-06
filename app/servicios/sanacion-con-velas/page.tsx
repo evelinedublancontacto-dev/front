@@ -423,8 +423,15 @@ const SanacionConVelas = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="font-body text-base px-10 py-6 rounded-full"
+                className="font-body text-base px-10 py-6 rounded-full flex items-center gap-2"
               >
+                <Image
+                  src="/assets/icons/whatsapp.png"
+                  alt="WhatsApp"
+                  width={20}
+                  height={20}
+                  className="w-5 h-5 object-contain"
+                />
                 WhatsApp
               </Button>
             </a>

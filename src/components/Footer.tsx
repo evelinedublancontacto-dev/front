@@ -3,6 +3,7 @@ import { Mail, Phone, MapPin, Instagram, Facebook } from "lucide-react";
 import Image from "next/image";
 import TwinkleStars from "@/components/TwinkleStars";
 import { logos } from "@/lib/brand";
+import { contact } from "@/lib/contact";
 
 const Footer = () => (
   <footer className="relative overflow-hidden">
@@ -147,11 +148,21 @@ const Footer = () => (
                 <span>contacto@evelinedublan.com</span>
               </li>
               <li className="flex items-center gap-2">
-                <Phone
-                  className="w-4 h-4"
-                  style={{ color: "hsl(42 70% 62%)" }}
-                />
-                <span>WhatsApp disponible</span>
+                <a
+                  href={contact.whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                >
+                  <Image
+                    src="/assets/icons/whatsapp.png"
+                    alt="WhatsApp"
+                    width={16}
+                    height={16}
+                    className="w-4 h-4 object-contain"
+                  />
+                  <span>WhatsApp disponible</span>
+                </a>
               </li>
               <li className="flex items-center gap-2">
                 <MapPin

@@ -4,7 +4,7 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { MessageCircle, CalendarDays } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import { contact } from "@/lib/contact";
 
 const whatsappCTAUrl = `${contact.whatsappUrl}?text=${encodeURIComponent(
@@ -49,7 +49,13 @@ const ContactSection = () => {
               className="inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg font-body font-semibold text-white text-sm transition-all duration-300 shadow-md hover:scale-[1.03] hover:brightness-110"
               style={{ backgroundColor: "#25D366" }}
             >
-              <MessageCircle className="w-4 h-4" />
+              <Image
+                src="/assets/icons/whatsapp.png"
+                alt="WhatsApp"
+                width={20}
+                height={20}
+                className="w-5 h-5 object-contain"
+              />
               Escribir por WhatsApp
             </a>
 

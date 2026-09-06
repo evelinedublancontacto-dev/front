@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   Phone,
@@ -94,7 +95,17 @@ const ContactPageContent = () => {
                 const content = (
                   <div className="flex items-start gap-4 p-5 rounded-xl bg-gradient-card border border-border hover:border-primary/30 transition-colors">
                     <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <item.icon className="w-5 h-5 text-primary" />
+                      {item.label === "WhatsApp" ? (
+                        <Image
+                          src="/assets/icons/whatsapp.png"
+                          alt="WhatsApp"
+                          width={24}
+                          height={24}
+                          className="w-6 h-6 object-contain"
+                        />
+                      ) : (
+                        <item.icon className="w-5 h-5 text-primary" />
+                      )}
                     </div>
                     <div>
                       <h3 className="font-display font-semibold text-foreground">
@@ -216,9 +227,16 @@ const ContactPageContent = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full px-8 py-4 bg-primary hover:bg-purple-glow text-primary-foreground font-body font-semibold rounded-lg transition-all duration-300 shadow-mystical hover:scale-[1.02]"
+                  className="w-full px-8 py-4 bg-primary hover:bg-purple-glow text-primary-foreground font-body font-semibold rounded-lg transition-all duration-300 shadow-mystical hover:scale-[1.02] flex items-center justify-center gap-2"
                 >
-                  Enviar por WhatsApp
+                  <Image
+                    src="/assets/icons/whatsapp.png"
+                    alt="WhatsApp"
+                    width={20}
+                    height={20}
+                    className="w-5 h-5 object-contain"
+                  />
+                  <span>Enviar por WhatsApp</span>
                 </button>
               </form>
             </div>
