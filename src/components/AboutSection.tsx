@@ -2,6 +2,8 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { seededRandom } from "@/lib/seededRandom";
 
 const SparkleStar = ({ className }: { className?: string }) => (
@@ -222,15 +224,12 @@ const AboutSection = () => {
               Sobre <span className="text-gradient-gold">Mí</span>
             </h2>
 
-            <div className="relative z-10 space-y-4 text-muted-foreground font-body leading-relaxed text-base md:text-[1.025rem] mb-6">
-              <p>
-                Soy Eveline Dublán, psicóloga (egresada de la UAEH), tanatóloga (AMTAC) y con formación en psicoterapia Ericksoniana (CEM). A la par, me he formado durante muchísimo tiempo como terapeuta holística y sanadora, tanto en técnicas para humanos como para animales. Tengo veinte años de experiencia acompañando a los seres sintientes en sus caminos de sanación y en la exploración de sus historias, ayudándoles a generar claridad en lo que piensan y sienten, y creando nuevos órdenes internos que les permitan formar una realidad más sana y consciente de sí mismos y de sus vidas.
+            <div className="relative z-10 space-y-4 text-muted-foreground font-body leading-relaxed text-base sm:text-lg mb-6">
+              <p className="font-display text-xl sm:text-2xl text-foreground font-medium italic leading-relaxed">
+                &ldquo;Acompaño a los seres sintientes en sus caminos de sanación, tejiendo puentes de claridad, respeto y equilibrio.&rdquo;
               </p>
               <p>
-                Mi consultorio, tanto presencial como en línea, es un espacio donde se imparte terapia con perspectiva de género, perspectiva de clase, antigordofobia, no especista y de inclusión a la comunidad LGBTTTIQ+. Me especializo en terapias individuales, así como en talleres de desarrollo personal y temas espirituales. Fui pionera en México en el trabajo con duelo por pérdida de un compañero animal, así como en el acta de voluntad anticipada sobre enfermedad y muerte, y en el primer podcast donde se incluían mensajes intuitivos de animales.
-              </p>
-              <p className="text-foreground/90 font-medium italic border-l-2 border-gold/60 pl-4 py-1">
-                &ldquo;Mi misión es ofrecerte un espacio seguro, compasivo y libre de juicio donde puedas reencontrar tu equilibrio y caminar hacia una vida más plena. Sea este un lugar dedicado a tejer puentes de sanación, claridad y respeto para todos los seres sintientes.&rdquo;
+                Soy Eveline Dublán, psicóloga (egresada de la UAEH), tanatóloga (AMTAC) y terapeuta holística de humanos y animales con veinte años de experiencia. Ofrezco un espacio seguro, compasivo y con perspectiva de inclusión donde reencontrar tu equilibrio y caminar hacia una vida más plena y consciente.
               </p>
             </div>
 
@@ -239,12 +238,21 @@ const AboutSection = () => {
             </p>
 
             <div className="relative z-10 flex flex-col items-center md:items-start gap-6">
-              <a
-                href="#contacto"
-                className="inline-flex items-center justify-center px-10 py-3.5 bg-primary text-primary-foreground font-body font-medium rounded-full transition-all duration-300 hover:bg-purple-glow hover:scale-105 shadow-mystical"
-              >
-                Conóceme
-              </a>
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                <Link
+                  href="/sobre-mi"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground font-body font-medium rounded-full transition-all duration-300 hover:bg-purple-glow hover:scale-105 shadow-mystical group"
+                >
+                  <span>Conoce mi historia completa</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+                <a
+                  href="#contacto"
+                  className="inline-flex items-center justify-center px-7 py-3.5 rounded-full border border-primary/30 text-foreground font-body font-medium transition-all duration-300 hover:bg-primary/10 hover:border-primary/60"
+                >
+                  Contáctame
+                </a>
+              </div>
               <div className="relative w-48 h-10">
                 <AnimatedCelestialField
                   decorations={[
