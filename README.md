@@ -23,6 +23,8 @@ devuelve el back. Endpoints usados:
     auth      POST /v1/auth/entrar · POST /v1/auth/salir · GET /v1/auth/yo
     admin     /v1/admin/citas · /servicios · /clientes · /posts
 
-`proxy.ts` protege `/admin` en el servidor consultando `/v1/auth/yo` con
-la cookie. En producción el back debe emitir la cookie con `COOKIE_DOMINIO`
-igual al dominio padre para que llegue al front.
+`proxy.ts` puede proteger `/admin` en el servidor consultando `/v1/auth/yo`
+con la cookie, pero solo cuando front y back comparten dominio y el back
+emite la cookie con `COOKIE_DOMINIO`; se activa con `ADMIN_GUARD_SERVIDOR=si`.
+En dominios distintos queda apagado y la protección la hace el back: toda
+llamada sin sesión responde 401 y la página manda a `/login`.
