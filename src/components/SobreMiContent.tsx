@@ -17,6 +17,7 @@ import {
   Award,
   Compass,
   Moon,
+  Quote,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -296,15 +297,19 @@ export default function SobreMiContent() {
               </div>
 
               {/* Mission Statement Card */}
-              <div className="relative p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-primary/15 via-purple-950/20 to-gold/10 border-2 border-gold/40 shadow-xl">
+              <div className="relative p-6 sm:p-8 rounded-2xl bg-card border-l-4 border-l-gold border-y border-r border-border/80 shadow-sm overflow-hidden">
+                <Quote
+                  className="absolute top-4 right-5 w-12 h-12 text-primary/10 pointer-events-none"
+                  aria-hidden
+                />
                 <div className="flex items-center gap-2 text-gold font-body text-xs uppercase tracking-[0.2em] font-semibold mb-3">
                   <Heart className="w-4 h-4 text-gold fill-gold/20" />
                   <span>Mi Misión</span>
                 </div>
-                <blockquote className="font-display text-lg sm:text-xl md:text-2xl italic text-foreground font-medium leading-relaxed mb-4">
+                <blockquote className="font-display text-lg sm:text-xl md:text-2xl italic text-foreground font-medium leading-relaxed mb-4 relative z-10">
                   &ldquo;Mi misión es ofrecerte un espacio seguro, compasivo y libre de juicio donde puedas reencontrar tu equilibrio y caminar hacia una vida más plena. Sea este un lugar dedicado a tejer puentes de sanación, claridad y respeto para todos los seres sintientes.&rdquo;
                 </blockquote>
-                <p className="font-display text-sm tracking-wider uppercase text-gold font-semibold text-right">
+                <p className="font-display text-sm tracking-wider uppercase text-gold font-semibold text-right relative z-10">
                   &mdash; Eveline Dublán
                 </p>
               </div>
