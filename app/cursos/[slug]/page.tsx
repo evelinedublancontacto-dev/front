@@ -405,7 +405,7 @@ export default function CursoDetalle({
                     árbol genealógico, lectura de oráculos y armonización con cuencos sagrados.
                   </p>
                   <Link
-                    href="/#sobre-mi"
+                    href="/sobre-mi"
                     className="inline-flex items-center gap-1.5 text-primary text-xs font-semibold font-body hover:underline"
                   >
                     Conoce más sobre su trayectoria <ChevronRight className="w-3.5 h-3.5" />
