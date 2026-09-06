@@ -175,7 +175,7 @@ const AboutSection = () => {
       <div className="container mx-auto px-6 relative">
         <div
           ref={ref}
-          className="grid md:grid-cols-2 gap-12 md:gap-16 items-center max-w-5xl mx-auto"
+          className="grid md:grid-cols-2 gap-12 md:gap-16 items-center max-w-6xl mx-auto"
         >
           <motion.div
             initial={{ opacity: 0, x: -40 }}
@@ -209,22 +209,35 @@ const AboutSection = () => {
             initial={{ opacity: 0, x: 40 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-center md:text-left relative min-h-[320px] py-4"
+            className="text-left relative min-h-[320px] py-4"
           >
             <AnimatedCelestialField decorations={allTextDecor} />
 
-            <p className="relative z-10 font-body text-lg md:text-xl italic text-foreground/90 leading-relaxed mb-6">
-              &ldquo;Soy Psicoterapeuta y Terapeuta Holística de Humanos y
-              Animales.&rdquo;
-            </p>
-            <p className="relative z-10 font-body text-muted-foreground leading-relaxed mb-8">
-              Quiero acompañarte en tu proceso de sanación y florecimiento, para
-              que encuentres el equilibrio entre cuerpo, mente y espíritu y
-              descubras la luz que llevas dentro.
-            </p>
-            <p className="relative z-10 font-display text-foreground font-medium tracking-wide mb-10">
+            <div className="relative z-10 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-body text-xs font-semibold uppercase tracking-[0.2em] mb-4">
+              <SparkleStar className="w-3.5 h-3.5 text-gold" />
+              <span>Quién Soy</span>
+            </div>
+
+            <h2 className="relative z-10 font-display text-3xl sm:text-4xl font-bold text-foreground mb-6">
+              Sobre <span className="text-gradient-gold">Mí</span>
+            </h2>
+
+            <div className="relative z-10 space-y-4 text-muted-foreground font-body leading-relaxed text-base md:text-[1.025rem] mb-6">
+              <p>
+                Soy Eveline Dublán, psicóloga (egresada de la UAEH), tanatóloga (AMTAC) y con formación en psicoterapia Ericksoniana (CEM). A la par, me he formado durante muchísimo tiempo como terapeuta holística y sanadora, tanto en técnicas para humanos como para animales. Tengo veinte años de experiencia acompañando a los seres sintientes en sus caminos de sanación y en la exploración de sus historias, ayudándoles a generar claridad en lo que piensan y sienten, y creando nuevos órdenes internos que les permitan formar una realidad más sana y consciente de sí mismos y de sus vidas.
+              </p>
+              <p>
+                Mi consultorio, tanto presencial como en línea, es un espacio donde se imparte terapia con perspectiva de género, perspectiva de clase, antigordofobia, no especista y de inclusión a la comunidad LGBTTTIQ+. Me especializo en terapias individuales, así como en talleres de desarrollo personal y temas espirituales. Fui pionera en México en el trabajo con duelo por pérdida de un compañero animal, así como en el acta de voluntad anticipada sobre enfermedad y muerte, y en el primer podcast donde se incluían mensajes intuitivos de animales.
+              </p>
+              <p className="text-foreground/90 font-medium italic border-l-2 border-gold/60 pl-4 py-1">
+                &ldquo;Mi misión es ofrecerte un espacio seguro, compasivo y libre de juicio donde puedas reencontrar tu equilibrio y caminar hacia una vida más plena. Sea este un lugar dedicado a tejer puentes de sanación, claridad y respeto para todos los seres sintientes.&rdquo;
+              </p>
+            </div>
+
+            <p className="relative z-10 font-display text-foreground font-medium tracking-wide mb-8">
               &mdash; Eveline Dublán &mdash;
             </p>
+
             <div className="relative z-10 flex flex-col items-center md:items-start gap-6">
               <a
                 href="#contacto"
