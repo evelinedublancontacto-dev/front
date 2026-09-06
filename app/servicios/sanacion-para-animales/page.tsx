@@ -110,7 +110,13 @@ const SanacionAnimales = () => {
             transition={{ duration: 0.5 }}
           >
             <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mx-auto mb-6 border border-white/20 shadow-mystical">
-              <PawPrint className="w-10 h-10 text-gold" />
+              <Image
+                src="/assets/icons/services/sanacion-para-animales.svg"
+                alt="Sanación para Animales"
+                width={48}
+                height={48}
+                className="w-12 h-12 object-contain filter drop-shadow-[0_2px_10px_rgba(212,175,55,0.4)]"
+              />
             </div>
           </motion.div>
           <motion.h1

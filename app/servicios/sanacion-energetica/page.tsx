@@ -98,7 +98,13 @@ const SanacionEnergetica = () => {
         <div className="container mx-auto px-6 relative z-10 text-center">
           <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
             <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mx-auto mb-6 border border-white/20 shadow-mystical">
-              <Sparkles className="w-10 h-10 text-gold" />
+              <Image
+                src="/assets/icons/services/sanacion-energetica.svg"
+                alt="Sanación Energética"
+                width={48}
+                height={48}
+                className="w-12 h-12 object-contain filter drop-shadow-[0_2px_10px_rgba(212,175,55,0.4)]"
+              />
             </div>
           </motion.div>
           <motion.h1
