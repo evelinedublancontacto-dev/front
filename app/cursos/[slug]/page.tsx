@@ -54,7 +54,7 @@ export default function CursoDetalle({ params }: { params: Promise<{ slug: strin
             </motion.h1>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="flex items-center justify-center gap-6 text-white/80 font-body text-sm">
               <span className="flex items-center gap-2"><Clock className="w-4 h-4" /> {course.duration}</span>
-              <span className="flex items-center gap-2"><Play className="w-4 h-4" /> {course.lessons} Lecciones</span>
+              <span className="flex items-center gap-2"><Play className="w-4 h-4" /> {typeof course.lessons === "number" ? `${course.lessons} Lecciones` : course.lessons}</span>
             </motion.div>
           </div>
         </div>
@@ -117,7 +117,7 @@ export default function CursoDetalle({ params }: { params: Promise<{ slug: strin
                   <div className="space-y-4 mb-8">
                     {[
                       { icon: Clock, text: `Duración: ${course.duration}` },
-                      { icon: Play, text: `${course.lessons} lecciones en video` },
+                      { icon: Play, text: typeof course.lessons === "number" ? `${course.lessons} lecciones en video` : `${course.lessons} del programa` },
                       { icon: BookOpen, text: "Acceso de por vida" },
                       { icon: CheckCircle, text: "Certificado de finalización" },
                     ].map((item, i) => (

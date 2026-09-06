@@ -103,7 +103,7 @@ const Cursos = () => {
                         </span>
                         <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white/90 text-xs font-body">
                           <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {course.duration}</span>
-                          <span className="flex items-center gap-1"><Play className="w-3.5 h-3.5" /> {course.lessons} Lecciones</span>
+                          <span className="flex items-center gap-1"><Play className="w-3.5 h-3.5" /> {typeof course.lessons === "number" ? `${course.lessons} Lecciones` : course.lessons}</span>
                         </div>
                       </div>
                       <div className="p-6">
