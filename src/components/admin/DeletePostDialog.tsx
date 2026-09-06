@@ -9,12 +9,12 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
-import type { RecordModel } from 'pocketbase';
+import type { Post } from '@/lib/tipos';
 
 interface DeletePostDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  post: RecordModel | null;
+  post: Post | null;
   onConfirm: () => Promise<void>;
 }
 

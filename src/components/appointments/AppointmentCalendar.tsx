@@ -7,6 +7,8 @@ import Calendar from './Calendar';
 import TimeSlotPicker from './TimeSlotPicker';
 import AppointmentForm from './AppointmentForm';
 import { cn } from '@/lib/utils';
+import { api } from '@/lib/api';
+import type { TimeSlot } from '@/hooks/useAppointments';
 
 interface Servicio {
   id: string;
@@ -33,9 +35,8 @@ export default function AppointmentCalendar() {
   useEffect(() => {
     const fetchServicios = async () => {
       try {
-        const response = await fetch('/api/servicios');
-        const data = await response.json();
-        setServicios(data.servicios || []);
+        const data = await api.obtener<{ servicios: Servicio[] }>('/v1/servicios');
+        setServicios(data.servicios);
         if (data.servicios?.length > 0) {
           setServicioId(data.servicios[0].id);
         }
@@ -64,11 +65,10 @@ export default function AppointmentCalendar() {
         const fechaStr = format(selectedDate, 'yyyy-MM-dd');
         const params = new URLSearchParams({
           fecha: fechaStr,
-          ...(servicioId ? { servicioId } : {}),
+          ...(servicioId ? { servicio: servicioId } : {}),
         });
-        const response = await fetch(`/api/disponibilidad?${params}`);
-        const data = await response.json();
-        setSlots(data.slots || []);
+        const data = await api.obtener<{ slots: TimeSlot[] }>(`/v1/disponibilidad?${params}`);
+        setSlots(data.slots);
       } catch (error) {
         console.error('Error al cargar disponibilidad:', error);
         setSlots([]);

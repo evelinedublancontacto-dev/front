@@ -5,13 +5,10 @@ import { Calendar, ArrowRight, Sparkles, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import pb from "@/lib/pocketbase";
+import { api } from "@/lib/api";
 import TwinkleStars from "@/components/TwinkleStars";
 import Link from "next/link";
-import {
-  mergeBlogPosts,
-  type BlogPostRecord,
-} from "@/lib/blogPosts";
+import type { BlogPostRecord } from "@/lib/blogPosts";
 
 export const dynamic = "force-dynamic";
 
@@ -39,17 +36,10 @@ const Blog = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        let pbPosts: Record<string, unknown>[] = [];
-        try {
-          const result = await pb.collection("posts").getFullList({
-            sort: "-created",
-            filter: "published = true",
-          });
-          pbPosts = result as unknown as Record<string, unknown>[];
-        } catch (err) {
-          console.error("Error fetching PocketBase posts:", err);
-        }
-        setPosts(mergeBlogPosts(pbPosts));
+        const r = await api.obtener<{ posts: BlogPostRecord[] }>("/v1/posts?por_pagina=100");
+        setPosts(r.posts);
+      } catch (err) {
+        console.error("Error al cargar el blog:", err);
       } finally {
         setLoading(false);
       }

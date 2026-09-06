@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { User, Mail, Phone, FileText, Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { api, ErrorApi, mensajeDeError } from "@/lib/api";
 
 const appointmentSchema = z.object({
   nombre: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -55,30 +56,23 @@ export default function AppointmentForm({
   const onSubmit = async (data: AppointmentFormData) => {
     setSubmitting(true);
     try {
-      const response = await fetch("/api/citas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nombre: data.nombre,
-          email: data.email,
-          telefono: data.telefono,
-          servicio: servicioId,
-          fecha,
-          hora,
-          notas: data.notas || "",
-        }),
+      await api.enviar("/v1/citas", {
+        nombre: data.nombre,
+        email: data.email,
+        telefono: data.telefono,
+        servicio: servicioId,
+        fecha,
+        hora,
+        notas: data.notas || "",
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Error al crear la cita");
-      }
 
       reset();
       onSuccess();
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Error al agendar la cita";
+        err instanceof ErrorApi && err.codigo === "horario_ocupado"
+          ? "Ese horario se acaba de ocupar. Elige otro, por favor."
+          : mensajeDeError(err, "Error al agendar la cita");
       console.error("Error al agendar cita:", err);
       alert(message);
     } finally {

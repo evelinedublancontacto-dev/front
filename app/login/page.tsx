@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { mensajeDeError } from "@/lib/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -25,9 +26,10 @@ const Login = () => {
     try {
       await login(email, password);
       toast({ title: "¡Bienvenido!", description: "Has iniciado sesión correctamente." });
-      router.push("/admin");
-    } catch {
-      toast({ title: "Error de autenticación", description: "Email o contraseña incorrectos.", variant: "destructive" });
+      const volver = new URLSearchParams(window.location.search).get("volver");
+      router.push(volver && volver.startsWith("/admin") ? volver : "/admin");
+    } catch (err) {
+      toast({ title: "Error de autenticación", description: mensajeDeError(err, "Email o contraseña incorrectos."), variant: "destructive" });
     } finally {
       setIsLoading(false);
     }

@@ -1,9 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
-import pb from "@/lib/pocketbase";
-import type { RecordModel } from "pocketbase";
+import { api, ErrorApi, mensajeDeError } from "@/lib/api";
+import type { Cita, Cliente, Post, Servicio } from "@/lib/tipos";
+import { ETIQUETA_ESTADO } from "@/lib/tipos";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -26,7 +26,6 @@ import {
   Pencil,
   Trash2,
   Calendar,
-  UserPlus,
   Briefcase,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -36,9 +35,9 @@ import PostFormDialog, {
   POST_CATEGORIES,
 } from "@/components/admin/PostFormDialog";
 import DeletePostDialog from "@/components/admin/DeletePostDialog";
-import ServicioFormDialog from "@/components/admin/ServicioFormDialog";
-import CitaFormDialog from "@/components/admin/CitaFormDialog";
-import serviciosData from "@/data/services.json";
+import ServicioFormDialog, { type ServicioFormData } from "@/components/admin/ServicioFormDialog";
+import CitaFormDialog, { type CitaFormData } from "@/components/admin/CitaFormDialog";
+import ClienteFormDialog, { type ClienteFormData } from "@/components/admin/ClienteFormDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,11 +52,11 @@ import {
 const Admin = () => {
   const { user, logout } = useAuth();
   const router = useRouter();
-  const [users, setUsers] = useState<RecordModel[]>([]);
-  const [posts, setPosts] = useState<RecordModel[]>([]);
-  const [servicios, setServicios] = useState<RecordModel[]>([]);
-  const [citas, setCitas] = useState<RecordModel[]>([]);
-  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [servicios, setServicios] = useState<Servicio[]>([]);
+  const [citas, setCitas] = useState<Cita[]>([]);
+  const [loadingClientes, setLoadingClientes] = useState(false);
   const [loadingPosts, setLoadingPosts] = useState(false);
   const [loadingServicios, setLoadingServicios] = useState(false);
   const [loadingCitas, setLoadingCitas] = useState(false);
@@ -65,263 +64,269 @@ const Admin = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [servicioFormOpen, setServicioFormOpen] = useState(false);
   const [citaFormOpen, setCitaFormOpen] = useState(false);
+  const [clienteFormOpen, setClienteFormOpen] = useState(false);
   const [deleteServicioOpen, setDeleteServicioOpen] = useState(false);
   const [deleteCitaOpen, setDeleteCitaOpen] = useState(false);
-  const [editingPost, setEditingPost] = useState<RecordModel | null>(null);
-  const [deletingPost, setDeletingPost] = useState<RecordModel | null>(null);
-  const [editingServicio, setEditingServicio] = useState<RecordModel | null>(
-    null,
-  );
-  const [deletingServicio, setDeletingServicio] = useState<RecordModel | null>(
-    null,
-  );
-  const [editingCliente, setEditingCliente] = useState<RecordModel | null>(
-    null,
-  );
-  const [deletingCliente, setDeletingCliente] = useState<RecordModel | null>(
-    null,
-  );
-  const [editingCita, setEditingCita] = useState<RecordModel | null>(null);
-  const [deletingCita, setDeletingCita] = useState<RecordModel | null>(null);
+  const [deleteClienteOpen, setDeleteClienteOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [deletingPost, setDeletingPost] = useState<Post | null>(null);
+  const [editingServicio, setEditingServicio] = useState<Servicio | null>(null);
+  const [deletingServicio, setDeletingServicio] = useState<Servicio | null>(null);
+  const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
+  const [deletingCliente, setDeletingCliente] = useState<Cliente | null>(null);
+  const [editingCita, setEditingCita] = useState<Cita | null>(null);
+  const [deletingCita, setDeletingCita] = useState<Cita | null>(null);
 
-  // Service categories for the dropdown
-  const serviceCategories = [
-    { value: "psicoterapia", label: "Psicoterapia" },
-    { value: "sanacion-energetica", label: "Sanación Energética" },
-    { value: "cuencos-tibetanos", label: "Cuencos Tibetanos" },
-    { value: "meditacion-guiada", label: "Meditación Guiada" },
-    { value: "terapia-parejas", label: "Terapia de Parejas" },
-    { value: "sesion-cumpleanos", label: "Sesión de Cumpleaños" },
-  ];
+  /* Un 401 significa que la sesión venció: al login. Cualquier otro error, aviso. */
+  const reportar = useCallback(
+    (err: unknown, mensaje: string) => {
+      if (err instanceof ErrorApi && err.sinSesion) {
+        router.push("/login?volver=/admin");
+        return;
+      }
+      console.error(mensaje, err);
+      toast.error(mensajeDeError(err, mensaje));
+    },
+    [router],
+  );
 
-  // Appointment status options
-  const appointmentStatuses = [
-    { value: "disponible", label: "Disponible" },
-    { value: "confirmada", label: "Confirmada" },
-    { value: "cancelada", label: "Cancelada" },
-    { value: "completada", label: "Completada" },
-  ];
-
-  const fetchUsers = async () => {
-    setLoadingUsers(true);
+  const fetchClientes = useCallback(async () => {
+    setLoadingClientes(true);
     try {
-      const result = await pb
-        .collection("users")
-        .getFullList({ sort: "-created" });
-      setUsers(result);
+      const r = await api.obtener<{ clientes: Cliente[] }>("/v1/admin/clientes?por_pagina=200");
+      setClientes(r.clientes);
     } catch (err) {
-      console.error("Error fetching users:", err);
-      toast.error("No se pudieron cargar los usuarios.");
+      reportar(err, "No se pudieron cargar los clientes.");
     } finally {
-      setLoadingUsers(false);
+      setLoadingClientes(false);
     }
-  };
+  }, [reportar]);
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     setLoadingPosts(true);
     try {
-      const result = await pb
-        .collection("posts")
-        .getFullList({ sort: "-created" });
-      setPosts(result);
+      const r = await api.obtener<{ posts: Post[] }>("/v1/admin/posts");
+      setPosts(r.posts);
     } catch (err) {
-      console.error("Error fetching posts:", err);
-      toast.info(
-        'No se encontró la colección "posts". Créala en tu panel de PocketBase.',
-      );
+      reportar(err, "No se pudieron cargar los posts.");
     } finally {
       setLoadingPosts(false);
     }
-  };
+  }, [reportar]);
 
-  const fetchServicios = async () => {
+  const fetchServicios = useCallback(async () => {
     setLoadingServicios(true);
     try {
-      // Servicios se cargan desde el archivo JSON
-      setServicios(serviciosData as unknown as RecordModel[]);
+      const r = await api.obtener<{ servicios: Servicio[] }>("/v1/admin/servicios");
+      setServicios(r.servicios);
     } catch (err) {
-      console.error("Error fetching servicios:", err);
-      toast.error("No se pudieron cargar los servicios.");
+      reportar(err, "No se pudieron cargar los servicios.");
     } finally {
       setLoadingServicios(false);
     }
-  };
+  }, [reportar]);
 
-  const fetchCitas = async () => {
+  const fetchCitas = useCallback(async () => {
     setLoadingCitas(true);
     try {
-      const response = await fetch("/api/citas");
-      const data = await response.json();
-      setCitas(data.citas || []);
+      const r = await api.obtener<{ citas: Cita[] }>("/v1/admin/citas?por_pagina=200");
+      setCitas(r.citas);
     } catch (err) {
-      console.error("Error fetching citas:", err);
-      toast.error("No se pudieron cargar las citas.");
+      reportar(err, "No se pudieron cargar las citas.");
     } finally {
       setLoadingCitas(false);
     }
-  };
+  }, [reportar]);
 
   useEffect(() => {
-    fetchUsers();
+    fetchClientes();
     fetchPosts();
     fetchServicios();
     fetchCitas();
-  }, []);
+  }, [fetchClientes, fetchPosts, fetchServicios, fetchCitas]);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push("/login");
   };
 
+  // Posts
   const handleNewPost = () => {
     setEditingPost(null);
     setFormOpen(true);
   };
-
-  const handleEditPost = (post: RecordModel) => {
-    setEditingPost(post);
-    setFormOpen(true);
+  const handleEditPost = async (post: Post) => {
+    try {
+      const r = await api.obtener<{ post: Post }>(`/v1/admin/posts/${post.id}`); // con contenido
+      setEditingPost(r.post);
+      setFormOpen(true);
+    } catch (err) {
+      reportar(err, "No se pudo abrir el post.");
+    }
   };
-
-  const handleDeletePost = (post: RecordModel) => {
+  const handleDeletePost = (post: Post) => {
     setDeletingPost(post);
     setDeleteOpen(true);
   };
-
   const handleSavePost = async (data: PostFormData) => {
     try {
       if (editingPost) {
-        await pb.collection("posts").update(editingPost.id, data);
+        await api.actualizar(`/v1/admin/posts/${editingPost.id}`, data);
         toast.success("Post actualizado correctamente.");
       } else {
-        await pb.collection("posts").create(data);
+        await api.enviar("/v1/admin/posts", data);
         toast.success("Post creado correctamente.");
       }
       fetchPosts();
     } catch (err) {
-      console.error("Error saving post:", err);
-      toast.error(
-        'Error al guardar el post. Verifica que la colección "posts" exista con los campos correctos.',
-      );
+      reportar(err, "Error al guardar el post.");
       throw err;
     }
   };
-
   const handleConfirmDelete = async () => {
     if (!deletingPost) return;
     try {
-      await pb.collection("posts").delete(deletingPost.id);
+      await api.borrar(`/v1/admin/posts/${deletingPost.id}`);
       toast.success("Post eliminado correctamente.");
       fetchPosts();
     } catch (err) {
-      console.error("Error deleting post:", err);
-      toast.error("Error al eliminar el post.");
+      reportar(err, "Error al eliminar el post.");
       throw err;
     }
   };
 
-  // Servicios CRUD
+  // Servicios
   const handleNewServicio = () => {
     setEditingServicio(null);
     setServicioFormOpen(true);
   };
-
-  const handleEditServicio = (servicio: RecordModel) => {
+  const handleEditServicio = (servicio: Servicio) => {
     setEditingServicio(servicio);
     setServicioFormOpen(true);
   };
-
-  const handleDeleteServicio = (servicio: RecordModel) => {
+  const handleDeleteServicio = (servicio: Servicio) => {
     setDeletingServicio(servicio);
     setDeleteServicioOpen(true);
   };
-
-  const handleSaveServicio = async (data: Record<string, unknown>) => {
+  const handleSaveServicio = async (data: ServicioFormData) => {
+    const cuerpo = {
+      titulo: data.titulo,
+      descripcion: data.descripcion,
+      duracion_min: data.duracion,
+      precio: data.precio,
+      activo: data.activo,
+    };
     try {
       if (editingServicio) {
-        await pb.collection("servicios").update(editingServicio.id, data);
+        await api.actualizar(`/v1/admin/servicios/${editingServicio.id}`, cuerpo);
         toast.success("Servicio actualizado correctamente.");
       } else {
-        await pb.collection("servicios").create(data);
+        await api.enviar("/v1/admin/servicios", cuerpo);
         toast.success("Servicio creado correctamente.");
       }
       fetchServicios();
     } catch (err) {
-      console.error("Error saving servicio:", err);
-      toast.error("Error al guardar el servicio.");
+      reportar(err, "Error al guardar el servicio.");
       throw err;
     }
   };
-
   const handleConfirmDeleteServicio = async () => {
     if (!deletingServicio) return;
     try {
-      await pb.collection("servicios").delete(deletingServicio.id);
+      await api.borrar(`/v1/admin/servicios/${deletingServicio.id}`);
       toast.success("Servicio eliminado correctamente.");
       fetchServicios();
     } catch (err) {
-      console.error("Error deleting servicio:", err);
-      toast.error("Error al eliminar el servicio.");
-      throw err;
+      reportar(err, "Error al eliminar el servicio. Si tiene citas, desactívalo.");
     }
   };
 
-  // Citas CRUD
+  // Clientes
+  const handleNewCliente = () => {
+    setEditingCliente(null);
+    setClienteFormOpen(true);
+  };
+  const handleEditCliente = (cliente: Cliente) => {
+    setEditingCliente(cliente);
+    setClienteFormOpen(true);
+  };
+  const handleDeleteCliente = (cliente: Cliente) => {
+    setDeletingCliente(cliente);
+    setDeleteClienteOpen(true);
+  };
+  const handleSaveCliente = async (data: ClienteFormData) => {
+    try {
+      if (editingCliente) {
+        await api.actualizar(`/v1/admin/clientes/${editingCliente.id}`, data);
+        toast.success("Cliente actualizado correctamente.");
+      } else {
+        await api.enviar("/v1/admin/clientes", data);
+        toast.success("Cliente creado correctamente.");
+      }
+      fetchClientes();
+    } catch (err) {
+      reportar(err, "Error al guardar el cliente.");
+      throw err;
+    }
+  };
+  const handleConfirmDeleteCliente = async () => {
+    if (!deletingCliente) return;
+    try {
+      await api.borrar(`/v1/admin/clientes/${deletingCliente.id}`);
+      toast.success("Cliente eliminado correctamente.");
+      fetchClientes();
+    } catch (err) {
+      reportar(err, "Error al eliminar el cliente. Si tiene citas, no se puede borrar.");
+    }
+  };
+
+  // Citas
   const handleNewCita = () => {
     setEditingCita(null);
     setCitaFormOpen(true);
   };
-
-  const handleEditCita = (cita: RecordModel) => {
+  const handleEditCita = (cita: Cita) => {
     setEditingCita(cita);
     setCitaFormOpen(true);
   };
-
-  const handleDeleteCita = (cita: RecordModel) => {
+  const handleDeleteCita = (cita: Cita) => {
     setDeletingCita(cita);
     setDeleteCitaOpen(true);
   };
-
-  const handleSaveCita = async (data: Record<string, unknown>) => {
+  const handleSaveCita = async (data: CitaFormData) => {
     try {
       if (editingCita) {
-        const response = await fetch(`/api/citas`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: editingCita.id, ...data }),
+        /* El correo identifica al cliente y no se cambia desde la cita. */
+        await api.actualizar(`/v1/admin/citas/${editingCita.id}`, {
+          nombre: data.nombre,
+          telefono: data.telefono,
+          servicio: data.servicio,
+          fecha: data.fecha,
+          hora: data.hora,
+          estado: data.estado,
+          notas: data.notas,
         });
-        if (!response.ok) throw new Error("Error al actualizar la cita");
         toast.success("Cita actualizada correctamente.");
       } else {
-        const response = await fetch("/api/citas", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-        if (!response.ok) throw new Error("Error al crear la cita");
+        await api.enviar("/v1/admin/citas", data);
         toast.success("Cita creada correctamente.");
       }
       fetchCitas();
-      setCitaFormOpen(false);
+      fetchClientes();
     } catch (err) {
-      console.error("Error saving cita:", err);
-      toast.error("Error al guardar la cita.");
+      reportar(err, "Error al guardar la cita.");
+      throw err;
     }
   };
-
   const handleConfirmDeleteCita = async () => {
     if (!deletingCita) return;
     try {
-      const response = await fetch(`/api/citas?id=${deletingCita.id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Error al eliminar la cita");
+      await api.borrar(`/v1/admin/citas/${deletingCita.id}`);
       toast.success("Cita eliminada correctamente.");
       fetchCitas();
       setDeleteCitaOpen(false);
     } catch (err) {
-      console.error("Error deleting cita:", err);
-      toast.error("Error al eliminar la cita.");
+      reportar(err, "Error al eliminar la cita.");
     }
   };
 
@@ -345,7 +350,7 @@ const Admin = () => {
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex flex-col items-end">
               <span className="text-sm font-semibold text-foreground">
-                {user?.email}
+                {user?.correo}
               </span>
               <span className="text-[11px] text-muted-foreground font-medium">
                 Administrador
@@ -371,10 +376,10 @@ const Admin = () => {
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Usuarios
+                  Clientes
                 </p>
                 <p className="text-2xl font-bold text-foreground">
-                  {users.length}
+                  {clientes.length}
                 </p>
               </div>
             </CardContent>
@@ -428,10 +433,10 @@ const Admin = () => {
         <Tabs defaultValue="posts" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 max-w-2xl h-12 bg-muted/50 p-1">
             <TabsTrigger
-              value="users"
+              value="clientes"
               className="flex items-center gap-2 h-full data-[state=active]:bg-background data-[state=active]:shadow-sm font-semibold text-xs"
             >
-              <Users className="w-4 h-4" /> Usuarios
+              <Users className="w-4 h-4" /> Clientes
             </TabsTrigger>
             <TabsTrigger
               value="posts"
@@ -452,33 +457,42 @@ const Admin = () => {
               <Calendar className="w-4 h-4" /> Citas
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="users">
+          <TabsContent value="clientes">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 bg-gradient-to-r from-card to-muted/20 py-4">
                 <CardTitle className="text-base font-semibold">
-                  Lista de Usuarios
+                  Clientes
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={fetchUsers}
-                  disabled={loadingUsers}
-                  className="font-medium text-xs h-8"
-                >
-                  <RefreshCw
-                    className={`w-3.5 h-3.5 mr-1 ${loadingUsers ? "animate-spin" : ""}`}
-                  />{" "}
-                  Actualizar
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={fetchClientes}
+                    disabled={loadingClientes}
+                    className="font-medium text-xs h-8"
+                  >
+                    <RefreshCw
+                      className={`w-3.5 h-3.5 mr-1 ${loadingClientes ? "animate-spin" : ""}`}
+                    />{" "}
+                    Actualizar
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleNewCliente}
+                    className="font-medium text-xs h-8"
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1" /> Nuevo Cliente
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="p-0">
-                {loadingUsers ? (
+                {loadingClientes ? (
                   <div className="flex justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
                   </div>
-                ) : users.length === 0 ? (
+                ) : clientes.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    No hay usuarios registrados aún.
+                    Aún no hay clientes. Se crean solos al reservar una cita.
                   </p>
                 ) : (
                   <div className="overflow-x-auto">
@@ -491,33 +505,53 @@ const Admin = () => {
                           <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                             Email
                           </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-center">
-                            Verificado
+                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+                            Teléfono
                           </TableHead>
                           <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Fecha de Registro
+                            Desde
+                          </TableHead>
+                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-right">
+                            Acciones
                           </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {users.map((u) => (
-                          <TableRow key={u.id} className="hover:bg-muted/20">
+                        {clientes.map((c) => (
+                          <TableRow key={c.id} className="hover:bg-muted/20">
                             <TableCell className="font-medium text-sm">
-                              {u.name || u.username || "—"}
+                              {c.nombre || "—"}
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
-                              {u.email}
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <Badge
-                                variant={u.verified ? "default" : "secondary"}
-                                className="text-[11px] font-semibold"
-                              >
-                                {u.verified ? "Sí" : "No"}
-                              </Badge>
+                              {c.correo}
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
-                              {new Date(u.created).toLocaleDateString("es-ES")}
+                              {c.telefono || "—"}
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {new Date(c.creado_en).toLocaleDateString("es-ES")}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleEditCliente(c)}
+                                  title="Editar"
+                                  className="h-8 w-8"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleDeleteCliente(c)}
+                                  title="Eliminar"
+                                  className="h-8 w-8 text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -564,9 +598,7 @@ const Admin = () => {
                 ) : posts.length === 0 ? (
                   <div className="text-center py-8 space-y-3">
                     <p className="text-muted-foreground">
-                      No hay posts aún. Crea la colección "posts" en PocketBase
-                      con campos: title, slug, content, excerpt, image,
-                      published.
+                      No hay posts aún.
                     </p>
                     <Button onClick={handleNewPost}>
                       <Plus className="w-4 h-4 mr-1" /> Crear Primer Post
@@ -621,7 +653,7 @@ const Admin = () => {
                               </Badge>
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
-                              {new Date(post.created).toLocaleDateString(
+                              {new Date(post.date || post.created || Date.now()).toLocaleDateString(
                                 "es-ES",
                               )}
                             </TableCell>
@@ -692,9 +724,7 @@ const Admin = () => {
                 ) : servicios.length === 0 ? (
                   <div className="text-center py-8 space-y-3">
                     <p className="text-muted-foreground">
-                      No hay servicios aún. Crea la colección "servicios" en
-                      PocketBase con campos: titulo, descripcion, duracion,
-                      precio, activo.
+                      No hay servicios aún.
                     </p>
                     <Button onClick={handleNewServicio}>
                       <Plus className="w-4 h-4 mr-1" /> Crear Primer Servicio
@@ -824,9 +854,7 @@ const Admin = () => {
                 ) : citas.length === 0 ? (
                   <div className="text-center py-8 space-y-3">
                     <p className="text-muted-foreground">
-                      No hay citas aún. Crea la colección "citas" en PocketBase
-                      con campos: nombre, email, telefono, servicio, fecha,
-                      hora, estado, notas.
+                      No hay citas aún.
                     </p>
                     <Button onClick={handleNewCita}>
                       <Plus className="w-4 h-4 mr-1" /> Crear Primera Cita
@@ -877,7 +905,8 @@ const Admin = () => {
                                 {cita.email || "—"}
                               </TableCell>
                               <TableCell className="text-sm">
-                                {servicioSeleccionado?.titulo ||
+                                {cita.servicioNombre ||
+                                  servicioSeleccionado?.titulo ||
                                   cita.servicio ||
                                   "—"}
                               </TableCell>
@@ -894,20 +923,15 @@ const Admin = () => {
                               <TableCell className="text-center">
                                 <Badge
                                   variant={
-                                    cita.estado === "confirmada"
+                                    cita.estado === "confirmada" || cita.estado === "completada"
                                       ? "default"
-                                      : cita.estado === "completada"
-                                        ? "default"
-                                        : cita.estado === "cancelada"
-                                          ? "destructive"
-                                          : "secondary"
+                                      : cita.estado === "cancelada"
+                                        ? "destructive"
+                                        : "secondary"
                                   }
                                   className="text-[11px] font-semibold"
                                 >
-                                  {cita.estado
-                                    ? cita.estado.charAt(0).toUpperCase() +
-                                      cita.estado.slice(1)
-                                    : "—"}
+                                  {ETIQUETA_ESTADO[cita.estado] ?? cita.estado}
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-right">
@@ -989,6 +1013,29 @@ const Admin = () => {
         onSave={handleSaveCita}
         servicios={servicios}
       />
+      <ClienteFormDialog
+        open={clienteFormOpen}
+        onOpenChange={setClienteFormOpen}
+        cliente={editingCliente}
+        onSave={handleSaveCliente}
+      />
+      <AlertDialog open={deleteClienteOpen} onOpenChange={setDeleteClienteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar este cliente?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Solo se puede borrar un cliente sin citas. Si tiene historial,
+              consérvalo.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDeleteCliente}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <AlertDialog open={deleteCitaOpen} onOpenChange={setDeleteCitaOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

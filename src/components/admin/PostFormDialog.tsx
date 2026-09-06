@@ -7,13 +7,13 @@ import RichTextEditor from '@/components/admin/RichTextEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import type { RecordModel } from 'pocketbase';
+import type { Post } from '@/lib/tipos';
 import { Loader2 } from 'lucide-react';
 
 interface PostFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  post: RecordModel | null;
+  post: Post | null;
   onSave: (data: PostFormData) => Promise<void>;
 }
 

@@ -12,13 +12,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import type { RecordModel } from "pocketbase";
+import type { Servicio } from "@/lib/tipos";
+
+export interface ServicioFormData {
+  titulo: string;
+  descripcion: string;
+  duracion: number;
+  precio: number;
+  activo: boolean;
+}
 
 interface ServicioFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  servicio: RecordModel | null;
-  onSave: (data: Record<string, unknown>) => Promise<void>;
+  servicio: Servicio | null;
+  onSave: (data: ServicioFormData) => Promise<void>;
 }
 
 export default function ServicioFormDialog({

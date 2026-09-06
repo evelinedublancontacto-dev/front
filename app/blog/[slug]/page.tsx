@@ -6,15 +6,9 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TwinkleStars from "@/components/TwinkleStars";
-import pb from "@/lib/pocketbase";
+import { api, ErrorApi } from "@/lib/api";
 import Link from "next/link";
-import {
-  findLegacyPost,
-  getLegacyRelated,
-  mergeBlogPosts,
-  toBlogPost,
-  type BlogPostRecord,
-} from "@/lib/blogPosts";
+import type { BlogPostRecord } from "@/lib/blogPosts";
 
 const CATEGORY_MAP: Record<string, string> = {
   psicoterapia: "Psicoterapia",
@@ -35,47 +29,13 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
       setLoading(true);
       setNotFound(false);
       try {
-        let found: BlogPostRecord | null = null;
-        try {
-          const result = await pb.collection("posts").getFullList({
-            filter: `slug = "${slug}" && published = true`,
-          });
-          if (result.length > 0) {
-            found = toBlogPost(result[0] as unknown as Record<string, unknown>);
-          }
-        } catch {
-          /* PocketBase unavailable — fall back to migration seed */
-        }
-
-        if (!found) {
-          found = findLegacyPost(slug) ?? null;
-        }
-
-        if (!found) {
-          setNotFound(true);
-          return;
-        }
-
-        setPost(found);
-
-        try {
-          const allPb = await pb.collection("posts").getFullList({
-            filter: "published = true",
-            sort: "-created",
-          });
-          const merged = mergeBlogPosts(
-            allPb as unknown as Record<string, unknown>[],
-          );
-          setRelated(
-            merged
-              .filter((p) => p.category === found!.category && p.slug !== slug)
-              .slice(0, 2),
-          );
-        } catch {
-          setRelated(getLegacyRelated(found.category, slug, 2));
-        }
+        const r = await api.obtener<{ post: BlogPostRecord; relacionados: BlogPostRecord[] }>(
+          `/v1/posts/${encodeURIComponent(slug)}`,
+        );
+        setPost(r.post);
+        setRelated(r.relacionados);
       } catch (err) {
-        console.error("Error fetching post:", err);
+        if (!(err instanceof ErrorApi && err.status === 404)) console.error("Error al cargar el artículo:", err);
         setNotFound(true);
       } finally {
         setLoading(false);
