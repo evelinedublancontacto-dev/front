@@ -15,14 +15,56 @@ const fadeUp = {
 };
 
 const spaces = [
-  { icon: BookOpen, title: "Espacio de Lectura, Oráculos y Meditación", desc: "Libros mágicos, oráculos de distintas autoras, cojines suaves y zafus. Consulta literatura, realiza preguntas a los oráculos y canaliza el diseño de tus objetos mágicos." },
-  { icon: Gem, title: "Cuarzos", desc: "Selección de cuarzos limpios y energizados, listos para vibrar contigo de forma individual, unirse a un grupo de piedras, integrarse a tus brisas o formar parte de tu nueva Crystal Grid.", href: "/luz-de-luna/cuarzos-y-cristales" },
-  { icon: Leaf, title: "Hierbas Mágicas", desc: "Conviértete en bruja o brujo verde. Hierbas y esencias herbales listas para crear resguardos energéticos, baños de limpieza, sanación, abundancia, coronas y escobas para el hogar.", href: "/luz-de-luna/hierbas-magicas" },
-  { icon: Sparkles, title: "Crystal Grids", desc: "Rejillas de madera, símbolos sagrados, cuarzos, aceites e inciensos dan vida a tu práctica para sanar, limpiar, proteger y abrir caminos." },
-  { icon: Star, title: "Brisas y Pociones", desc: "La alquimia y la magia se unen para crear brisas de protección, sanación, armonización, limpieza energética, amor propio, creatividad y concentración." },
-  { icon: Flame, title: "Velas", desc: "De miel, cera de miel, soya y coco. Vístelas con hierbas y miel, dibuja símbolos, báñalas en aceite, envuélvelas en hojas y corta cordones con el trabajo del fuego." },
-  { icon: Wand2, title: "Mesa de Trabajo", desc: "Conecta con tus guías y guardianas para dar vida a tu objeto de poder. Comparte experiencias, historias mágicas y cuentos Zen, o trabaja en silencio." },
-  { icon: Moon, title: "Artículos Mágicos", desc: "Coronas de protección, campanas, spell jars, escobas de hierbas, coronas de cuarzo, stickers de sellos, sigilos y símbolos mágicos." },
+  {
+    icon: BookOpen,
+    title: "Espacio de Lectura, Oráculos y Meditación",
+    desc: "Libros mágicos, oráculos de distintas autoras, cojines suaves y zafus. Consulta literatura, realiza preguntas a los oráculos y canaliza el diseño de tus objetos mágicos.",
+    image: "/assets/luz-de-luna/lectura-oraculos.jpg",
+  },
+  {
+    icon: Gem,
+    title: "Cuarzos",
+    desc: "Selección de cuarzos limpios y energizados, listos para vibrar contigo de forma individual, unirse a un grupo de piedras, integrarse a tus brisas o formar parte de tu nueva Crystal Grid.",
+    href: "/luz-de-luna/cuarzos-y-cristales",
+    image: "/assets/luz-de-luna/cuarzos.jpg",
+  },
+  {
+    icon: Leaf,
+    title: "Hierbas Mágicas",
+    desc: "Conviértete en bruja o brujo verde. Hierbas y esencias herbales listas para crear resguardos energéticos, baños de limpieza, sanación, abundancia, coronas y escobas para el hogar.",
+    href: "/luz-de-luna/hierbas-magicas",
+    image: "/assets/luz-de-luna/hierbas-magicas.jpg",
+  },
+  {
+    icon: Sparkles,
+    title: "Crystal Grids",
+    desc: "Rejillas de madera, símbolos sagrados, cuarzos, aceites e inciensos dan vida a tu práctica para sanar, limpiar, proteger y abrir caminos.",
+    image: "/assets/luz-de-luna/crystal-grids.jpg",
+  },
+  {
+    icon: Star,
+    title: "Brisas y Pociones",
+    desc: "La alquimia y la magia se unen para crear brisas de protección, sanación, armonización, limpieza energética, amor propio, creatividad y concentración.",
+    image: "/assets/luz-de-luna/brisas-y-pociones.jpg",
+  },
+  {
+    icon: Flame,
+    title: "Velas",
+    desc: "De miel, cera de miel, soya y coco. Vístelas con hierbas y miel, dibuja símbolos, báñalas en aceite, envuélvelas en hojas y corta cordones con el trabajo del fuego.",
+    image: "/assets/luz-de-luna/velas.jpg",
+  },
+  {
+    icon: Wand2,
+    title: "Mesa de Trabajo",
+    desc: "Conecta con tus guías y guardianas para dar vida a tu objeto de poder. Comparte experiencias, historias mágicas y cuentos Zen, o trabaja en silencio.",
+    image: "/assets/luz-de-luna/mesa-de-trabajo.jpg",
+  },
+  {
+    icon: Moon,
+    title: "Artículos Mágicos",
+    desc: "Coronas de protección, campanas, spell jars, escobas de hierbas, coronas de cuarzo, stickers de sellos, sigilos y símbolos mágicos.",
+    image: "/assets/luz-de-luna/articulos-magicos.jpg",
+  },
 ];
 
 const LuzDeLuna = () => {
@@ -86,21 +128,33 @@ const LuzDeLuna = () => {
                     viewport={{ once: true }}
                     custom={i}
                     variants={fadeUp}
-                    className="bg-gradient-card rounded-xl p-6 border-glow hover:scale-[1.02] transition-all duration-500 h-full"
+                    className="bg-gradient-card rounded-xl p-6 border-glow hover:scale-[1.02] transition-all duration-500 h-full flex flex-col"
                   >
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                      <space.icon className="w-6 h-6 text-primary" />
+                    <div className="mb-4 overflow-hidden rounded-lg aspect-[4/3] bg-primary/10 relative">
+                      {space.image ? (
+                        <Image
+                          src={space.image}
+                          alt={space.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <space.icon className="w-10 h-10 text-primary/40" />
+                        </div>
+                      )}
                     </div>
                     <h3 className="font-display text-base font-semibold text-foreground mb-2">{space.title}</h3>
-                    <p className="text-muted-foreground font-body text-sm leading-relaxed">{space.desc}</p>
+                    <p className="text-muted-foreground font-body text-sm leading-relaxed flex-grow">{space.desc}</p>
                   </motion.div>
                 );
                 return "href" in space && space.href ? (
-                  <Link key={space.title} href={space.href} className="block">
+                  <Link key={space.title} href={space.href} className="block h-full">
                     {card}
                   </Link>
                 ) : (
-                  <div key={space.title}>{card}</div>
+                  <div key={space.title} className="h-full">{card}</div>
                 );
               })}
             </div>
