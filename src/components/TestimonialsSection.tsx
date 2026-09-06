@@ -2,10 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
-import { Star, Quote, Sparkles, Heart, MessageCircle, CalendarDays, ArrowRight, Pause, Play } from "lucide-react";
-import Link from "next/link";
+import { Star, Quote, Sparkles, Pause, Play } from "lucide-react";
 import { testimonials, type Testimonial } from "@/data/testimonials";
-import { contact } from "@/lib/contact";
 import {
   Carousel,
   CarouselContent,
@@ -36,10 +34,6 @@ const SparkleDecor = ({ className }: { className?: string }) => (
     <path d="M12 0 14.5 9.5 24 12 14.5 14.5 12 24 9.5 14.5 0 12 9.5 9.5Z" />
   </svg>
 );
-
-const whatsappCTAUrl = `${contact.whatsappUrl}?text=${encodeURIComponent(
-  "Hola Eveline, leí los testimonios en tu página y me gustaría recibir información para comenzar mi proceso."
-)}`;
 
 const TestimonialsSection = () => {
   const [activeCategory, setActiveCategory] = useState<string>("todos");
@@ -289,44 +283,6 @@ const TestimonialsSection = () => {
             </div>
           )}
         </div>
-
-        {/* Bottom Call to Action Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-16 bg-white/90 backdrop-blur-md rounded-2xl p-8 md:p-10 border border-primary/20 shadow-mystical max-w-4xl mx-auto text-center"
-        >
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-4">
-            <Heart className="w-6 h-6 text-primary fill-primary/20" />
-          </div>
-          <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-3">
-            ¿Lista para comenzar tu camino de sanación?
-          </h3>
-          <p className="text-muted-foreground font-body text-sm md:text-base max-w-xl mx-auto mb-6 leading-relaxed">
-            Permítete recibir el acompañamiento respetuoso, profesional y amoroso que necesitas para volver a ti.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <a
-              href={whatsappCTAUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-body font-semibold text-white text-sm transition-all duration-300 shadow-md hover:scale-105"
-              style={{ backgroundColor: "#25D366" }}
-            >
-              <MessageCircle className="w-4 h-4" />
-              Escribir por WhatsApp
-            </a>
-            <Link
-              href="/citas"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-body font-semibold bg-primary text-primary-foreground text-sm transition-all duration-300 shadow-mystical hover:bg-purple-glow hover:scale-105"
-            >
-              <CalendarDays className="w-4 h-4" />
-              Agendar una Cita
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        </motion.div>
       </div>
     </section>
   );
