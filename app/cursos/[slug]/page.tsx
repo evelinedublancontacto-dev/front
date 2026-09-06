@@ -22,6 +22,7 @@ import {
   Calendar,
   ShieldCheck,
   ChevronRight,
+  Download,
 } from "lucide-react";
 import Image from "next/image";
 import { courses, type Course } from "@/data/courses";
@@ -236,66 +237,81 @@ export default function CursoDetalle({
           <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-10 lg:gap-12">
             {/* Left 2 Columns */}
             <div className="lg:col-span-2 space-y-12">
-              {/* Featured Mystical Video Preview Player */}
+              {/* Featured Mystical Instagram Reel Player */}
               <motion.div
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 custom={0}
                 variants={fadeUp}
-                className="bg-gradient-card rounded-2xl border-glow overflow-hidden shadow-mystical"
+                className="bg-gradient-card rounded-2xl border-glow overflow-hidden shadow-mystical p-6 md:p-8"
               >
-                <div className="p-5 sm:p-6 pb-4 border-b border-border/80 flex items-center justify-between gap-4 flex-wrap">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
                       <Sparkles className="w-5 h-5 text-gold" />
                     </div>
                     <div>
-                      <h2 className="font-display text-lg font-bold text-foreground leading-tight">
-                        Video Presentación &amp; Resonancia
+                      <h2 className="font-display text-lg sm:text-xl font-bold text-foreground leading-tight">
+                        Reel de Presentación • Estilo Instagram
                       </h2>
                       <p className="text-xs font-body text-muted-foreground">
-                        Música mística de cuencos sagrados y frecuencias de sanación (sin voz)
+                        Texto animado por escenas con cuencos sagrados y música mística (sin voz)
                       </p>
                     </div>
                   </div>
 
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/10 text-gold-light border border-gold/20 text-xs font-medium font-body">
-                    <Volume2 className="w-3.5 h-3.5" /> 432 Hz / Armónicos
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/10 text-gold-light border border-gold/20 text-xs font-medium font-body">
+                      <Volume2 className="w-3.5 h-3.5" /> 9:16 Vertical
+                    </span>
+                    {course.previewVideo && (
+                      <a
+                        href={course.previewVideo}
+                        download={`${course.slug}-reel.mp4`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-medium font-body hover:bg-primary hover:text-white transition-colors"
+                        title="Descargar Reel para compartir en Instagram o WhatsApp"
+                      >
+                        <Download className="w-3.5 h-3.5" /> Descargar Reel
+                      </a>
+                    )}
+                  </div>
                 </div>
 
-                {/* Video container */}
-                <div className="relative aspect-video bg-black/90 group">
-                  {course.previewVideo ? (
-                    <video
-                      ref={videoRef}
-                      src={course.previewVideo}
-                      poster={course.image}
-                      playsInline
-                      loop
-                      controls
-                      onPlay={() => setIsPlaying(true)}
-                      onPause={() => setIsPlaying(false)}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-muted/20">
-                      <div className="text-center p-6">
-                        <Play className="w-12 h-12 text-primary mx-auto mb-2 opacity-60" />
-                        <p className="text-sm text-muted-foreground font-body">
-                          Video de presentación próximamente
-                        </p>
+                {/* Vertical Reel Mockup */}
+                <div className="max-w-[340px] sm:max-w-[360px] mx-auto aspect-[9/16] rounded-[2.5rem] p-2 ring-4 ring-gold/40 bg-gradient-to-b from-[#2d1245] to-[#120520] shadow-2xl overflow-hidden relative group">
+                  <div className="w-full h-full rounded-[2rem] overflow-hidden relative bg-black">
+                    {course.previewVideo ? (
+                      <video
+                        ref={videoRef}
+                        src={course.previewVideo}
+                        poster={course.image}
+                        playsInline
+                        loop
+                        controls
+                        onPlay={() => setIsPlaying(true)}
+                        onPause={() => setIsPlaying(false)}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-muted/20">
+                        <div className="text-center p-6">
+                          <Play className="w-12 h-12 text-primary mx-auto mb-2 opacity-60" />
+                          <p className="text-sm text-muted-foreground font-body">
+                            Reel de presentación próximamente
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
 
-                <div className="p-4 bg-muted/30 text-xs font-body text-muted-foreground flex items-center justify-between flex-wrap gap-2">
-                  <span>
-                    🎧 Recomendación: Escuchar con audífonos para percibir las frecuencias armónicas
+                {/* Reel description footer */}
+                <div className="mt-6 pt-5 border-t border-border flex items-center justify-between flex-wrap gap-3 text-xs font-body text-muted-foreground">
+                  <span className="flex items-center gap-1.5">
+                    ✨ <strong>4 escenas dinámicas:</strong> Gancho • Revelación • Método • Llamado a la acción
                   </span>
-                  <span className="text-foreground/70 font-medium">14 segundos • HD 720p</span>
+                  <span>15 segundos • HD 720x1280</span>
                 </div>
               </motion.div>
 
