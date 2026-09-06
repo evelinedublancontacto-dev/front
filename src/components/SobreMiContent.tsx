@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Award,
   Compass,
+  Moon,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -89,17 +90,37 @@ export default function SobreMiContent() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Navbar />
 
-      {/* Hero Header */}
-      <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden bg-gradient-to-b from-[hsl(270,30%,12%)] via-[hsl(270,30%,16%)] to-background">
-        <TwinkleStars count={24} />
-
-        {/* Subtle background glow */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-primary/20 rounded-full blur-[120px]" />
-          <div className="absolute top-1/3 right-10 w-[300px] h-[300px] bg-gold/10 rounded-full blur-[100px]" />
+      {/* Hero Header with Background Image */}
+      <section className="relative pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden">
+        {/* Background Image with mystical overlays */}
+        <div className="absolute inset-0">
+          <Image
+            src="/assets/sobre-mi-hero-bg.jpg"
+            alt="Fondo celestial místico para Sobre Mí"
+            className="w-full h-full object-cover"
+            width={1920}
+            height={1080}
+            priority
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(115deg, hsla(275,55%,18%,0.72) 0%, hsla(270,30%,10%,0.55) 45%, hsla(42,45%,25%,0.6) 100%)",
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse 70% 60% at 50% 45%, hsla(270,30%,8%,0.35) 0%, transparent 70%)",
+            }}
+          />
         </div>
 
-        <div className="container mx-auto px-6 relative z-10 text-center">
+        <TwinkleStars count={18} topMin={5} topRange={90} />
+
+        <div className="container mx-auto px-6 relative z-10 text-center max-w-4xl pb-8">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -108,7 +129,7 @@ export default function SobreMiContent() {
           >
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-xs sm:text-sm font-body text-white/70 hover:text-gold transition-colors duration-200"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-body text-white/80 hover:text-gold transition-colors duration-200 bg-white/10 backdrop-blur-sm px-4 py-1.5 rounded-full border border-white/15 shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Volver al inicio</span>
@@ -116,23 +137,71 @@ export default function SobreMiContent() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
+            className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mx-auto mb-6 border border-white/20 shadow-mystical"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/15 border border-gold/30 text-gold-light font-body text-xs font-semibold uppercase tracking-[0.25em] mb-4">
-              <Sparkles className="w-3.5 h-3.5 text-gold" />
-              <span>Quién Soy</span>
-            </div>
-
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
-              Eveline <span className="text-gradient-gold">Dublán</span>
-            </h1>
-
-            <p className="font-body text-base sm:text-lg md:text-xl text-purple-200/90 max-w-3xl mx-auto leading-relaxed">
-              Psicóloga · Tanatóloga · Psicoterapia Ericksoniana · Terapeuta Holística de Humanos y Animales
-            </p>
+            <Sparkles className="w-10 h-10 text-gold" />
           </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="font-body text-xs sm:text-sm tracking-[0.25em] uppercase mb-4"
+            style={{ color: "hsl(42 70% 62%)" }}
+          >
+            Quién Soy · Mi Camino & Misión
+          </motion.p>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-5 leading-tight"
+          >
+            <span style={{ color: "hsl(0 0% 100%)" }}>Eveline </span>
+            <span className="text-gradient-gold">Dublán</span>
+          </motion.h1>
+
+          <motion.div
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+            className="flex items-center justify-center gap-4 mb-5"
+          >
+            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-gold/40" />
+            <Moon className="w-4 h-4 text-gold/70" />
+            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-gold/40" />
+          </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.45 }}
+            className="font-body text-lg md:text-xl max-w-3xl mx-auto leading-relaxed"
+            style={{ color: "hsla(0, 0%, 100%, 0.88)" }}
+          >
+            Psicóloga · Tanatóloga · Psicoterapia Ericksoniana · Terapeuta Holística de Humanos y Animales
+          </motion.p>
+        </div>
+
+        {/* Wave transition divider to content */}
+        <div className="absolute bottom-0 left-0 right-0 z-20 leading-[0]">
+          <svg
+            viewBox="0 0 1440 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="block w-full"
+            preserveAspectRatio="none"
+            style={{ height: "48px" }}
+          >
+            <path
+              d="M0 60C240 120 480 0 720 60C960 120 1200 0 1440 60V120H0V60Z"
+              fill="hsl(var(--background))"
+            />
+          </svg>
         </div>
       </section>
 
