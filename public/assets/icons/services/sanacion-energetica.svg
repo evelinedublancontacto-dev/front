@@ -1,36 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <defs>
-    <linearGradient id="gold-energy" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="gold-energy-2" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FDE08B" />
-      <stop offset="45%" stop-color="#D4AF37" />
+      <stop offset="50%" stop-color="#D4AF37" />
       <stop offset="100%" stop-color="#B8860B" />
     </linearGradient>
   </defs>
-  <!-- Sacred halo ring -->
-  <circle cx="32" cy="32" r="30" stroke="url(#gold-energy)" stroke-width="1.25" stroke-dasharray="2 3" opacity="0.6" />
 
-  <!-- Radiating Aura Waves -->
-  <path d="M18 20 C22 14 42 14 46 20" stroke="url(#gold-energy)" stroke-width="1.25" stroke-linecap="round" opacity="0.6" />
-  <path d="M22 16 C26 11 38 11 42 16" stroke="url(#gold-energy)" stroke-width="1.25" stroke-linecap="round" opacity="0.4" />
+  <!-- Delicate Outer Sacred Circle -->
+  <circle cx="32" cy="32" r="30" stroke="url(#gold-energy-2)" stroke-width="1.2" stroke-dasharray="2 3" opacity="0.45" />
 
-  <!-- Sacred Merkaba / Diamond Star of Energy in the center -->
-  <path d="M32 14 L36.5 24 L47 28.5 L36.5 33 L32 43 L27.5 33 L17 28.5 L27.5 24 Z" stroke="url(#gold-energy)" stroke-width="1.75" stroke-linejoin="round" />
-  <circle cx="32" cy="28.5" r="3" stroke="url(#gold-energy)" stroke-width="1.5" />
+  <!-- Radiating Energy Waves from fingertips -->
+  <path d="M22 10 C27 7 37 7 42 10" stroke="url(#gold-energy-2)" stroke-width="1.5" stroke-linecap="round" opacity="0.75" />
+  <path d="M25 6 C28 4 36 4 39 6" stroke="url(#gold-energy-2)" stroke-width="1.2" stroke-linecap="round" opacity="0.5" />
 
-  <!-- Healing Hands cupping from below -->
-  <!-- Left Hand -->
-  <path d="M12 50 C14 45 18 41 23 40 C27 39 29 41 29 44 C27 46 25 47 21 47 C18 47 15 51 13 54" stroke="url(#gold-energy)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-  <!-- Right Hand -->
-  <path d="M52 50 C50 45 46 41 41 40 C37 39 35 41 35 44 C37 46 39 47 43 47 C46 47 49 51 51 54" stroke="url(#gold-energy)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Open Healing Hand (Mano de Sanación / Mano Sanadora) -->
+  <!-- Hand Outline: Wrist, Thumb, Fingers, and Palm -->
+  <path d="M25 54 
+           L25 45 
+           C23 44 16 38 15 34 
+           C14 31 17 29 19 32 
+           L23 37 
+           L23 20 
+           C23 17 26 17 26 20 
+           L26 31 
+           L28 16 
+           C28 13 31 13 31 16 
+           L31 31 
+           L33 18 
+           C33 15 36 15 36 18 
+           L36 32 
+           L38 23 
+           C38 20 41 20 41 23 
+           L41 38 
+           C41 46 39 54 39 54" 
+        stroke="url(#gold-energy-2)" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
 
-  <!-- Energy rays between hands and star -->
-  <path d="M26 36 L24 40" stroke="url(#gold-energy)" stroke-width="1.25" stroke-linecap="round" opacity="0.7" />
-  <path d="M38 36 L40 40" stroke="url(#gold-energy)" stroke-width="1.25" stroke-linecap="round" opacity="0.7" />
-  <path d="M32 45 L32 49" stroke="url(#gold-energy)" stroke-width="1.5" stroke-linecap="round" />
+  <!-- Wrist base line -->
+  <path d="M25 54 C29 55.5 35 55.5 39 54" stroke="url(#gold-energy-2)" stroke-width="1.75" stroke-linecap="round" />
 
-  <!-- Celestial sparkles -->
-  <path d="M12 24 L14 24 M13 23 L13 25" stroke="url(#gold-energy)" stroke-width="1.2" stroke-linecap="round" />
-  <path d="M51 23 L53 23 M52 22 L52 24" stroke="url(#gold-energy)" stroke-width="1.2" stroke-linecap="round" />
-  <circle cx="16" cy="36" r="1" fill="#D4AF37" />
-  <circle cx="48" cy="36" r="1" fill="#D4AF37" />
+  <!-- Radiant Sacred Energy Star in the center of the palm -->
+  <path d="M32 37 L33.5 41 L37.5 42.5 L33.5 44 L32 48 L30.5 44 L26.5 42.5 L30.5 41 Z" 
+        stroke="url(#gold-energy-2)" stroke-width="1.5" stroke-linejoin="round" />
+
+  <!-- Aura pulses radiating from the palm center -->
+  <circle cx="32" cy="42.5" r="8" stroke="url(#gold-energy-2)" stroke-width="1" stroke-dasharray="2 2" opacity="0.6" />
+
+  <!-- Celestial Energy Sparkles around the hand -->
+  <path d="M12 21 L14 21 M13 20 L13 22" stroke="url(#gold-energy-2)" stroke-width="1.2" stroke-linecap="round" />
+  <path d="M51 21 L53 21 M52 20 L52 22" stroke="url(#gold-energy-2)" stroke-width="1.2" stroke-linecap="round" />
+  <circle cx="10" cy="36" r="1" fill="#D4AF37" />
+  <circle cx="54" cy="36" r="1" fill="#D4AF37" />
+  <circle cx="18" cy="12" r="1" fill="#D4AF37" />
+  <circle cx="46" cy="12" r="1" fill="#D4AF37" />
 </svg>
