@@ -11,6 +11,7 @@ const navLinks = [
   { label: "Inicio", href: "#inicio" },
   { label: "Sobre Mí", href: "#sobre-mi" },
   { label: "Servicios", href: "#servicios" },
+  { label: "Testimonios", href: "#testimonios" },
   { label: "Citas", href: "/citas" },
   { label: "Meditaciones", href: "/meditaciones" },
   {
@@ -224,7 +225,7 @@ const Navbar = () => {
           </Link>
         )}
 
-        <ul className="hidden md:flex items-center gap-8">
+        <ul className="hidden xl:flex items-center gap-6 2xl:gap-8">
           {navLinks.map((link) => (
             <li key={link.label}>
               {isDropdown(link) ? (
@@ -238,7 +239,7 @@ const Navbar = () => {
 
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-white"
+          className="xl:hidden text-white"
         >
           {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -250,7 +251,7 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-b border-white/10 bg-[hsl(270,30%,12%)]/98 backdrop-blur-xl"
+            className="xl:hidden border-b border-white/10 bg-[hsl(270,30%,12%)]/98 backdrop-blur-xl"
           >
             <ul className="flex flex-col items-center py-6 gap-4">
               {navLinks.map((link) => (
