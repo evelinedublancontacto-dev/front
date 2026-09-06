@@ -1,14 +1,11 @@
 "use client";
 
-import { use, useState, useRef } from "react";
+import { use, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
   Clock,
   Play,
-  Pause,
-  Volume2,
-  VolumeX,
   BookOpen,
   CheckCircle2,
   Sparkles,
@@ -17,15 +14,12 @@ import {
   Award,
   Users,
   MessageCircle,
-  HelpCircle,
   Flame,
-  Calendar,
   ShieldCheck,
   ChevronRight,
-  Download,
 } from "lucide-react";
 import Image from "next/image";
-import { courses, type Course } from "@/data/courses";
+import { courses } from "@/data/courses";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -50,9 +44,6 @@ export default function CursoDetalle({
   const { slug } = use(params);
   const course = courses.find((c) => c.slug === slug);
   const [copied, setCopied] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   if (!course) {
     return (
@@ -82,25 +73,6 @@ export default function CursoDetalle({
       navigator.clipboard.writeText(window.location.href);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
-    }
-  };
-
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        videoRef.current.play();
-        setIsPlaying(true);
-      }
-    }
-  };
-
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
     }
   };
 
@@ -237,90 +209,12 @@ export default function CursoDetalle({
           <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-10 lg:gap-12">
             {/* Left 2 Columns */}
             <div className="lg:col-span-2 space-y-12">
-              {/* Featured Mystical Instagram Reel Player */}
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={0}
-                variants={fadeUp}
-                className="bg-gradient-card rounded-2xl border-glow overflow-hidden shadow-mystical p-6 md:p-8"
-              >
-                <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      <Sparkles className="w-5 h-5 text-gold" />
-                    </div>
-                    <div>
-                      <h2 className="font-display text-lg sm:text-xl font-bold text-foreground leading-tight">
-                        Reel de Presentación • Estilo Instagram
-                      </h2>
-                      <p className="text-xs font-body text-muted-foreground">
-                        Texto animado por escenas con cuencos sagrados y música mística (sin voz)
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/10 text-gold-light border border-gold/20 text-xs font-medium font-body">
-                      <Volume2 className="w-3.5 h-3.5" /> 9:16 Vertical
-                    </span>
-                    {course.previewVideo && (
-                      <a
-                        href={course.previewVideo}
-                        download={`${course.slug}-reel.mp4`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-medium font-body hover:bg-primary hover:text-white transition-colors"
-                        title="Descargar Reel para compartir en Instagram o WhatsApp"
-                      >
-                        <Download className="w-3.5 h-3.5" /> Descargar Reel
-                      </a>
-                    )}
-                  </div>
-                </div>
-
-                {/* Vertical Reel Mockup */}
-                <div className="max-w-[340px] sm:max-w-[360px] mx-auto aspect-[9/16] rounded-[2.5rem] p-2 ring-4 ring-gold/40 bg-gradient-to-b from-[#2d1245] to-[#120520] shadow-2xl overflow-hidden relative group">
-                  <div className="w-full h-full rounded-[2rem] overflow-hidden relative bg-black">
-                    {course.previewVideo ? (
-                      <video
-                        ref={videoRef}
-                        src={course.previewVideo}
-                        poster={course.image}
-                        playsInline
-                        loop
-                        controls
-                        onPlay={() => setIsPlaying(true)}
-                        onPause={() => setIsPlaying(false)}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-muted/20">
-                        <div className="text-center p-6">
-                          <Play className="w-12 h-12 text-primary mx-auto mb-2 opacity-60" />
-                          <p className="text-sm text-muted-foreground font-body">
-                            Reel de presentación próximamente
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Reel description footer */}
-                <div className="mt-6 pt-5 border-t border-border flex items-center justify-between flex-wrap gap-3 text-xs font-body text-muted-foreground">
-                  <span className="flex items-center gap-1.5">
-                    ✨ <strong>4 escenas dinámicas:</strong> Gancho • Revelación • Método • Llamado a la acción
-                  </span>
-                  <span>15 segundos • HD 720x1280</span>
-                </div>
-              </motion.div>
-
               {/* Course Long Description */}
               <motion.div
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
-                custom={1}
+                custom={0}
                 variants={fadeUp}
                 className="bg-white/70 backdrop-blur-sm rounded-2xl p-7 md:p-9 border border-border"
               >
@@ -365,7 +259,7 @@ export default function CursoDetalle({
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
-                custom={2}
+                custom={1}
                 variants={fadeUp}
               >
                 <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
@@ -422,7 +316,7 @@ export default function CursoDetalle({
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
-                custom={3}
+                custom={2}
                 variants={fadeUp}
                 className="bg-gradient-section rounded-2xl p-7 md:p-8 border border-border"
               >
@@ -486,7 +380,7 @@ export default function CursoDetalle({
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
-                custom={4}
+                custom={3}
                 variants={fadeUp}
                 className="bg-white/80 rounded-2xl p-7 md:p-8 border border-border flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left"
               >
