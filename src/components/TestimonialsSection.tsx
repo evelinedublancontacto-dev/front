@@ -1,11 +1,19 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
-import { Star, Quote, Sparkles, Heart, MessageCircle, CalendarDays, ArrowRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { motion, useInView } from "framer-motion";
+import { Star, Quote, Sparkles, Heart, MessageCircle, CalendarDays, ArrowRight, Pause, Play } from "lucide-react";
 import Link from "next/link";
 import { testimonials, type Testimonial } from "@/data/testimonials";
 import { contact } from "@/lib/contact";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 
 const categories = [
   { id: "todos", label: "Todas las reseñas" },
@@ -35,13 +43,65 @@ const whatsappCTAUrl = `${contact.whatsappUrl}?text=${encodeURIComponent(
 
 const TestimonialsSection = () => {
   const [activeCategory, setActiveCategory] = useState<string>("todos");
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
+  const isSectionVisible = useInView(sectionRef, { margin: "0px" });
 
   const filteredTestimonials =
     activeCategory === "todos"
       ? testimonials
       : testimonials.filter((t) => t.category === activeCategory);
+
+  const canLoop = filteredTestimonials.length > 3;
+
+  // Track active slide and total count
+  useEffect(() => {
+    if (!api) return;
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap());
+
+    const onSelect = () => {
+      setCurrent(api.selectedScrollSnap());
+    };
+
+    api.on("select", onSelect);
+    api.on("reInit", onSelect);
+
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api, filteredTestimonials]);
+
+  // Reset to first slide when category changes
+  useEffect(() => {
+    if (api) {
+      api.scrollTo(0);
+      setCurrent(0);
+    }
+  }, [activeCategory, api]);
+
+  // Autoplay functionality: advances automatically every 5s when not paused and in view
+  useEffect(() => {
+    if (!api || isPaused || !isSectionVisible || filteredTestimonials.length <= 1) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      if (api.canScrollNext()) {
+        api.scrollNext();
+      } else {
+        api.scrollTo(0);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [api, isPaused, isSectionVisible, filteredTestimonials.length]);
 
   return (
     <section id="testimonios" className="py-24 bg-gradient-section relative overflow-hidden">
@@ -61,7 +121,7 @@ const TestimonialsSection = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 relative z-10" ref={sectionRef}>
+      <div className="container mx-auto px-4 sm:px-6 relative z-10" ref={sectionRef}>
         {/* Section Header */}
         <div className="text-center mb-12 md:mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-body text-xs font-semibold uppercase tracking-[0.2em] mb-4">
@@ -98,83 +158,137 @@ const TestimonialsSection = () => {
           </div>
         </div>
 
-        {/* Testimonials Grid */}
-        <motion.div
-          layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto"
+        {/* Testimonials Carousel (3 items on desktop, 2 on tablet, 1 on mobile) */}
+        <div
+          className="relative max-w-7xl mx-auto px-2 sm:px-12"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
         >
-          <AnimatePresence mode="popLayout">
-            {filteredTestimonials.map((item, index) => (
-              <motion.div
-                key={item.id}
-                layout
-                initial={{ opacity: 0, y: 25 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
-                className="group relative bg-gradient-card rounded-2xl p-7 md:p-8 border-glow hover:scale-[1.02] transition-all duration-500 flex flex-col justify-between h-full shadow-sm hover:shadow-mystical"
-              >
-                {/* Background Watermark Quote */}
-                <Quote
-                  className="absolute top-6 right-6 w-12 h-12 text-primary/10 pointer-events-none group-hover:text-primary/15 transition-colors"
-                  aria-hidden
-                />
+          <Carousel
+            setApi={setApi}
+            opts={{
+              align: "start",
+              loop: canLoop,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-4 py-4 items-stretch">
+              {filteredTestimonials.map((item) => (
+                <CarouselItem
+                  key={item.id}
+                  className="pl-4 basis-full md:basis-1/2 lg:basis-1/3 flex"
+                >
+                  <div className="group relative bg-gradient-card rounded-2xl p-7 md:p-8 border-glow hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between w-full h-full shadow-sm hover:shadow-mystical">
+                    {/* Background Watermark Quote */}
+                    <Quote
+                      className="absolute top-6 right-6 w-12 h-12 text-primary/10 pointer-events-none group-hover:text-primary/15 transition-colors"
+                      aria-hidden
+                    />
 
-                <div>
-                  {/* Top Bar: Stars + Category Chip */}
-                  <div className="flex items-center justify-between gap-2 mb-4">
-                    <div className="flex items-center gap-1 text-gold" aria-label="Calificación 5 de 5 estrellas">
-                      {[...Array(item.stars)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-gold text-gold" />
-                      ))}
+                    <div>
+                      {/* Top Bar: Stars + Category Chip */}
+                      <div className="flex items-center justify-between gap-2 mb-4">
+                        <div
+                          className="flex items-center gap-1 text-gold"
+                          aria-label="Calificación 5 de 5 estrellas"
+                        >
+                          {[...Array(item.stars)].map((_, i) => (
+                            <Star key={i} className="w-4 h-4 fill-gold text-gold" />
+                          ))}
+                        </div>
+                        <span className="text-[11px] font-body font-medium px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/15">
+                          {item.categoryLabel}
+                        </span>
+                      </div>
+
+                      {/* Highlight Motto / Quote */}
+                      {item.highlight && (
+                        <h3 className="font-display text-base font-semibold text-foreground mb-3 leading-snug group-hover:text-primary transition-colors">
+                          &ldquo;{item.highlight}&rdquo;
+                        </h3>
+                      )}
+
+                      {/* Content Paragraphs */}
+                      <div className="font-body text-sm text-foreground/80 leading-relaxed space-y-3 mb-6">
+                        {item.content.split("\n\n").map((paragraph, pIdx) => (
+                          <p key={pIdx} className="text-justify sm:text-left">
+                            {paragraph}
+                          </p>
+                        ))}
+                      </div>
                     </div>
-                    <span className="text-[11px] font-body font-medium px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/15">
-                      {item.categoryLabel}
-                    </span>
-                  </div>
 
-                  {/* Highlight Motto / Quote */}
-                  {item.highlight && (
-                    <h3 className="font-display text-base font-semibold text-foreground mb-3 leading-snug group-hover:text-primary transition-colors">
-                      &ldquo;{item.highlight}&rdquo;
-                    </h3>
-                  )}
-
-                  {/* Content Paragraphs */}
-                  <div className="font-body text-sm text-foreground/80 leading-relaxed space-y-3 mb-6">
-                    {item.content.split("\n\n").map((paragraph, pIdx) => (
-                      <p key={pIdx} className="text-justify sm:text-left">
-                        {paragraph}
-                      </p>
-                    ))}
+                    {/* Author Info Card Footer */}
+                    <div className="pt-4 border-t border-border/80 flex items-center gap-3.5">
+                      <div className="relative w-11 h-11 rounded-full bg-gradient-to-br from-primary to-purple-glow text-white font-display font-semibold text-sm flex items-center justify-center ring-2 ring-gold/40 shadow-sm shrink-0">
+                        {getInitials(item.name)}
+                      </div>
+                      <div>
+                        <h4 className="font-display font-semibold text-sm text-foreground">
+                          {item.name}
+                        </h4>
+                        {item.fullName && item.fullName !== item.name && (
+                          <p className="font-body text-xs text-muted-foreground">
+                            {item.fullName}
+                          </p>
+                        )}
+                        {item.role && (
+                          <p className="font-body text-xs text-primary/90 font-medium">
+                            {item.role}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+
+            {/* Navigation Arrows */}
+            {filteredTestimonials.length > 1 && (
+              <>
+                <CarouselPrevious className="-left-3 sm:-left-6 lg:-left-7 h-10 w-10 border-primary/20 bg-white/90 text-primary hover:bg-primary hover:text-white shadow-md transition-all duration-300" />
+                <CarouselNext className="-right-3 sm:-right-6 lg:-right-7 h-10 w-10 border-primary/20 bg-white/90 text-primary hover:bg-primary hover:text-white shadow-md transition-all duration-300" />
+              </>
+            )}
+          </Carousel>
+
+          {/* Dots Navigation and Play/Pause Toggle */}
+          {filteredTestimonials.length > 1 && (
+            <div className="flex justify-center items-center gap-3 mt-8">
+              {count > 1 && (
+                <div className="flex items-center gap-2">
+                  {Array.from({ length: count }).map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => api?.scrollTo(idx)}
+                      className={`transition-all duration-300 rounded-full ${
+                        current === idx
+                          ? "w-8 h-2.5 bg-primary shadow-sm"
+                          : "w-2.5 h-2.5 bg-primary/25 hover:bg-primary/50"
+                      }`}
+                      aria-label={`Ir al testimonio ${idx + 1}`}
+                    />
+                  ))}
                 </div>
-
-                {/* Author Info Card Footer */}
-                <div className="pt-4 border-t border-border/80 flex items-center gap-3.5">
-                  <div className="relative w-11 h-11 rounded-full bg-gradient-to-br from-primary to-purple-glow text-white font-display font-semibold text-sm flex items-center justify-center ring-2 ring-gold/40 shadow-sm shrink-0">
-                    {getInitials(item.name)}
-                  </div>
-                  <div>
-                    <h4 className="font-display font-semibold text-sm text-foreground">
-                      {item.name}
-                    </h4>
-                    {item.fullName && item.fullName !== item.name && (
-                      <p className="font-body text-xs text-muted-foreground">
-                        {item.fullName}
-                      </p>
-                    )}
-                    {item.role && (
-                      <p className="font-body text-xs text-primary/90 font-medium">
-                        {item.role}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
+              )}
+              <button
+                onClick={() => setIsPaused((prev) => !prev)}
+                className="p-1.5 rounded-full text-muted-foreground/70 hover:text-primary hover:bg-primary/10 transition-colors ml-1"
+                aria-label={isPaused ? "Reanudar avance automático" : "Pausar avance automático"}
+                title={isPaused ? "Reanudar carrusel" : "Pausar carrusel"}
+              >
+                {isPaused ? (
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                ) : (
+                  <Pause className="w-3.5 h-3.5 fill-current" />
+                )}
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Bottom Call to Action Banner */}
         <motion.div
