@@ -9,12 +9,14 @@ export interface Course {
   price: string;
   priceUsd: string;
   image: string;
+  previewVideo?: string;
   videos: { title: string; url: string; duration: string }[];
 }
 
 export const courses: Course[] = [
   {
     slug: "arbol-genealogico",
+    previewVideo: "/assets/courses/videos/arbol-genealogico.mp4",
     title: "Análisis y Sanación Profunda de Tu Árbol Genealógico",
     category: "Ancestros",
     description: "Descubre la información oculta de tu árbol genealógico, identifica tus dobles, secretos y patrones repetitivos para sanar tu raíz familiar.",
@@ -32,6 +34,7 @@ export const courses: Course[] = [
   },
   {
     slug: "sanacion-con-velas",
+    previewVideo: "/assets/courses/videos/sanacion-con-velas.mp4",
     title: "Rituales de Sanación con Velas",
     category: "Velas y Magia",
     description: "Aprende la magia y conexión del fuego sagrado para diseñar rituales de sanación profundos y lectura de restos de cera.",
@@ -49,6 +52,7 @@ export const courses: Course[] = [
   },
   {
     slug: "sanacion-para-animales",
+    previewVideo: "/assets/courses/videos/sanacion-para-animales.mp4",
     title: "Sanación para Animales",
     category: "Sanación Animal",
     description: "Técnicas energéticas para animales de compañía y silvestres: conexión de corazón, chakras, heridas traumáticas, apoyo en duelo y protección.",
@@ -69,6 +73,7 @@ export const courses: Course[] = [
   },
   {
     slug: "sanacion-y-florecimiento",
+    previewVideo: "/assets/courses/videos/sanacion-y-florecimiento.mp4",
     title: "Curso Sanación y Florecimiento",
     category: "Sagrado Femenino",
     description: "Formación de 9 módulos para mujeres: energía uterina, linaje femenino, diosas, oráculos vivientes y liberación del poder femenino.",
@@ -88,6 +93,7 @@ export const courses: Course[] = [
   },
   {
     slug: "taller-de-angeles",
+    previewVideo: "/assets/courses/videos/taller-de-angeles.mp4",
     title: "Taller de Ángeles (Nivel Básico)",
     category: "Angelical",
     description: "Aprende a sanarte con energía angelical de la nueva era: construcción de altar, canalización de luz y burbujas de protección.",
@@ -105,6 +111,7 @@ export const courses: Course[] = [
   },
   {
     slug: "taller-de-abundancia",
+    previewVideo: "/assets/courses/videos/taller-de-abundancia.mp4",
     title: "Taller de Abundancia 💎✨",
     category: "Prosperidad",
     description: "Revisa, limpia y activa tu aparato energético de abundancia. Disuelve contratos limitantes, deudas kármicas y abre tu vasija receptora.",
@@ -121,6 +128,7 @@ export const courses: Course[] = [
   },
   {
     slug: "lectura-de-oraculo",
+    previewVideo: "/assets/courses/videos/lectura-de-oraculo.mp4",
     title: "Taller de Lectura de Oráculo",
     category: "Oráculos",
     description: "Aprende el arte de la lectura intuitiva: cuidado de cartas, preparación energética, tiradas sagradas y canalización certera de mensajes.",
@@ -137,6 +145,7 @@ export const courses: Course[] = [
   },
   {
     slug: "cortar-lazos-con-tu-ex",
+    previewVideo: "/assets/courses/videos/cortar-lazos-con-tu-ex.mp4",
     title: "Cortar Lazos con tu Ex",
     category: "Relaciones y Energía",
     description: "Corta lazos energéticos, emocionales y sexuales que drenan tu energía, recupera fragmentos de tu alma y abre espacio a un amor sano.",
@@ -152,6 +161,7 @@ export const courses: Course[] = [
   },
   {
     slug: "sanacion-del-linaje-materno",
+    previewVideo: "/assets/courses/videos/sanacion-del-linaje-materno.mp4",
     title: "Sanación del Linaje Materno",
     category: "Ancestros",
     description: "Sana las memorias de 7 generaciones de ancestras en tu útero: heridas, duelos y patrones heredados con amor, límites y perdón.",
@@ -167,6 +177,7 @@ export const courses: Course[] = [
   },
   {
     slug: "sanacion-del-linaje-paterno",
+    previewVideo: "/assets/courses/videos/sanacion-del-linaje-paterno.mp4",
     title: "Sanación del Linaje Paterno",
     category: "Ancestros",
     description: "Sana tu canal derecho: prosperidad, profesión, reconocimiento, cuerpo físico, límites saludables y reconciliación con el sagrado masculino.",
@@ -182,6 +193,7 @@ export const courses: Course[] = [
   },
   {
     slug: "vidas-pasadas",
+    previewVideo: "/assets/courses/videos/vidas-pasadas.mp4",
     title: "Taller de Vidas Pasadas",
     category: "Regresión y Alma",
     description: "Regresión consciente protegida con el sonido armónico de los Cuencos Tibetanos para comprender relaciones, contratos de alma y sanar patrones.",
