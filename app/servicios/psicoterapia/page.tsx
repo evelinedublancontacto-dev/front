@@ -8,13 +8,14 @@ import {
   CalendarCheck,
   DollarSign,
   ArrowLeft,
-  Phone,
-} from "lucide-react";
+  Phone, CalendarDays } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { contact } from "@/lib/contact";
+import AgendaEnLinea from "@/components/AgendaEnLinea";
 import TwinkleStars from "@/components/TwinkleStars";
 
 const fadeUp = {
@@ -437,6 +438,7 @@ const Psicoterapia = () => {
                 rápida y fácilmente, encontraremos un espacio en la agenda que
                 sea conveniente para ambas partes.
               </p>
+              <AgendaEnLinea />
               <p className="font-body text-xs text-muted-foreground italic">
                 Es indispensable que la persona que vaya a tomar la terapia sea
                 quien agende su cita personalmente.
@@ -485,15 +487,45 @@ const Psicoterapia = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center"
+            className="text-center flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <a href="tel:+527711439116">
+            <a href={contact.telUrl}>
               <Button
                 size="lg"
                 className="font-body text-base px-10 py-6 rounded-full shadow-mystical"
               >
                 <Phone className="w-5 h-5 mr-2" />
-                Agendar mi cita
+                Llamar para agendar
+              </Button>
+            </a>
+            <Link href="/citas">
+              <Button
+                size="lg"
+                variant="outline"
+                className="font-body text-base px-10 py-6 rounded-full border-primary/40 hover:bg-primary/10"
+              >
+                <CalendarDays className="w-5 h-5 mr-2" />
+                Agendar en línea
+              </Button>
+            </Link>
+            <a
+              href={contact.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button
+                size="lg"
+                variant="outline"
+                className="font-body text-base px-10 py-6 rounded-full flex items-center gap-2"
+              >
+                <Image
+                  src="/assets/icons/whatsapp.png"
+                  alt="WhatsApp"
+                  width={20}
+                  height={20}
+                  className="w-5 h-5 object-contain"
+                />
+                WhatsApp
               </Button>
             </a>
           </motion.div>

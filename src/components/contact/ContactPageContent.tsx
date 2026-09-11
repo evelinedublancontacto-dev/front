@@ -16,7 +16,7 @@ import {
   Video,
 } from "lucide-react";
 import { toast } from "sonner";
-import { contact, buildWhatsAppMessage } from "@/lib/contact";
+import { contact, social, buildWhatsAppMessage } from "@/lib/contact";
 
 const contactMethods = [
   {
@@ -73,6 +73,34 @@ const ContactPageContent = () => {
   return (
     <section className="py-16 md:py-20">
       <div className="container mx-auto px-6 max-w-5xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-12"
+        >
+          <Link
+            href="/citas"
+            className="group flex flex-col sm:flex-row sm:items-center gap-5 p-7 md:p-8 rounded-2xl border border-primary/30 bg-gradient-card shadow-mystical hover:border-primary/50 transition-colors"
+          >
+            <div className="w-14 h-14 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/25 transition-colors">
+              <CalendarDays className="w-7 h-7 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h2 className="font-display text-xl md:text-2xl font-bold text-foreground mb-1">
+                Agenda tu sesión en línea
+              </h2>
+              <p className="text-muted-foreground font-body text-sm leading-relaxed">
+                Elige servicio, fecha y hora tú misma. Queda reservada al
+                instante, sin esperar respuesta.
+              </p>
+            </div>
+            <span className="inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-primary text-primary-foreground font-body font-semibold text-sm whitespace-nowrap transition-transform group-hover:scale-[1.03]">
+              Ver horarios
+            </span>
+          </Link>
+        </motion.div>
+
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-14">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -141,35 +169,24 @@ const ContactPageContent = () => {
               })}
             </div>
 
-            <div className="flex gap-4 pt-2">
-              {[Instagram, Facebook].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="w-11 h-11 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
-                  aria-label={i === 0 ? "Instagram" : "Facebook"}
-                >
-                  <Icon className="w-5 h-5" />
-                </a>
-              ))}
+            <div className="flex flex-wrap gap-3 pt-2">
+              {social.map((perfil) => {
+                const Icono = perfil.red === "facebook" ? Facebook : Instagram;
+                return (
+                  <a
+                    key={perfil.url}
+                    href={perfil.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${perfil.label} — ${perfil.handle}`}
+                    className="inline-flex items-center gap-2 h-11 pl-3 pr-4 rounded-full bg-secondary text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
+                  >
+                    <Icono className="w-5 h-5 flex-shrink-0" />
+                    <span className="font-body text-sm">{perfil.handle}</span>
+                  </a>
+                );
+              })}
             </div>
-
-            <Link
-              href="/citas"
-              className="flex items-center gap-4 p-5 rounded-xl border border-primary/25 bg-primary/5 hover:bg-primary/10 transition-colors group"
-            >
-              <div className="w-12 h-12 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
-                <CalendarDays className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-display font-semibold text-foreground">
-                  ¿Prefieres agendar directamente?
-                </h3>
-                <p className="text-muted-foreground font-body text-sm">
-                  Reserva tu sesión en línea con fecha y hora
-                </p>
-              </div>
-            </Link>
           </motion.div>
 
           <motion.div
@@ -179,11 +196,12 @@ const ContactPageContent = () => {
           >
             <div className="bg-gradient-card rounded-2xl border border-border p-6 md:p-8 shadow-mystical">
               <h2 className="font-display text-2xl font-bold text-foreground mb-1">
-                Envíame un mensaje
+                ¿Tienes una duda antes de agendar?
               </h2>
               <p className="text-muted-foreground font-body text-sm mb-6">
-                Completa el formulario y te llevaremos a WhatsApp con tu
-                mensaje listo para enviar.
+                Escríbeme y te llevaremos a WhatsApp con tu mensaje listo para
+                enviar. Si ya sabes qué sesión quieres, agenda directamente
+                arriba.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">

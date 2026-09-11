@@ -11,12 +11,12 @@ import {
   Shield,
   Camera,
   AlertCircle,
-  CheckCircle2,
-} from "lucide-react";
+  CheckCircle2, CalendarDays } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AgendaEnLinea from "@/components/AgendaEnLinea";
 import Link from "next/link";
 import TwinkleStars from "@/components/TwinkleStars";
 import { contact } from "@/lib/contact";
@@ -451,6 +451,7 @@ const SanacionAnimales = () => {
                 <strong className="text-primary">{contact.phone}</strong> donde
                 rápida y fácilmente encontraremos un espacio conveniente.
               </p>
+              <AgendaEnLinea />
               <p className="font-body text-xs text-muted-foreground italic">
                 Es indispensable que la persona responsable directa del animal
                 sea quien agende su cita personalmente.
@@ -497,7 +498,7 @@ const SanacionAnimales = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center"
+            className="text-center flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <a href={contact.telUrl}>
               <Button
@@ -505,7 +506,37 @@ const SanacionAnimales = () => {
                 className="font-body text-base px-10 py-6 rounded-full shadow-mystical"
               >
                 <Phone className="w-5 h-5 mr-2" />
-                Agendar mi cita
+                Llamar para agendar
+              </Button>
+            </a>
+            <Link href="/citas">
+              <Button
+                size="lg"
+                variant="outline"
+                className="font-body text-base px-10 py-6 rounded-full border-primary/40 hover:bg-primary/10"
+              >
+                <CalendarDays className="w-5 h-5 mr-2" />
+                Agendar en línea
+              </Button>
+            </Link>
+            <a
+              href={contact.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button
+                size="lg"
+                variant="outline"
+                className="font-body text-base px-10 py-6 rounded-full flex items-center gap-2"
+              >
+                <Image
+                  src="/assets/icons/whatsapp.png"
+                  alt="WhatsApp"
+                  width={20}
+                  height={20}
+                  className="w-5 h-5 object-contain"
+                />
+                WhatsApp
               </Button>
             </a>
           </motion.div>

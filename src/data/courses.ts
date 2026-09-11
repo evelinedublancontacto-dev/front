@@ -9,6 +9,8 @@ export interface Course {
   price: string;
   priceUsd: string;
   image: string;
+  /** Solo estos talleres entregan manual impreso/digital. */
+  incluyeManual?: boolean;
   videos: { title: string; url: string; duration: string }[];
 }
 
@@ -41,6 +43,7 @@ export const courses: Course[] = [
     price: "$999 MXN",
     priceUsd: "$58 USD",
     image: "/assets/courses/sanacion-velas.jpg",
+    incluyeManual: true,
     videos: [
       { title: "Sesión 1: Fuego sagrado y tipos de velas", url: "", duration: "Sesión en vivo" },
       { title: "Sesión 2: Diseño y activación de rituales", url: "", duration: "Sesión en vivo" },
@@ -58,6 +61,7 @@ export const courses: Course[] = [
     price: "$900 MXN / módulo",
     priceUsd: "$52 USD / mod",
     image: "/assets/courses/sanacion-animales.jpg",
+    incluyeManual: true,
     videos: [
       { title: "Módulo 1: Conexión intuitiva y escaneo energético", url: "", duration: "Zoom en vivo" },
       { title: "Módulo 2: Chakras y masaje terapéutico animal", url: "", duration: "Zoom en vivo" },
@@ -130,6 +134,7 @@ export const courses: Course[] = [
     price: "$1,800 MXN",
     priceUsd: "$105 USD",
     image: "/assets/courses/lectura-oraculo.jpg",
+    incluyeManual: true,
     videos: [
       { title: "Día 1: Consagración del oráculo y tiradas básicas", url: "", duration: "Presencial" },
       { title: "Día 2: Canalización intuitiva y ética de lectura", url: "", duration: "Presencial" },

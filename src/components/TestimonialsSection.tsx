@@ -35,6 +35,109 @@ const SparkleDecor = ({ className }: { className?: string }) => (
   </svg>
 );
 
+/* A partir de este largo la reseña se recorta y aparece "Leer más". Sin esto
+   una sola reseña larga estira a todas las tarjetas del carrusel, porque
+   comparten altura. */
+const LARGO_MAXIMO = 520;
+
+/** Corta en el límite de párrafo más cercano para no partir una frase. */
+function recortar(contenido: string): { vistaPrevia: string; hayMas: boolean } {
+  if (contenido.length <= LARGO_MAXIMO) return { vistaPrevia: contenido, hayMas: false };
+
+  const parrafos = contenido.split("\n\n");
+  const tomados: string[] = [];
+  for (const parrafo of parrafos) {
+    const conEste = [...tomados, parrafo].join("\n\n");
+    if (tomados.length > 0 && conEste.length > LARGO_MAXIMO) break;
+    tomados.push(parrafo);
+  }
+  return { vistaPrevia: tomados.join("\n\n"), hayMas: true };
+}
+
+const TestimonialCard = ({ item }: { item: Testimonial }) => {
+  const [expandido, setExpandido] = useState(false);
+  const { vistaPrevia, hayMas } = recortar(item.content);
+  const texto = expandido ? item.content : vistaPrevia;
+
+  return (
+    <div className="group relative bg-gradient-card rounded-2xl p-7 md:p-8 border-glow hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between w-full h-full shadow-sm hover:shadow-mystical">
+      {/* Background Watermark Quote */}
+      <Quote
+        className="absolute top-6 right-6 w-12 h-12 text-primary/10 pointer-events-none group-hover:text-primary/15 transition-colors"
+        aria-hidden
+      />
+
+      <div>
+        {/* Top Bar: Stars + Category Chip */}
+        <div className="flex items-center justify-between gap-2 mb-4">
+          <div
+            className="flex items-center gap-1 text-gold"
+            aria-label="Calificación 5 de 5 estrellas"
+          >
+            {[...Array(item.stars)].map((_, i) => (
+              <Star key={i} className="w-4 h-4 fill-gold text-gold" />
+            ))}
+          </div>
+          <span className="text-[11px] font-body font-medium px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/15">
+            {item.categoryLabel}
+          </span>
+        </div>
+
+        {/* Highlight Motto / Quote */}
+        {item.highlight && (
+          <h3 className="font-display text-base font-semibold text-foreground mb-3 leading-snug group-hover:text-primary transition-colors">
+            &ldquo;{item.highlight}&rdquo;
+          </h3>
+        )}
+
+        {/* Content Paragraphs */}
+        <div className="font-body text-sm text-foreground/80 leading-relaxed space-y-3 mb-3">
+          {texto.split("\n\n").map((paragraph, pIdx) => (
+            <p key={pIdx} className="text-justify sm:text-left">
+              {paragraph}
+              {!expandido && hayMas && pIdx === texto.split("\n\n").length - 1 && (
+                <span className="text-muted-foreground">…</span>
+              )}
+            </p>
+          ))}
+        </div>
+
+        {hayMas && (
+          <button
+            type="button"
+            onClick={() => setExpandido((v) => !v)}
+            className="font-body text-sm font-medium text-primary hover:text-primary/80 transition-colors mb-6"
+          >
+            {expandido ? "Leer menos" : "Leer más"}
+          </button>
+        )}
+      </div>
+
+      {/* Author Info Card Footer */}
+      <div className="pt-4 border-t border-border/80 flex items-center gap-3.5">
+        <div className="relative w-11 h-11 rounded-full bg-gradient-to-br from-primary to-purple-glow text-white font-display font-semibold text-sm flex items-center justify-center ring-2 ring-gold/40 shadow-sm shrink-0">
+          {getInitials(item.name)}
+        </div>
+        <div>
+          <h4 className="font-display font-semibold text-sm text-foreground">
+            {item.name}
+          </h4>
+          {item.fullName && item.fullName !== item.name && (
+            <p className="font-body text-xs text-muted-foreground">
+              {item.fullName}
+            </p>
+          )}
+          {item.role && (
+            <p className="font-body text-xs text-primary/90 font-medium">
+              {item.role}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const TestimonialsSection = () => {
   const [activeCategory, setActiveCategory] = useState<string>("todos");
   const [api, setApi] = useState<CarouselApi>();
@@ -174,68 +277,7 @@ const TestimonialsSection = () => {
                   key={item.id}
                   className="pl-4 basis-full md:basis-1/2 lg:basis-1/3 flex"
                 >
-                  <div className="group relative bg-gradient-card rounded-2xl p-7 md:p-8 border-glow hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between w-full h-full shadow-sm hover:shadow-mystical">
-                    {/* Background Watermark Quote */}
-                    <Quote
-                      className="absolute top-6 right-6 w-12 h-12 text-primary/10 pointer-events-none group-hover:text-primary/15 transition-colors"
-                      aria-hidden
-                    />
-
-                    <div>
-                      {/* Top Bar: Stars + Category Chip */}
-                      <div className="flex items-center justify-between gap-2 mb-4">
-                        <div
-                          className="flex items-center gap-1 text-gold"
-                          aria-label="Calificación 5 de 5 estrellas"
-                        >
-                          {[...Array(item.stars)].map((_, i) => (
-                            <Star key={i} className="w-4 h-4 fill-gold text-gold" />
-                          ))}
-                        </div>
-                        <span className="text-[11px] font-body font-medium px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/15">
-                          {item.categoryLabel}
-                        </span>
-                      </div>
-
-                      {/* Highlight Motto / Quote */}
-                      {item.highlight && (
-                        <h3 className="font-display text-base font-semibold text-foreground mb-3 leading-snug group-hover:text-primary transition-colors">
-                          &ldquo;{item.highlight}&rdquo;
-                        </h3>
-                      )}
-
-                      {/* Content Paragraphs */}
-                      <div className="font-body text-sm text-foreground/80 leading-relaxed space-y-3 mb-6">
-                        {item.content.split("\n\n").map((paragraph, pIdx) => (
-                          <p key={pIdx} className="text-justify sm:text-left">
-                            {paragraph}
-                          </p>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Author Info Card Footer */}
-                    <div className="pt-4 border-t border-border/80 flex items-center gap-3.5">
-                      <div className="relative w-11 h-11 rounded-full bg-gradient-to-br from-primary to-purple-glow text-white font-display font-semibold text-sm flex items-center justify-center ring-2 ring-gold/40 shadow-sm shrink-0">
-                        {getInitials(item.name)}
-                      </div>
-                      <div>
-                        <h4 className="font-display font-semibold text-sm text-foreground">
-                          {item.name}
-                        </h4>
-                        {item.fullName && item.fullName !== item.name && (
-                          <p className="font-body text-xs text-muted-foreground">
-                            {item.fullName}
-                          </p>
-                        )}
-                        {item.role && (
-                          <p className="font-body text-xs text-primary/90 font-medium">
-                            {item.role}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  <TestimonialCard item={item} />
                 </CarouselItem>
               ))}
             </CarouselContent>

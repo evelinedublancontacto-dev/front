@@ -3,7 +3,7 @@ import { Mail, Phone, MapPin, Instagram, Facebook } from "lucide-react";
 import Image from "next/image";
 import TwinkleStars from "@/components/TwinkleStars";
 import { logos } from "@/lib/brand";
-import { contact } from "@/lib/contact";
+import { contact, social } from "@/lib/contact";
 
 const Footer = () => (
   <footer className="relative overflow-hidden">
@@ -145,7 +145,7 @@ const Footer = () => (
                   className="w-4 h-4"
                   style={{ color: "hsl(42 70% 62%)" }}
                 />
-                <span>contacto@evelinedublan.com</span>
+                <span>evelinedublan@gmail.com</span>
               </li>
               <li className="flex items-center gap-2">
                 <a
@@ -173,20 +173,23 @@ const Footer = () => (
               </li>
             </ul>
             <div className="flex gap-4 mt-4">
-              <a
-                href="#"
-                className="hover:scale-110 transition-transform"
-                style={{ color: "hsl(42 70% 62%)" }}
-              >
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="hover:scale-110 transition-transform"
-                style={{ color: "hsl(42 70% 62%)" }}
-              >
-                <Facebook className="w-5 h-5" />
-              </a>
+              {social.map((perfil) => {
+                const Icono = perfil.red === "facebook" ? Facebook : Instagram;
+                return (
+                  <a
+                    key={perfil.url}
+                    href={perfil.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={`${perfil.label} — ${perfil.handle}`}
+                    aria-label={`${perfil.label} — ${perfil.handle}`}
+                    className="hover:scale-110 transition-transform"
+                    style={{ color: "hsl(42 70% 62%)" }}
+                  >
+                    <Icono className="w-5 h-5" />
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>

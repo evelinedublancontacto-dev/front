@@ -49,7 +49,7 @@ export const testimonials: Testimonial[] = [
     categoryLabel: "Sanación & Espiritualidad",
     highlight: "Lugares internos que sólo pueden tocarse desde el espíritu",
     content:
-      "Conocí a Eveline en 2018, en una etapa de mi vida en la que atravesaba numerosas pérdidas. En ese momento ya estaba trabajando profundamente estos procesos con mi psicóloga y mi psiquiatra, pero dentro de mí existía la certeza de que necesitaba algo más. Necesitaba llegar a lugares internos que no siempre pueden explicarse desde la razón, lugares que sólo pueden tocarse desde una conexión más profunda con el espíritu y con esa energía universal que nos atraviesa.\n\nEveline apareció en mi camino justamente en ese momento y tengo la fortuna de seguir contando con sus conocimientos y sabiduría para sanar cada proceso por el que atravieso. Desde nuestro primer encuentro sentí que había encontrado a alguien capaz de acompañarme en ese territorio que hasta entonces parecía inexplorado.",
+      "Conocí a Eveline en 2018, en una etapa de mi vida en la que atravesaba numerosas pérdidas. En ese momento ya estaba trabajando profundamente estos procesos con mi psicóloga y mi psiquiatra, pero dentro de mí existía la certeza de que necesitaba algo más. Necesitaba llegar a lugares internos que no siempre pueden explicarse desde la razón, lugares que sólo pueden tocarse desde una conexión más profunda con el espíritu y con esa energía universal que nos atraviesa.\n\nEveline apareció en mi camino justamente en ese momento y tengo la fortuna de seguir contando con sus conocimientos y sabiduría para sanar cada proceso por el que atravieso.\n\nDesde nuestro primer encuentro sentí que había encontrado a alguien capaz de acompañarme en ese territorio que hasta entonces no sabía cómo nombrar. Ella me mostró, con sensibilidad y profundidad, un camino de conexión espiritual que complementó mi proceso psicológico y emocional de una manera que para mí ha sido verdaderamente transformadora.\n\nA través de este camino he tenido nuevos despertares, he podido mirar partes de mí desde otra perspectiva y, sobre todo, he comprendido que la sanación también puede ocurrir cuando aprendemos a escuchar nuestro espíritu.\n\nHoy puedo decir que mi proceso de sanación no estaría completo sin esa dimensión espiritual que Eveline me ayudó a descubrir.\n\nLe estoy profundamente agradecida por haber aparecido en mi vida y por haberme mostrado un camino que, aunque siempre estuvo dentro de mí, necesitaba de alguien como ella para poder reconocerlo.\n\nNota al pie: sé que mis gatitos y perritos también le agradecen mucho a Eveline, nos ha ayudado como manada.",
     stars: 5,
   },
   {
@@ -92,6 +92,16 @@ export const testimonials: Testimonial[] = [
     highlight: "Una decisión personal valiente y una aliada en la mejor etapa",
     content:
       "Tomar terapia fue una decisión personal muy valiente, y decidí tomarla cuando había agotado lo personalmente manejable y emprendí la búsqueda de quien me daría esa mano para entrar a explorar y reconocer patrones, emociones y situaciones que no me permitían ser una mejor versión de mí.\n\nTuve la fortuna de conocer a Eveline, quien me ha dado el acompañamiento profesional y espiritual durante 15 años, para yo lograr reconstruirme y recuperar mi fuerza personal, valor y determinación para vivir una vida equilibrada en todos los aspectos. Muchas gracias Eveline, por ser una gran aliada en la mejor etapa de mi vida.",
+    stars: 5,
+  },
+  {
+    id: "deyanira-g",
+    name: "Deyanira G.",
+    category: "psicoterapia",
+    categoryLabel: "Psicoterapia",
+    highlight: "Escuchada y respetada, incluso cuando hablar no era sencillo",
+    content:
+      "Decidir iniciar terapia no siempre es fácil, pero haber decidido iniciarla con Eveline ha sido un acierto sin duda.\n\nAgradezco mucho el profesionalismo, paciencia y empatía con la que me ha acompañado; siempre me he sentido escuchada y respetada, incluso cuando hablar de ciertas cosas no ha sido sencillo.\n\nEn lo personal ha sido una experiencia muy positiva, de mucho aprendizaje y autoconocimiento. La recomiendo ampliamente para quienes estén pensando iniciar su propio proceso en un espacio seguro.",
     stars: 5,
   },
 ];

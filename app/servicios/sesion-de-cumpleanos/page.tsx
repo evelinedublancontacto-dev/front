@@ -11,12 +11,12 @@ import {
   Star,
   Video,
   Clock,
-  CalendarCheck,
-} from "lucide-react";
+  CalendarCheck, CalendarDays } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AgendaEnLinea from "@/components/AgendaEnLinea";
 import Link from "next/link";
 import TwinkleStars from "@/components/TwinkleStars";
 import { contact } from "@/lib/contact";
@@ -345,6 +345,7 @@ const SesionCumpleanos = () => {
                 <strong className="text-primary">{contact.phone}</strong> o por
                 WhatsApp al mismo número.
               </p>
+              <AgendaEnLinea />
               <p className="font-body text-xs text-muted-foreground italic">
                 Es indispensable que la persona que vaya a tomar la sesión sea
                 quien agende su cita personalmente.
@@ -399,9 +400,19 @@ const SesionCumpleanos = () => {
                 className="font-body text-base px-10 py-6 rounded-full shadow-mystical"
               >
                 <Phone className="w-5 h-5 mr-2" />
-                Agendar mi cita
+                Llamar para agendar
               </Button>
             </a>
+            <Link href="/citas">
+              <Button
+                size="lg"
+                variant="outline"
+                className="font-body text-base px-10 py-6 rounded-full border-primary/40 hover:bg-primary/10"
+              >
+                <CalendarDays className="w-5 h-5 mr-2" />
+                Agendar en línea
+              </Button>
+            </Link>
             <a
               href={contact.whatsappUrl}
               target="_blank"

@@ -83,10 +83,19 @@ export default function CursoDetalle({
 
   if (hasBullets) {
     const parts = course.longDescription.split(/(?=•)/);
-    mainText = parts[0].replace(/Programa:?/i, "").trim();
+    // La última línea del texto introductorio es el encabezado de la lista que
+    // sigue ("Programa:", "Temario:", "Clase 1:"): sobra al perder las viñetas.
+    mainText = parts[0]
+      .trim()
+      .replace(/\n[^\n]{0,40}:\s*$/, "")
+      .trim();
     syllabusBullets = parts
       .slice(1)
-      .map((b) => b.replace(/^•\s*/, "").trim())
+      // Cada viñeta arrastra el texto que le sigue hasta la próxima "•". Si el
+      // temario se divide en secciones ("Clase 2:", "Módulo 3:"), ese
+      // encabezado queda pegado al final de la viñeta anterior: nos quedamos
+      // solo con la primera línea.
+      .map((b) => b.replace(/^•\s*/, "").split("\n")[0].trim())
       .filter(Boolean);
   }
 
@@ -342,9 +351,15 @@ export default function CursoDetalle({
                       <Check className="w-3.5 h-3.5 text-primary font-bold" />
                     </div>
                     <div>
-                      <p className="font-semibold text-foreground">Material y Ejercicios Prácticos</p>
+                      <p className="font-semibold text-foreground">
+                        {course.incluyeManual
+                          ? "Manual y Ejercicios Prácticos"
+                          : "Ejercicios Prácticos"}
+                      </p>
                       <p className="text-xs text-muted-foreground">
-                        Manuales, rituales precisos y protocolos de aplicación para tu vida diaria.
+                        {course.incluyeManual
+                          ? "Manual completo, rituales precisos y protocolos de aplicación para tu vida diaria."
+                          : "Rituales precisos y protocolos de aplicación para tu vida diaria."}
                       </p>
                     </div>
                   </div>
@@ -465,7 +480,9 @@ export default function CursoDetalle({
                     <div className="flex items-center gap-3">
                       <BookOpen className="w-4 h-4 text-primary shrink-0" />
                       <span className="text-foreground/80 font-body text-xs sm:text-sm">
-                        Material didáctico y soporte
+                        {course.incluyeManual
+                          ? "Manual y material didáctico"
+                          : "Ejercicios prácticos y acompañamiento"}
                       </span>
                     </div>
 

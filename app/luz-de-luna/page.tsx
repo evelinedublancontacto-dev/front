@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { Moon, BookOpen, Gem, Leaf, Flame, Wand2, Sparkles, Star, ArrowLeft } from "lucide-react";
+import { Moon, BookOpen, Gem, Leaf, Flame, Wand2, Sparkles, Star, ArrowLeft, Instagram } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
@@ -8,11 +8,14 @@ import Footer from "@/components/Footer";
 import Link from "next/link";
 import MotionStars from "@/components/MotionStars";
 import { logos } from "@/lib/brand";
+import { social } from "@/lib/contact";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.15 } }),
 };
+
+const instagramTienda = social.find((p) => p.id === "luzDeLuna")!;
 
 const spaces = [
   {
@@ -100,6 +103,20 @@ const LuzDeLuna = () => {
             <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="text-lg md:text-xl text-white/80 font-body max-w-3xl mx-auto leading-relaxed">
               Tienda y espacio de conexión espiritual que se manifiesta físicamente una luna al mes para recibir a quienes buscan objetos de poder para su práctica espiritual.
             </motion.p>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.5 }} className="mt-8">
+              <a
+                href={instagramTienda.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 pl-4 pr-5 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/35 transition-colors"
+              >
+                <Instagram className="w-5 h-5" style={{ color: "hsl(42 70% 62%)" }} />
+                <span className="font-body text-sm">
+                  Sigue <strong className="font-semibold">{instagramTienda.handle}</strong>
+                  <span className="hidden sm:inline text-white/70"> y entérate de la próxima luna</span>
+                </span>
+              </a>
+            </motion.div>
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0">

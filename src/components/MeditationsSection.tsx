@@ -14,14 +14,14 @@ const MeditationsSection = () => {
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
           <p className="text-primary font-body text-sm tracking-[0.2em] uppercase mb-3">
-            Meditaciones
+            Para tu práctica
           </p>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Luz de <span className="text-gradient-purple">Luna</span>
+            <span className="text-gradient-purple">Meditaciones</span> guiadas
           </h2>
           <p className="text-muted-foreground font-body max-w-2xl mx-auto">
-            Meditaciones guiadas para nutrir tu alma y conectar con la energía
-            universal. Encuentra el catálogo completo en la sección de
+            Meditaciones y ejercicios para nutrir tu alma y conectar con la
+            energía universal. Encuentra el catálogo completo en la sección de
             Meditaciones.
           </p>
         </div>
