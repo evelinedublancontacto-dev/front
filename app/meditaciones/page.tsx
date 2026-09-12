@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { Play, Pause, Volume2, Heart, Sparkles, Moon, ArrowLeft } from "lucide-react";
+import { Play, Pause, Volume2, Heart, Sparkles, Moon, Shield, PawPrint, Gem, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -10,8 +10,28 @@ import TwinkleStars from "@/components/TwinkleStars";
 
 interface Meditation {
   title: string;
-  audioUrl: string;
+  description?: string;
+  audioUrl?: string;
+  soundcloudId?: string;
 }
+
+const soundcloudParams = new URLSearchParams({
+  color: "#7d34b2",
+  visual: "false",
+  show_artwork: "false",
+  show_comments: "false",
+  show_user: "false",
+  show_teaser: "false",
+  hide_related: "true",
+  sharing: "false",
+  buying: "false",
+  download: "false",
+}).toString();
+
+const soundcloudSrc = (trackId: string) =>
+  `https://w.soundcloud.com/player/?url=${encodeURIComponent(
+    `https://api.soundcloud.com/tracks/${trackId}`
+  )}&${soundcloudParams}`;
 
 interface MeditationSection {
   title: string;
@@ -38,10 +58,13 @@ const sections: MeditationSection[] = [
     icon: <Sparkles className="w-6 h-6" />,
     color: "from-violet-500/20 to-indigo-500/20",
     meditations: [
-      { title: "Anahata (4° Chakra)", audioUrl: "https://archive.org/download/SanarATuNinaInterior1/Chakra%204_%20ANAHATA.mp3" },
-      { title: "Vishudda (5° Chakra)", audioUrl: "https://archive.org/download/SanarATuNinaInterior1/Chakra%205_%20VISHUDDA.mp3" },
-      { title: "Ajna (6° Chakra)", audioUrl: "https://archive.org/download/SanarATuNinaInterior1/Chakra%206_%20AJNA.mp3" },
-      { title: "Sahasrara (7° Chakra)", audioUrl: "https://archive.org/download/SanarATuNinaInterior1/Chakra%207_%20Sahasrara.mp3" },
+      { title: "Muladhara (1er Chakra)", description: "Alineación del chakra raíz.", soundcloudId: "1168890694" },
+      { title: "Svadhisthana (2° Chakra)", description: "Qué trabaja este chakra y cómo alinearlo.", soundcloudId: "389015673" },
+      { title: "Manipura (3er Chakra)", description: "Alineación del chakra del plexo solar.", soundcloudId: "1170156085" },
+      { title: "Anahata (4° Chakra)", description: "Alineación del chakra del corazón.", soundcloudId: "1170889918" },
+      { title: "Vishuddha (5° Chakra)", description: "Alineación del chakra de la garganta.", audioUrl: "/assets/meditaciones/chakra-5-vishuddha.m4a" },
+      { title: "Ajna (6° Chakra)", description: "Descripción del tercer ojo y ejercicio para alinearlo.", soundcloudId: "391180932" },
+      { title: "Sahasrara (7° Chakra)", description: "Alineación del chakra de la coronilla.", audioUrl: "/assets/meditaciones/chakra-7-sahasrara.m4a" },
     ],
   },
   {
@@ -52,6 +75,34 @@ const sections: MeditationSection[] = [
       { title: "Sanar Sagrado Femenino", audioUrl: "https://archive.org/download/SanarATuNinaInterior1/Sanar%20Sagrado%20Femenino.mp3" },
       { title: "Sanar A Tu Niña Interior 1", audioUrl: "https://archive.org/download/SanarATuNinaInterior1/Sanar%20A%20Tu%20Nin%CC%83a%20Interior%201.mp3" },
       { title: "Sanar A Tu Niño-a Interior 2", audioUrl: "https://archive.org/download/SanarATuNinaInterior1/Sanar%20A%20Tu%20Nin%CC%83o-a%20Interior%202.mp3" },
+    ],
+  },
+  {
+    title: "Abundancia",
+    icon: <Gem className="w-6 h-6" />,
+    color: "from-amber-500/20 to-yellow-500/20",
+    meditations: [
+      { title: "Explicación de la abundancia", description: "Escucha esta introducción antes del ejercicio.", soundcloudId: "485143047" },
+      { title: "Ejercicio de abundancia", description: "La práctica para abrir tu camino a la abundancia.", soundcloudId: "485146965" },
+    ],
+  },
+  {
+    title: "Protección y purificación",
+    icon: <Shield className="w-6 h-6" />,
+    color: "from-sky-500/20 to-primary/20",
+    meditations: [
+      { title: "Protección y resguardo para mujeres en riesgo", description: "Eleva tu energía, protégete de la violencia y sana tu sagrado femenino.", soundcloudId: "571243527" },
+      { title: "Protección contra huracanes", description: "Meditación de resguardo para el paso del huracán.", soundcloudId: "906456742" },
+      { title: "Unicornios", description: "Meditación con unicornios para purificar tu energía.", soundcloudId: "2074719420" },
+    ],
+  },
+  {
+    title: "Animales",
+    icon: <PawPrint className="w-6 h-6" />,
+    color: "from-lime-500/20 to-emerald-500/20",
+    meditations: [
+      { title: "Protección de animales durante huracanes", description: "Ejercicio para proteger a tus animales mientras pasa el huracán.", soundcloudId: "1110040237" },
+      { title: "Cierre de campo áurico en animales", description: "Limpia y cierra el aura de los compañeros animales que viven contigo.", soundcloudId: "1051800928" },
     ],
   },
 ];
@@ -108,7 +159,7 @@ const AudioPlayer = ({ meditation, index }: { meditation: Meditation; index: num
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group bg-card border border-border rounded-2xl p-5 hover:border-primary/30 hover:shadow-lg transition-all duration-300"
+      className="group bg-card border border-border rounded-2xl p-5 h-full flex flex-col justify-center hover:border-primary/30 hover:shadow-lg transition-all duration-300"
     >
       <audio
         ref={audioRef}
@@ -130,11 +181,16 @@ const AudioPlayer = ({ meditation, index }: { meditation: Meditation; index: num
           )}
         </button>
         <div className="flex-1 min-w-0">
-          <h4 className="font-display text-base font-semibold text-foreground truncate mb-2">
+          <h4 className="font-display text-base font-semibold text-foreground truncate">
             {meditation.title}
           </h4>
+          {meditation.description && (
+            <p className="text-xs text-muted-foreground font-body mt-1 line-clamp-2">
+              {meditation.description}
+            </p>
+          )}
           <div
-            className="w-full h-2 bg-muted rounded-full cursor-pointer overflow-hidden"
+            className="w-full h-2 bg-muted rounded-full cursor-pointer overflow-hidden mt-2"
             onClick={handleSeek}
           >
             <div
@@ -152,6 +208,44 @@ const AudioPlayer = ({ meditation, index }: { meditation: Meditation; index: num
     </motion.div>
   );
 };
+
+const SoundCloudPlayer = ({
+  meditation,
+  trackId,
+  index,
+}: {
+  meditation: Meditation;
+  trackId: string;
+  index: number;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5, delay: index * 0.1 }}
+    className="bg-card border border-border rounded-2xl p-5 h-full flex flex-col hover:border-primary/30 hover:shadow-lg transition-all duration-300"
+  >
+    <h4 className="font-display text-base font-semibold text-foreground leading-snug">
+      {meditation.title}
+    </h4>
+    {meditation.description && (
+      <p className="text-xs text-muted-foreground font-body mt-1 line-clamp-2">
+        {meditation.description}
+      </p>
+    )}
+    <div className="mt-auto pt-4 rounded-xl overflow-hidden">
+      <iframe
+        title={meditation.title}
+        src={soundcloudSrc(trackId)}
+        width="100%"
+        height={120}
+        loading="lazy"
+        allow="autoplay"
+        style={{ border: 0, display: "block" }}
+      />
+    </div>
+  </motion.div>
+);
 
 const MeditationSectionBlock = ({ section, sectionIndex }: { section: MeditationSection; sectionIndex: number }) => {
   const ref = useRef(null);
@@ -172,9 +266,13 @@ const MeditationSectionBlock = ({ section, sectionIndex }: { section: Meditation
         <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">{section.title}</h2>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {section.meditations.map((med, i) => (
-          <AudioPlayer key={med.title} meditation={med} index={i} />
-        ))}
+        {section.meditations.map((med, i) =>
+          med.soundcloudId ? (
+            <SoundCloudPlayer key={med.title} meditation={med} trackId={med.soundcloudId} index={i} />
+          ) : (
+            <AudioPlayer key={med.title} meditation={med} index={i} />
+          )
+        )}
       </div>
     </motion.div>
   );
