@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { seededRandom } from "@/lib/seededRandom";
+import { roundForStyle, seededRandom } from "@/lib/seededRandom";
 
 const SparkleStar = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
@@ -43,9 +43,9 @@ function buildDecorations(count: number, seed: number, palette: string[]): Celes
     const base = (i + seed) * 7919 + 1;
     return {
       kind: kinds[Math.floor(seededRandom(base) * kinds.length)],
-      top: `${seededRandom(base + 1) * 88 + 2}%`,
-      left: `${seededRandom(base + 2) * 88 + 2}%`,
-      size: 6 + seededRandom(base + 3) * 18,
+      top: `${roundForStyle(seededRandom(base + 1) * 88 + 2)}%`,
+      left: `${roundForStyle(seededRandom(base + 2) * 88 + 2)}%`,
+      size: roundForStyle(6 + seededRandom(base + 3) * 18),
       delay: seededRandom(base + 4) * 2.5,
       duration: 2.2 + seededRandom(base + 5) * 3.5,
       colorClass: palette[Math.floor(seededRandom(base + 6) * palette.length)],

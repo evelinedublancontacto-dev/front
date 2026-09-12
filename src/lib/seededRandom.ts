@@ -6,6 +6,19 @@ export function seededRandom(seed: number): number {
   return x - Math.floor(x);
 }
 
+/**
+ * Redondea un valor antes de escribirlo en un estilo en línea.
+ * El navegador vuelve a serializar el atributo `style` con ~6 dígitos
+ * significativos, así que `68.12528781620131%` se lee de vuelta como
+ * `68.1253%` y React lo reporta como error de hidratación aunque servidor y
+ * cliente hayan calculado el mismo número. Con 2 decimales ambas cadenas
+ * coinciden, y `Number(...)` quita los ceros de más (4.00 → 4) porque el
+ * navegador también los quita.
+ */
+export function roundForStyle(value: number): number {
+  return Number(value.toFixed(2));
+}
+
 export type StarStyleOptions = {
   topMin?: number;
   topRange?: number;
@@ -19,10 +32,10 @@ export function getTwinkleStarStyle(
 ): CSSProperties {
   const base = index * 7919 + 1;
   return {
-    top: `${topMin + seededRandom(base) * topRange}%`,
-    left: `${leftMin + seededRandom(base + 1) * leftRange}%`,
-    animationDelay: `${seededRandom(base + 2) * 5}s`,
-    animationDuration: `${2 + seededRandom(base + 3) * 3}s`,
+    top: `${roundForStyle(topMin + seededRandom(base) * topRange)}%`,
+    left: `${roundForStyle(leftMin + seededRandom(base + 1) * leftRange)}%`,
+    animationDelay: `${roundForStyle(seededRandom(base + 2) * 5)}s`,
+    animationDuration: `${roundForStyle(2 + seededRandom(base + 3) * 3)}s`,
   };
 }
 
@@ -32,8 +45,8 @@ export function getMotionStarStyle(
 ): CSSProperties {
   const base = index * 7919 + 1;
   return {
-    top: `${topMin + seededRandom(base) * topRange}%`,
-    left: `${leftMin + seededRandom(base + 1) * leftRange}%`,
+    top: `${roundForStyle(topMin + seededRandom(base) * topRange)}%`,
+    left: `${roundForStyle(leftMin + seededRandom(base + 1) * leftRange)}%`,
   };
 }
 
