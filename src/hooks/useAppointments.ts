@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { api } from "@/lib/api";
-import type { Cita, Servicio } from "@/lib/tipos";
+import type { Cita, Modalidad, Servicio } from "@/lib/tipos";
 
 export type { Cita, Servicio };
 
@@ -43,6 +43,7 @@ export function useDisponibilidad(fecha: string | null) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [disponible, setDisponible] = useState(false);
+  const [modalidad, setModalidad] = useState<Modalidad | null>(null);
 
   const fetchDisponibilidad = useCallback(async () => {
     if (!fecha) {
@@ -53,9 +54,12 @@ export function useDisponibilidad(fecha: string | null) {
     try {
       setLoading(true);
       setError(null);
-      const data = await api.obtener<{ slots: TimeSlot[]; disponible: boolean }>(`/v1/disponibilidad?fecha=${fecha}`);
+      const data = await api.obtener<{ slots: TimeSlot[]; disponible: boolean; modalidad?: Modalidad }>(
+        `/v1/disponibilidad?fecha=${fecha}`,
+      );
       setSlots(data.slots);
       setDisponible(data.disponible);
+      setModalidad(data.modalidad ?? null);
     } catch (err: unknown) {
       setError(getErrorMessage(err));
       setSlots([]);
@@ -68,5 +72,5 @@ export function useDisponibilidad(fecha: string | null) {
     fetchDisponibilidad();
   }, [fetchDisponibilidad]);
 
-  return { slots, loading, error, disponible, refetch: fetchDisponibilidad };
+  return { slots, loading, error, disponible, modalidad, refetch: fetchDisponibilidad };
 }

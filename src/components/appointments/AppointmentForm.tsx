@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { User, Mail, Phone, FileText, Send, Loader2 } from "lucide-react";
+import { User, Mail, Phone, FileText, Send, Loader2, AlertCircle, UserCheck, MapPin, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { api, ErrorApi, mensajeDeError } from "@/lib/api";
+import { AVISO_QUIEN_AGENDA, ETIQUETA_MODALIDAD, type Modalidad } from "@/lib/tipos";
 
 const appointmentSchema = z.object({
   nombre: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -30,8 +31,20 @@ interface AppointmentFormProps {
   hora: string;
   servicioId: string;
   servicios: Servicio[];
+  /** Viene de la disponibilidad del día: viernes presencial, el resto en línea. */
+  modalidad?: Modalidad | null;
   onSuccess: () => void;
   className?: string;
+}
+
+/** Mensajes propios para los códigos que el back devuelve al reservar. */
+function mensajeDeReserva(err: unknown): string {
+  if (err instanceof ErrorApi) {
+    if (err.codigo === "horario_ocupado") return "Ese horario se acaba de ocupar. Elige otro, por favor.";
+    /* cita_ya_agendada trae la fecha y hora de la cita previa en el mensaje del back. */
+    if (err.codigo === "cita_ya_agendada") return err.message;
+  }
+  return mensajeDeError(err, "No pudimos agendar la cita. Intenta de nuevo, por favor.");
 }
 
 export default function AppointmentForm({
@@ -39,10 +52,12 @@ export default function AppointmentForm({
   hora,
   servicioId,
   servicios,
+  modalidad,
   onSuccess,
   className,
 }: AppointmentFormProps) {
   const [submitting, setSubmitting] = useState(false);
+  const [errorEnvio, setErrorEnvio] = useState<string | null>(null);
 
   const {
     register,
@@ -55,6 +70,7 @@ export default function AppointmentForm({
 
   const onSubmit = async (data: AppointmentFormData) => {
     setSubmitting(true);
+    setErrorEnvio(null);
     try {
       await api.enviar("/v1/citas", {
         nombre: data.nombre,
@@ -69,12 +85,8 @@ export default function AppointmentForm({
       reset();
       onSuccess();
     } catch (err: unknown) {
-      const message =
-        err instanceof ErrorApi && err.codigo === "horario_ocupado"
-          ? "Ese horario se acaba de ocupar. Elige otro, por favor."
-          : mensajeDeError(err, "Error al agendar la cita");
       console.error("Error al agendar cita:", err);
-      alert(message);
+      setErrorEnvio(mensajeDeReserva(err));
     } finally {
       setSubmitting(false);
     }
@@ -90,6 +102,7 @@ export default function AppointmentForm({
   };
 
   const servicioSeleccionado = servicios.find((s) => s.id === servicioId);
+  const IconoModalidad = modalidad === "presencial" ? MapPin : Video;
 
   return (
     <div
@@ -103,6 +116,12 @@ export default function AppointmentForm({
         <h2 className="text-lg font-semibold text-gray-900">
           Datos de contacto
         </h2>
+      </div>
+
+      {/* Quién debe agendar */}
+      <div className="mb-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+        <UserCheck className="w-4 h-4 mt-0.5 shrink-0 text-amber-600" />
+        <p>{AVISO_QUIEN_AGENDA} Escribe tus propios datos de contacto.</p>
       </div>
 
       {/* Resumen de la cita */}
@@ -139,6 +158,15 @@ export default function AppointmentForm({
                 </p>
               </div>
             </>
+          )}
+          {modalidad && (
+            <div className="col-span-2">
+              <span className="text-gray-500">Modalidad:</span>
+              <p className="font-medium text-gray-900 inline-flex items-center gap-1.5 ml-1">
+                <IconoModalidad className="w-4 h-4 text-primary" />
+                {ETIQUETA_MODALIDAD[modalidad]}
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -230,6 +258,16 @@ export default function AppointmentForm({
             />
           </div>
         </div>
+
+        {errorEnvio && (
+          <div
+            role="alert"
+            className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-3 text-sm text-red-800"
+          >
+            <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-red-600" />
+            <p>{errorEnvio}</p>
+          </div>
+        )}
 
         {/* Submit */}
         <button

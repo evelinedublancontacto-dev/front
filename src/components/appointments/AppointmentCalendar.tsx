@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
-import { CalendarDays, CheckCircle, Sparkles, ArrowLeft, ArrowRight } from 'lucide-react';
+import { CalendarDays, CheckCircle, Sparkles, ArrowLeft, ArrowRight, UserCheck, MapPin, Video } from 'lucide-react';
 import Calendar from './Calendar';
 import TimeSlotPicker from './TimeSlotPicker';
 import AppointmentForm from './AppointmentForm';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
 import type { TimeSlot } from '@/hooks/useAppointments';
+import { AVISO_QUIEN_AGENDA, ETIQUETA_MODALIDAD, type Modalidad } from '@/lib/tipos';
 
 interface Servicio {
   id: string;
@@ -27,6 +28,8 @@ export default function AppointmentCalendar() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [slots, setSlots] = useState<{ hora: string; disponible: boolean }[]>([]);
+  /* La modalidad la decide el día (viernes presencial, el resto en línea); la manda el back. */
+  const [modalidad, setModalidad] = useState<Modalidad | null>(null);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [loadingServicios, setLoadingServicios] = useState(true);
   const [bookingSuccess, setBookingSuccess] = useState(false);
@@ -55,6 +58,7 @@ export default function AppointmentCalendar() {
   useEffect(() => {
     if (!selectedDate) {
       setSlots([]);
+      setModalidad(null);
       return;
     }
 
@@ -67,11 +71,13 @@ export default function AppointmentCalendar() {
           fecha: fechaStr,
           ...(servicioId ? { servicio: servicioId } : {}),
         });
-        const data = await api.obtener<{ slots: TimeSlot[] }>(`/v1/disponibilidad?${params}`);
+        const data = await api.obtener<{ slots: TimeSlot[]; modalidad?: Modalidad }>(`/v1/disponibilidad?${params}`);
         setSlots(data.slots);
+        setModalidad(data.modalidad ?? null);
       } catch (error) {
         console.error('Error al cargar disponibilidad:', error);
         setSlots([]);
+        setModalidad(null);
       } finally {
         setLoadingSlots(false);
       }
@@ -164,8 +170,22 @@ export default function AppointmentCalendar() {
     );
   }
 
+  const IconoModalidad = modalidad === 'presencial' ? MapPin : Video;
+
   return (
     <div className="max-w-5xl mx-auto">
+      {/* Aviso: quién debe agendar */}
+      <div
+        role="note"
+        className="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900"
+      >
+        <UserCheck className="w-5 h-5 mt-0.5 shrink-0 text-amber-600" />
+        <p className="text-sm">
+          <span className="font-semibold">Importante:</span> {AVISO_QUIEN_AGENDA} Solo se puede tener una cita
+          agendada a la vez.
+        </p>
+      </div>
+
       {/* Progress Steps */}
       <div className="mb-8">
         <div className="flex items-center justify-between relative">
@@ -227,8 +247,8 @@ export default function AppointmentCalendar() {
                 {step === 'servicio' && 'Elige el tipo de sesión que necesitas'}
                 {step === 'fecha' &&
                   (isCuencos
-                    ? 'Los cuencos tibetanos solo se agendan los viernes'
-                    : 'Selecciona el día que prefieras')}
+                    ? 'Los cuencos tibetanos solo se agendan los viernes, de forma presencial'
+                    : 'Los viernes las sesiones son presenciales; el resto de la semana, en línea')}
                 {step === 'hora' && 'Elige el horario disponible'}
                 {step === 'confirmacion' &&
                   (bookingSuccess
@@ -300,8 +320,8 @@ export default function AppointmentCalendar() {
                 onlyWeekday={isCuencos ? 5 : undefined}
                 helperText={
                   isCuencos
-                    ? 'Disponible únicamente los viernes · Hora del centro de México (CDMX)'
-                    : 'Horarios en hora del centro de México (CDMX)'
+                    ? 'Disponible únicamente los viernes (presencial) · Hora del centro de México (CDMX)'
+                    : 'Viernes: presencial en consultorio · Lunes a jueves: en línea · Hora del centro de México (CDMX)'
                 }
               />
             </div>
@@ -322,9 +342,24 @@ export default function AppointmentCalendar() {
                     : ''}
                 </span>
               </p>
-              <p className="text-xs text-primary mb-4 font-medium">
+              <p className="text-xs text-primary mb-3 font-medium">
                 Hora del centro de México (CDMX)
               </p>
+              {modalidad && !loadingSlots && (
+                <div
+                  className={cn(
+                    'mb-4 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium',
+                    modalidad === 'presencial'
+                      ? 'bg-gold/15 text-amber-900 border border-gold/40'
+                      : 'bg-primary/10 text-primary border border-primary/20'
+                  )}
+                >
+                  <IconoModalidad className="w-4 h-4 shrink-0" />
+                  {modalidad === 'presencial'
+                    ? 'Este día la sesión es presencial, en consultorio (solo los viernes).'
+                    : 'Este día la sesión es en línea, por videollamada.'}
+                </div>
+              )}
               <TimeSlotPicker
                 slots={slots}
                 selectedSlot={selectedSlot}
@@ -341,6 +376,7 @@ export default function AppointmentCalendar() {
               hora={selectedSlot}
               servicioId={servicioId}
               servicios={servicios}
+              modalidad={modalidad}
               onSuccess={handleBookingSuccess}
             />
           )}
@@ -354,9 +390,16 @@ export default function AppointmentCalendar() {
               <h3 className="text-2xl font-bold text-gray-900 mb-2">
                 ¡Tu cita ha sido agendada!
               </h3>
-              <p className="text-gray-500 mb-8">
+              <p className="text-gray-500 mb-2">
                 Te hemos enviado un correo de confirmación con los detalles de tu cita.
               </p>
+              {modalidad && (
+                <p className="text-sm font-medium text-primary mb-8 inline-flex items-center gap-2">
+                  <IconoModalidad className="w-4 h-4" />
+                  {ETIQUETA_MODALIDAD[modalidad]}
+                </p>
+              )}
+              {!modalidad && <div className="mb-6" />}
               <button
                 onClick={() => {
                   setSelectedDate(undefined);

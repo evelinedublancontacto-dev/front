@@ -11,6 +11,17 @@ export const ETIQUETA_ESTADO: Record<EstadoCita, string> = {
   completada: "Completada",
 };
 
+export type Modalidad = "presencial" | "en_linea";
+
+export const ETIQUETA_MODALIDAD: Record<Modalidad, string> = {
+  presencial: "Presencial, en consultorio",
+  en_linea: "En línea (videollamada)",
+};
+
+/** Aviso que Eveline pide mostrar en toda la reserva. */
+export const AVISO_QUIEN_AGENDA =
+  "La cita debe agendarla directamente la persona que tomará la sesión.";
+
 export interface Servicio {
   id: string;
   titulo: string;
