@@ -7,10 +7,13 @@ import { toast } from "sonner";
 import {
   Briefcase,
   Calendar,
+  CalendarClock,
+  CalendarDays,
   Check,
   ChevronDown,
   ExternalLink,
   FileText,
+  List,
   Loader2,
   LogOut,
   Pencil,
@@ -47,6 +50,8 @@ import ServicioFormDialog, { type ServicioFormData } from "@/components/admin/Se
 import CitaFormDialog, { type CitaFormData } from "@/components/admin/CitaFormDialog";
 import ClienteFormDialog, { type ClienteFormData } from "@/components/admin/ClienteFormDialog";
 import ConfirmarBorradoDialog from "@/components/admin/ConfirmarBorradoDialog";
+import CalendarioCitas, { claveFecha, rangoDelMes } from "@/components/admin/CalendarioCitas";
+import { ESTILO_ESTADO } from "@/components/admin/estados";
 
 /* ------------------------------------------------------------------ *
  *  Pestañas y utilidades de presentación
@@ -55,12 +60,13 @@ import ConfirmarBorradoDialog from "@/components/admin/ConfirmarBorradoDialog";
 type Pestana = "citas" | "clientes" | "posts" | "servicios";
 const PESTANAS: Pestana[] = ["citas", "clientes", "posts", "servicios"];
 
-const ESTILO_ESTADO: Record<EstadoCita, string> = {
-  pendiente: "border-amber-200 bg-amber-50 text-amber-800",
-  confirmada: "border-emerald-200 bg-emerald-50 text-emerald-800",
-  completada: "border-primary/20 bg-primary/10 text-primary",
-  cancelada: "border-red-200 bg-red-50 text-red-700",
-};
+/** Cómo se ven las citas: tabla, cuadrícula del mes o agenda de un día. */
+type VistaCitas = "lista" | "mes" | "dia";
+const VISTAS_CITAS: Array<{ id: VistaCitas; etiqueta: string; icono: React.ComponentType<{ className?: string }> }> = [
+  { id: "lista", etiqueta: "Lista", icono: List },
+  { id: "mes", etiqueta: "Mes", icono: CalendarDays },
+  { id: "dia", etiqueta: "Día", icono: CalendarClock },
+];
 
 const fechaCorta = (iso: string) =>
   new Date(iso).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" });
@@ -121,7 +127,7 @@ function AccionIcono({
           size="icon"
           onClick={onClick}
           aria-label={etiqueta}
-          className={cn("h-8 w-8 text-muted-foreground hover:text-foreground", destructiva && "hover:bg-destructive/10 hover:text-destructive")}
+          className={cn("h-8 w-8 text-muted-foreground hover:bg-muted hover:text-foreground", destructiva && "hover:bg-destructive/10 hover:text-destructive")}
         >
           {children}
         </Button>
@@ -196,6 +202,7 @@ function Seccion({
   onActualizar,
   onNuevo,
   etiquetaNuevo,
+  acciones,
   filtros,
   children,
 }: {
@@ -209,6 +216,8 @@ function Seccion({
   onActualizar: () => void;
   onNuevo: () => void;
   etiquetaNuevo: string;
+  /** Controles propios de la pestaña, junto a Actualizar. */
+  acciones?: React.ReactNode;
   filtros?: React.ReactNode;
   children: React.ReactNode;
 }) {
@@ -225,7 +234,8 @@ function Seccion({
             </h2>
             <p className="text-sm text-muted-foreground">{descripcion}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {acciones}
             <Button variant="outline" size="sm" onClick={onActualizar} disabled={cargando} aria-label="Actualizar">
               <RefreshCw className={cn("h-4 w-4", cargando && "animate-spin")} />
               <span className="hidden sm:inline">Actualizar</span>
@@ -276,6 +286,12 @@ const Admin = () => {
   const [pestana, setPestana] = useState<Pestana>("citas");
   const [busqueda, setBusqueda] = useState("");
   const [filtroEstado, setFiltroEstado] = useState<"todas" | EstadoCita>("todas");
+  const [vistaCitas, setVistaCitas] = useState<VistaCitas>("lista");
+  /* Día enfocado del calendario; su mes es el que se pide al back. */
+  const [diaCitas, setDiaCitas] = useState(() => claveFecha(new Date()));
+  const [citasMes, setCitasMes] = useState<Cita[]>([]);
+  const [loadingMes, setLoadingMes] = useState(false);
+  const [nuevaCitaFecha, setNuevaCitaFecha] = useState<string | undefined>(undefined);
 
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -382,6 +398,25 @@ const Admin = () => {
     }
   }, [reportar]);
 
+  /* El calendario pide justo el mes que se está viendo: así no depende de
+     que la cita quepa en las últimas 200 de la lista. */
+  const mesCitas = diaCitas.slice(0, 7);
+  const fetchMes = useCallback(
+    async (mes: string) => {
+      const { desde, hasta } = rangoDelMes(`${mes}-01`);
+      setLoadingMes(true);
+      try {
+        const r = await api.obtener<{ citas: Cita[] }>(`/v1/admin/citas?desde=${desde}&hasta=${hasta}&por_pagina=200`);
+        setCitasMes(r.citas);
+      } catch (err) {
+        reportar(err, "No se pudieron cargar las citas del mes.");
+      } finally {
+        setLoadingMes(false);
+      }
+    },
+    [reportar],
+  );
+
   const fetchTodo = useCallback(() => {
     fetchClientes();
     fetchPosts();
@@ -392,6 +427,16 @@ const Admin = () => {
   useEffect(() => {
     if (user) fetchTodo();
   }, [user, fetchTodo]);
+
+  useEffect(() => {
+    if (user && vistaCitas !== "lista") fetchMes(mesCitas);
+  }, [user, vistaCitas, mesCitas, fetchMes]);
+
+  /* Tras crear, editar o borrar hay que refrescar las dos fuentes. */
+  const refrescarCitas = () => {
+    fetchCitas();
+    if (vistaCitas !== "lista") fetchMes(mesCitas);
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -531,8 +576,9 @@ const Admin = () => {
   };
 
   // Citas
-  const handleNewCita = () => {
+  const handleNewCita = (fecha?: string) => {
     setEditingCita(null);
+    setNuevaCitaFecha(fecha);
     setCitaFormOpen(true);
   };
   const handleEditCita = (cita: Cita) => {
@@ -561,7 +607,7 @@ const Admin = () => {
         await api.enviar("/v1/admin/citas", data);
         toast.success("Cita creada.");
       }
-      fetchCitas();
+      refrescarCitas();
       fetchClientes();
     } catch (err) {
       reportar(err, "Error al guardar la cita.");
@@ -573,7 +619,7 @@ const Admin = () => {
     try {
       await api.borrar(`/v1/admin/citas/${deletingCita.id}`);
       toast.success("Cita eliminada.");
-      fetchCitas();
+      refrescarCitas();
     } catch (err) {
       reportar(err, "Error al eliminar la cita.");
       throw err;
@@ -585,7 +631,9 @@ const Admin = () => {
     try {
       await api.actualizar(`/v1/admin/citas/${cita.id}`, { estado });
       toast.success(`Cita de ${cita.nombre} ${ETIQUETA_ESTADO[estado].toLowerCase()}.`);
-      setCitas((prev) => prev.map((c) => (c.id === cita.id ? { ...c, estado } : c)));
+      const conNuevoEstado = (lista: Cita[]) => lista.map((c) => (c.id === cita.id ? { ...c, estado } : c));
+      setCitas(conNuevoEstado);
+      setCitasMes(conNuevoEstado);
     } catch (err) {
       reportar(err, "No se pudo cambiar el estado de la cita.");
     } finally {
@@ -593,16 +641,18 @@ const Admin = () => {
     }
   };
 
-  /* Filtrado en el cliente: son listas cortas. */
+  /* Filtrado en el cliente: son listas cortas. La lista trabaja sobre las
+     citas recientes; el calendario, sobre las del mes que se está viendo. */
   const q = busqueda.trim().toLowerCase();
+  const fuenteCitas = vistaCitas === "lista" ? citas : citasMes;
   const citasFiltradas = useMemo(
     () =>
-      citas.filter(
+      fuenteCitas.filter(
         (c) =>
           (filtroEstado === "todas" || c.estado === filtroEstado) &&
           (q === "" || contiene(q, c.nombre, c.email, c.servicioNombre, c.telefono)),
       ),
-    [citas, filtroEstado, q],
+    [fuenteCitas, filtroEstado, q],
   );
   const clientesFiltrados = useMemo(
     () => (q === "" ? clientes : clientes.filter((c) => contiene(q, c.nombre, c.correo, c.telefono))),
@@ -618,13 +668,17 @@ const Admin = () => {
   );
 
   const conteoEstado = useMemo(() => {
-    const c: Record<"todas" | EstadoCita, number> = { todas: citas.length, pendiente: 0, confirmada: 0, cancelada: 0, completada: 0 };
-    for (const cita of citas) c[cita.estado] = (c[cita.estado] ?? 0) + 1;
+    const c: Record<"todas" | EstadoCita, number> = { todas: fuenteCitas.length, pendiente: 0, confirmada: 0, cancelada: 0, completada: 0 };
+    for (const cita of fuenteCitas) c[cita.estado] = (c[cita.estado] ?? 0) + 1;
     return c;
-  }, [citas]);
+  }, [fuenteCitas]);
+  /* La tarjeta de resumen siempre habla de la lista reciente, no del mes
+     que tenga abierto el calendario. */
+  const pendientes = citas.filter((c) => c.estado === "pendiente").length;
   const publicados = posts.filter((p) => p.published).length;
   const activos = servicios.filter((s) => s.activo !== false).length;
 
+  const cargandoCitas = vistaCitas === "lista" ? loadingCitas : loadingMes;
   const cargandoTodo = loadingCitas && loadingClientes && loadingPosts && loadingServicios;
 
   if (cargandoSesion || !user) {
@@ -641,7 +695,7 @@ const Admin = () => {
       etiqueta: "Citas",
       icono: Calendar,
       valor: citas.length,
-      detalle: conteoEstado.pendiente > 0 ? `${conteoEstado.pendiente} por confirmar` : "Ninguna pendiente",
+      detalle: pendientes > 0 ? `${pendientes} por confirmar` : "Ninguna pendiente",
       cargando: loadingCitas,
     },
     { id: "clientes", etiqueta: "Clientes", icono: Users, valor: clientes.length, detalle: "En total", cargando: loadingClientes },
@@ -748,15 +802,41 @@ const Admin = () => {
           <TabsContent value="citas" className="mt-0">
             <Seccion
               titulo="Citas"
-              descripcion="Las más recientes primero. Confirma o cancela desde la fila."
-              total={citas.length}
+              descripcion={
+                vistaCitas === "lista"
+                  ? "Las más recientes primero. Confirma o cancela desde la fila."
+                  : vistaCitas === "mes"
+                    ? "Las citas del mes. Toca un día para verlo completo."
+                    : "La agenda del día, hora por hora."
+              }
+              total={fuenteCitas.length}
               busqueda={busqueda}
               onBusqueda={setBusqueda}
               placeholder="Buscar por nombre, correo o servicio"
-              cargando={loadingCitas}
-              onActualizar={fetchCitas}
-              onNuevo={handleNewCita}
+              cargando={cargandoCitas}
+              onActualizar={refrescarCitas}
+              onNuevo={() => handleNewCita(vistaCitas === "dia" ? diaCitas : undefined)}
               etiquetaNuevo="Nueva cita"
+              acciones={
+                <div className="flex rounded-md border border-border p-0.5" role="group" aria-label="Cambiar vista">
+                  {VISTAS_CITAS.map(({ id, etiqueta, icono: Icono }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setVistaCitas(id)}
+                      aria-pressed={vistaCitas === id}
+                      title={etiqueta}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        vistaCitas === id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      )}
+                    >
+                      <Icono className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">{etiqueta}</span>
+                    </button>
+                  ))}
+                </div>
+              }
               filtros={
                 <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filtrar por estado">
                   {(["todas", ...ESTADOS_CITA] as const).map((estado) => (
@@ -779,13 +859,31 @@ const Admin = () => {
                 </div>
               }
             >
-              {!loadingCitas && citas.length === 0 ? (
+              {vistaCitas !== "lista" ? (
+                <CalendarioCitas
+                  vista={vistaCitas}
+                  fecha={diaCitas}
+                  onFecha={setDiaCitas}
+                  onAbrirDia={(clave) => {
+                    setDiaCitas(clave);
+                    setVistaCitas("dia");
+                  }}
+                  citas={citasFiltradas}
+                  servicios={servicios}
+                  cargando={loadingMes}
+                  cambiandoEstado={cambiandoEstado}
+                  onNueva={handleNewCita}
+                  onEditar={handleEditCita}
+                  onBorrar={handleDeleteCita}
+                  onEstado={cambiarEstadoCita}
+                />
+              ) : !loadingCitas && citas.length === 0 ? (
                 <Vacio
                   icono={Calendar}
                   titulo="Aún no hay citas"
                   texto="Aparecerán aquí cuando alguien reserve desde el sitio o cuando registres una a mano."
                   accion={
-                    <Button size="sm" onClick={handleNewCita}>
+                    <Button size="sm" onClick={() => handleNewCita()}>
                       <Plus className="h-4 w-4" /> Registrar una cita
                     </Button>
                   }
@@ -1096,7 +1194,14 @@ const Admin = () => {
         }
         onConfirm={handleConfirmDeleteServicio}
       />
-      <CitaFormDialog open={citaFormOpen} onOpenChange={setCitaFormOpen} cita={editingCita} onSave={handleSaveCita} servicios={servicios} />
+      <CitaFormDialog
+        open={citaFormOpen}
+        onOpenChange={setCitaFormOpen}
+        cita={editingCita}
+        onSave={handleSaveCita}
+        servicios={servicios}
+        fechaInicial={nuevaCitaFecha}
+      />
       <ClienteFormDialog open={clienteFormOpen} onOpenChange={setClienteFormOpen} cliente={editingCliente} onSave={handleSaveCliente} />
       <ConfirmarBorradoDialog
         open={deleteClienteOpen}

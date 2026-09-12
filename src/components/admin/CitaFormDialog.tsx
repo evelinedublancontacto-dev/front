@@ -37,6 +37,8 @@ interface CitaFormDialogProps {
   cita: Cita | null;
   onSave: (data: CitaFormData) => Promise<void>;
   servicios?: Servicio[];
+  /** Día ya elegido en el calendario al crear una cita nueva. */
+  fechaInicial?: string;
 }
 
 const VACIA: CitaFormData = {
@@ -56,6 +58,7 @@ export default function CitaFormDialog({
   cita,
   onSave,
   servicios = [],
+  fechaInicial,
 }: CitaFormDialogProps) {
   const [form, setForm] = useState<CitaFormData>(VACIA);
   const [saving, setSaving] = useState(false);
@@ -75,9 +78,9 @@ export default function CitaFormDialog({
             estado: cita.estado,
             notas: cita.notas,
           }
-        : VACIA,
+        : { ...VACIA, fecha: fechaInicial ?? "" },
     );
-  }, [cita, open]);
+  }, [cita, open, fechaInicial]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
