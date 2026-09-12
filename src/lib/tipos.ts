@@ -47,6 +47,8 @@ export interface Cita {
   hora: string;
   estado: EstadoCita;
   notas: string;
+  /** Primera cita con Eveline (se confirma con depósito) o subsecuente. */
+  primeraCita?: boolean;
   origen?: string;
   created: string;
 }

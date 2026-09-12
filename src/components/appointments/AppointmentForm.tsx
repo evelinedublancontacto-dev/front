@@ -13,6 +13,8 @@ const appointmentSchema = z.object({
   nombre: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
   email: z.string().email("Email inválido"),
   telefono: z.string().min(7, "Teléfono inválido"),
+  /* La primera cita se confirma con depósito y lleva indicaciones en el correo. */
+  tipoCita: z.enum(["primera", "subsecuente"], { message: "Indica si es tu primera cita o una subsecuente" }),
   notas: z.string().optional(),
 });
 
@@ -64,9 +66,11 @@ export default function AppointmentForm({
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm<AppointmentFormData>({
     resolver: zodResolver(appointmentSchema),
   });
+  const tipoCita = watch("tipoCita");
 
   const onSubmit = async (data: AppointmentFormData) => {
     setSubmitting(true);
@@ -80,6 +84,7 @@ export default function AppointmentForm({
         fecha,
         hora,
         notas: data.notas || "",
+        primeraCita: data.tipoCita === "primera",
       });
 
       reset();
@@ -239,6 +244,39 @@ export default function AppointmentForm({
             </p>
           )}
         </div>
+
+        {/* Primera cita o subsecuente */}
+        <fieldset>
+          <legend className="block text-sm font-medium text-gray-700 mb-2">
+            ¿Es tu primera cita con Eveline? *
+          </legend>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {(
+              [
+                { valor: "primera", titulo: "Sí, es mi primera cita", detalle: "Se confirma con depósito; te enviaremos las indicaciones por correo." },
+                { valor: "subsecuente", titulo: "No, ya he tenido sesiones", detalle: "Cita subsecuente." },
+              ] as const
+            ).map((op) => (
+              <label
+                key={op.valor}
+                className={cn(
+                  "flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition-colors",
+                  tipoCita === op.valor ? "border-primary bg-primary/5" : "border-gray-300 hover:border-primary/40",
+                  errors.tipoCita && "border-red-300",
+                )}
+              >
+                <input type="radio" value={op.valor} {...register("tipoCita")} className="mt-1 accent-primary" />
+                <span>
+                  <span className="block text-sm font-medium text-gray-900">{op.titulo}</span>
+                  <span className="block text-xs text-gray-500">{op.detalle}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+          {errors.tipoCita && (
+            <p className="mt-1 text-sm text-red-600">{errors.tipoCita.message}</p>
+          )}
+        </fieldset>
 
         {/* Notas */}
         <div>

@@ -157,6 +157,15 @@ export default function AdminCitasPage() {
                         <span className={`px-2 py-1 rounded-full text-xs font-medium border ${ESTADO_COLORS[cita.estado]}`}>
                           {ETIQUETA_ESTADO[cita.estado]}
                         </span>
+                        {cita.primeraCita !== undefined && (
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                              cita.primeraCita ? "bg-amber-50 text-amber-800 border-amber-200" : "bg-gray-50 text-gray-600 border-gray-200"
+                            }`}
+                          >
+                            {cita.primeraCita ? "Primera cita" : "Subsecuente"}
+                          </span>
+                        )}
                       </div>
                       <div className="flex flex-wrap gap-4 text-sm text-gray-500">
                         <div className="flex items-center gap-1">

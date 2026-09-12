@@ -29,6 +29,7 @@ export interface CitaFormData {
   hora: string;
   estado: EstadoCita;
   notas: string;
+  primeraCita: boolean;
 }
 
 interface CitaFormDialogProps {
@@ -50,6 +51,7 @@ const VACIA: CitaFormData = {
   hora: "",
   estado: "confirmada",
   notas: "",
+  primeraCita: false,
 };
 
 export default function CitaFormDialog({
@@ -77,6 +79,7 @@ export default function CitaFormDialog({
             hora: cita.hora,
             estado: cita.estado,
             notas: cita.notas,
+            primeraCita: cita.primeraCita ?? false,
           }
         : { ...VACIA, fecha: fechaInicial ?? "" },
     );
@@ -174,6 +177,18 @@ export default function CitaFormDialog({
               </SelectContent>
             </Select>
           </div>
+          <label className="flex items-start gap-3 rounded-lg border border-border/60 p-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.primeraCita}
+              onChange={(e) => set("primeraCita", e.target.checked)}
+              className="mt-1 accent-primary"
+            />
+            <span>
+              <span className="block text-sm font-medium">Es su primera cita</span>
+              <span className="block text-xs text-muted-foreground">Se confirma con depósito; el correo de cita lleva las indicaciones.</span>
+            </span>
+          </label>
           <div className="space-y-2">
             <Label htmlFor="notas" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Notas

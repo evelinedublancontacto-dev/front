@@ -601,6 +601,7 @@ const Admin = () => {
           hora: data.hora,
           estado: data.estado,
           notas: data.notas,
+          primeraCita: data.primeraCita,
         });
         toast.success("Cita actualizada.");
       } else {
