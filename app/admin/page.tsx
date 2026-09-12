@@ -1,65 +1,291 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { api, ErrorApi, mensajeDeError } from "@/lib/api";
-import type { Cita, Cliente, Post, Servicio } from "@/lib/tipos";
-import { ETIQUETA_ESTADO } from "@/lib/tipos";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  LogOut,
-  Users,
-  FileText,
-  LayoutDashboard,
-  RefreshCw,
-  Plus,
-  Pencil,
-  Trash2,
-  Calendar,
-  Briefcase,
-} from "lucide-react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import PostFormDialog, {
-  type PostFormData,
-  POST_CATEGORIES,
-} from "@/components/admin/PostFormDialog";
-import DeletePostDialog from "@/components/admin/DeletePostDialog";
+import {
+  Briefcase,
+  Calendar,
+  Check,
+  ChevronDown,
+  ExternalLink,
+  FileText,
+  Loader2,
+  LogOut,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Search,
+  Trash2,
+  Users,
+  X,
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { api, ErrorApi, mensajeDeError } from "@/lib/api";
+import { logos } from "@/lib/brand";
+import { cn } from "@/lib/utils";
+import type { Cita, Cliente, EstadoCita, Post, Servicio } from "@/lib/tipos";
+import { ESTADOS_CITA, ETIQUETA_ESTADO } from "@/lib/tipos";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import PostFormDialog, { type PostFormData, POST_CATEGORIES } from "@/components/admin/PostFormDialog";
 import ServicioFormDialog, { type ServicioFormData } from "@/components/admin/ServicioFormDialog";
 import CitaFormDialog, { type CitaFormData } from "@/components/admin/CitaFormDialog";
 import ClienteFormDialog, { type ClienteFormData } from "@/components/admin/ClienteFormDialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import ConfirmarBorradoDialog from "@/components/admin/ConfirmarBorradoDialog";
+
+/* ------------------------------------------------------------------ *
+ *  Pestañas y utilidades de presentación
+ * ------------------------------------------------------------------ */
+
+type Pestana = "citas" | "clientes" | "posts" | "servicios";
+const PESTANAS: Pestana[] = ["citas", "clientes", "posts", "servicios"];
+
+const ESTILO_ESTADO: Record<EstadoCita, string> = {
+  pendiente: "border-amber-200 bg-amber-50 text-amber-800",
+  confirmada: "border-emerald-200 bg-emerald-50 text-emerald-800",
+  completada: "border-primary/20 bg-primary/10 text-primary",
+  cancelada: "border-red-200 bg-red-50 text-red-700",
+};
+
+const fechaCorta = (iso: string) =>
+  new Date(iso).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" });
+
+/* La fecha de una cita viene como AAAA-MM-DD; se fija la hora para no
+   cambiar de día por la zona horaria. */
+const fechaCita = (fecha: string) => {
+  const texto = new Date(fecha + "T00:00:00").toLocaleDateString("es-MX", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+};
+
+const precioMXN = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 });
+
+const iniciales = (texto: string) =>
+  texto
+    .split(/[\s@._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase())
+    .join("");
+
+const contiene = (q: string, ...campos: Array<string | undefined | null>) =>
+  campos.some((c) => (c ?? "").toLowerCase().includes(q));
+
+/* ------------------------------------------------------------------ *
+ *  Piezas pequeñas de tabla
+ * ------------------------------------------------------------------ */
+
+function Th({ children, className }: { children?: React.ReactNode; className?: string }) {
+  return (
+    <TableHead className={cn("h-10 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground", className)}>
+      {children}
+    </TableHead>
+  );
+}
+
+function AccionIcono({
+  etiqueta,
+  onClick,
+  children,
+  destructiva,
+}: {
+  etiqueta: string;
+  onClick: () => void;
+  children: React.ReactNode;
+  destructiva?: boolean;
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClick}
+          aria-label={etiqueta}
+          className={cn("h-8 w-8 text-muted-foreground hover:text-foreground", destructiva && "hover:bg-destructive/10 hover:text-destructive")}
+        >
+          {children}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="top">{etiqueta}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+function AccionesFila({ onEditar, onBorrar, children }: { onEditar: () => void; onBorrar: () => void; children?: React.ReactNode }) {
+  return (
+    <div className="flex justify-end gap-0.5">
+      {children}
+      <AccionIcono etiqueta="Editar" onClick={onEditar}>
+        <Pencil className="h-4 w-4" />
+      </AccionIcono>
+      <AccionIcono etiqueta="Eliminar" onClick={onBorrar} destructiva>
+        <Trash2 className="h-4 w-4" />
+      </AccionIcono>
+    </div>
+  );
+}
+
+function FilasCargando({ columnas }: { columnas: number }) {
+  return (
+    <>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <TableRow key={i} className="hover:bg-transparent">
+          {Array.from({ length: columnas }).map((__, j) => (
+            <TableCell key={j}>
+              <Skeleton className={cn("h-4", j === 0 ? "w-40" : j === columnas - 1 ? "ml-auto w-16" : "w-24")} />
+            </TableCell>
+          ))}
+        </TableRow>
+      ))}
+    </>
+  );
+}
+
+function Vacio({
+  icono: Icono,
+  titulo,
+  texto,
+  accion,
+}: {
+  icono: React.ComponentType<{ className?: string }>;
+  titulo: string;
+  texto?: string;
+  accion?: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 px-6 py-14 text-center">
+      <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+        <Icono className="h-6 w-6 text-muted-foreground" />
+      </div>
+      <p className="font-medium text-foreground">{titulo}</p>
+      {texto && <p className="max-w-sm text-sm text-muted-foreground">{texto}</p>}
+      {accion && <div className="mt-2">{accion}</div>}
+    </div>
+  );
+}
+
+/* Cabecera común de cada pestaña: título, contador, buscador y acciones. */
+function Seccion({
+  titulo,
+  descripcion,
+  total,
+  busqueda,
+  onBusqueda,
+  placeholder,
+  cargando,
+  onActualizar,
+  onNuevo,
+  etiquetaNuevo,
+  filtros,
+  children,
+}: {
+  titulo: string;
+  descripcion: string;
+  total: number;
+  busqueda: string;
+  onBusqueda: (v: string) => void;
+  placeholder: string;
+  cargando: boolean;
+  onActualizar: () => void;
+  onNuevo: () => void;
+  etiquetaNuevo: string;
+  filtros?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      <div className="flex flex-col gap-3 border-b border-border/60 px-4 py-4 sm:px-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="flex items-center gap-2 font-display text-base font-semibold text-foreground">
+              {titulo}
+              {!cargando && (
+                <span className="rounded-full bg-muted px-2 py-0.5 font-body text-xs font-medium text-muted-foreground">{total}</span>
+              )}
+            </h2>
+            <p className="text-sm text-muted-foreground">{descripcion}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={onActualizar} disabled={cargando} aria-label="Actualizar">
+              <RefreshCw className={cn("h-4 w-4", cargando && "animate-spin")} />
+              <span className="hidden sm:inline">Actualizar</span>
+            </Button>
+            <Button size="sm" onClick={onNuevo}>
+              <Plus className="h-4 w-4" /> {etiquetaNuevo}
+            </Button>
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="relative sm:w-72">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="search"
+              value={busqueda}
+              onChange={(e) => onBusqueda(e.target.value)}
+              placeholder={placeholder}
+              aria-label={placeholder}
+              className="h-9 pl-9 pr-8"
+            />
+            {busqueda && (
+              <button
+                type="button"
+                onClick={() => onBusqueda("")}
+                aria-label="Limpiar búsqueda"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+          {filtros}
+        </div>
+      </div>
+      <div className="overflow-x-auto">{children}</div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ *  Panel
+ * ------------------------------------------------------------------ */
 
 const Admin = () => {
-  const { user, logout } = useAuth();
+  const { user, isLoading: cargandoSesion, logout } = useAuth();
   const router = useRouter();
+
+  const [pestana, setPestana] = useState<Pestana>("citas");
+  const [busqueda, setBusqueda] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState<"todas" | EstadoCita>("todas");
+
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [servicios, setServicios] = useState<Servicio[]>([]);
   const [citas, setCitas] = useState<Cita[]>([]);
-  const [loadingClientes, setLoadingClientes] = useState(false);
-  const [loadingPosts, setLoadingPosts] = useState(false);
-  const [loadingServicios, setLoadingServicios] = useState(false);
-  const [loadingCitas, setLoadingCitas] = useState(false);
+  const [loadingClientes, setLoadingClientes] = useState(true);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+  const [loadingServicios, setLoadingServicios] = useState(true);
+  const [loadingCitas, setLoadingCitas] = useState(true);
+
   const [formOpen, setFormOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [servicioFormOpen, setServicioFormOpen] = useState(false);
@@ -76,6 +302,24 @@ const Admin = () => {
   const [deletingCliente, setDeletingCliente] = useState<Cliente | null>(null);
   const [editingCita, setEditingCita] = useState<Cita | null>(null);
   const [deletingCita, setDeletingCita] = useState<Cita | null>(null);
+  const [cambiandoEstado, setCambiandoEstado] = useState<string | null>(null);
+
+  /* Sin sesión no se pinta el panel: al login, y de vuelta aquí al entrar. */
+  useEffect(() => {
+    if (!cargandoSesion && !user) router.replace("/login?volver=/admin");
+  }, [cargandoSesion, user, router]);
+
+  /* La pestaña abierta se recuerda en el hash (#posts) para volver a ella tras recargar. */
+  useEffect(() => {
+    const inicial = window.location.hash.replace("#", "") as Pestana;
+    if (PESTANAS.includes(inicial)) setPestana(inicial);
+  }, []);
+  const cambiarPestana = (valor: string) => {
+    const p = valor as Pestana;
+    setPestana(p);
+    setBusqueda("");
+    window.history.replaceState(null, "", `#${p}`);
+  };
 
   /* Un 401 significa que la sesión venció: al login. Cualquier otro error, aviso. */
   const reportar = useCallback(
@@ -138,16 +382,20 @@ const Admin = () => {
     }
   }, [reportar]);
 
-  useEffect(() => {
+  const fetchTodo = useCallback(() => {
     fetchClientes();
     fetchPosts();
     fetchServicios();
     fetchCitas();
   }, [fetchClientes, fetchPosts, fetchServicios, fetchCitas]);
 
+  useEffect(() => {
+    if (user) fetchTodo();
+  }, [user, fetchTodo]);
+
   const handleLogout = async () => {
     await logout();
-    router.push("/login");
+    router.replace("/login");
   };
 
   // Posts
@@ -172,10 +420,10 @@ const Admin = () => {
     try {
       if (editingPost) {
         await api.actualizar(`/v1/admin/posts/${editingPost.id}`, data);
-        toast.success("Post actualizado correctamente.");
+        toast.success("Post actualizado.");
       } else {
         await api.enviar("/v1/admin/posts", data);
-        toast.success("Post creado correctamente.");
+        toast.success("Post creado.");
       }
       fetchPosts();
     } catch (err) {
@@ -187,7 +435,7 @@ const Admin = () => {
     if (!deletingPost) return;
     try {
       await api.borrar(`/v1/admin/posts/${deletingPost.id}`);
-      toast.success("Post eliminado correctamente.");
+      toast.success("Post eliminado.");
       fetchPosts();
     } catch (err) {
       reportar(err, "Error al eliminar el post.");
@@ -219,10 +467,10 @@ const Admin = () => {
     try {
       if (editingServicio) {
         await api.actualizar(`/v1/admin/servicios/${editingServicio.id}`, cuerpo);
-        toast.success("Servicio actualizado correctamente.");
+        toast.success("Servicio actualizado.");
       } else {
         await api.enviar("/v1/admin/servicios", cuerpo);
-        toast.success("Servicio creado correctamente.");
+        toast.success("Servicio creado.");
       }
       fetchServicios();
     } catch (err) {
@@ -234,10 +482,11 @@ const Admin = () => {
     if (!deletingServicio) return;
     try {
       await api.borrar(`/v1/admin/servicios/${deletingServicio.id}`);
-      toast.success("Servicio eliminado correctamente.");
+      toast.success("Servicio eliminado.");
       fetchServicios();
     } catch (err) {
       reportar(err, "Error al eliminar el servicio. Si tiene citas, desactívalo.");
+      throw err;
     }
   };
 
@@ -258,10 +507,10 @@ const Admin = () => {
     try {
       if (editingCliente) {
         await api.actualizar(`/v1/admin/clientes/${editingCliente.id}`, data);
-        toast.success("Cliente actualizado correctamente.");
+        toast.success("Cliente actualizado.");
       } else {
         await api.enviar("/v1/admin/clientes", data);
-        toast.success("Cliente creado correctamente.");
+        toast.success("Cliente creado.");
       }
       fetchClientes();
     } catch (err) {
@@ -273,10 +522,11 @@ const Admin = () => {
     if (!deletingCliente) return;
     try {
       await api.borrar(`/v1/admin/clientes/${deletingCliente.id}`);
-      toast.success("Cliente eliminado correctamente.");
+      toast.success("Cliente eliminado.");
       fetchClientes();
     } catch (err) {
       reportar(err, "Error al eliminar el cliente. Si tiene citas, no se puede borrar.");
+      throw err;
     }
   };
 
@@ -306,10 +556,10 @@ const Admin = () => {
           estado: data.estado,
           notas: data.notas,
         });
-        toast.success("Cita actualizada correctamente.");
+        toast.success("Cita actualizada.");
       } else {
         await api.enviar("/v1/admin/citas", data);
-        toast.success("Cita creada correctamente.");
+        toast.success("Cita creada.");
       }
       fetchCitas();
       fetchClientes();
@@ -322,737 +572,555 @@ const Admin = () => {
     if (!deletingCita) return;
     try {
       await api.borrar(`/v1/admin/citas/${deletingCita.id}`);
-      toast.success("Cita eliminada correctamente.");
+      toast.success("Cita eliminada.");
       fetchCitas();
-      setDeleteCitaOpen(false);
     } catch (err) {
       reportar(err, "Error al eliminar la cita.");
+      throw err;
+    }
+  };
+  /* Atajo desde la fila: confirmar o cancelar sin abrir el formulario. */
+  const cambiarEstadoCita = async (cita: Cita, estado: EstadoCita) => {
+    setCambiandoEstado(cita.id);
+    try {
+      await api.actualizar(`/v1/admin/citas/${cita.id}`, { estado });
+      toast.success(`Cita de ${cita.nombre} ${ETIQUETA_ESTADO[estado].toLowerCase()}.`);
+      setCitas((prev) => prev.map((c) => (c.id === cita.id ? { ...c, estado } : c)));
+    } catch (err) {
+      reportar(err, "No se pudo cambiar el estado de la cita.");
+    } finally {
+      setCambiandoEstado(null);
     }
   };
 
+  /* Filtrado en el cliente: son listas cortas. */
+  const q = busqueda.trim().toLowerCase();
+  const citasFiltradas = useMemo(
+    () =>
+      citas.filter(
+        (c) =>
+          (filtroEstado === "todas" || c.estado === filtroEstado) &&
+          (q === "" || contiene(q, c.nombre, c.email, c.servicioNombre, c.telefono)),
+      ),
+    [citas, filtroEstado, q],
+  );
+  const clientesFiltrados = useMemo(
+    () => (q === "" ? clientes : clientes.filter((c) => contiene(q, c.nombre, c.correo, c.telefono))),
+    [clientes, q],
+  );
+  const postsFiltrados = useMemo(
+    () => (q === "" ? posts : posts.filter((p) => contiene(q, p.title, p.category, p.slug))),
+    [posts, q],
+  );
+  const serviciosFiltrados = useMemo(
+    () => (q === "" ? servicios : servicios.filter((s) => contiene(q, s.titulo, s.descripcion))),
+    [servicios, q],
+  );
+
+  const conteoEstado = useMemo(() => {
+    const c: Record<"todas" | EstadoCita, number> = { todas: citas.length, pendiente: 0, confirmada: 0, cancelada: 0, completada: 0 };
+    for (const cita of citas) c[cita.estado] = (c[cita.estado] ?? 0) + 1;
+    return c;
+  }, [citas]);
+  const publicados = posts.filter((p) => p.published).length;
+  const activos = servicios.filter((s) => s.activo !== false).length;
+
+  const cargandoTodo = loadingCitas && loadingClientes && loadingPosts && loadingServicios;
+
+  if (cargandoSesion || !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const resumen: Array<{ id: Pestana; etiqueta: string; icono: React.ComponentType<{ className?: string }>; valor: number; detalle: string; cargando: boolean }> = [
+    {
+      id: "citas",
+      etiqueta: "Citas",
+      icono: Calendar,
+      valor: citas.length,
+      detalle: conteoEstado.pendiente > 0 ? `${conteoEstado.pendiente} por confirmar` : "Ninguna pendiente",
+      cargando: loadingCitas,
+    },
+    { id: "clientes", etiqueta: "Clientes", icono: Users, valor: clientes.length, detalle: "En total", cargando: loadingClientes },
+    { id: "posts", etiqueta: "Blog", icono: FileText, valor: posts.length, detalle: `${publicados} publicados`, cargando: loadingPosts },
+    { id: "servicios", etiqueta: "Servicios", icono: Briefcase, valor: servicios.length, detalle: `${activos} activos`, cargando: loadingServicios },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-30 border-b border-border/60 bg-card/90 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[hsl(275_55%_35%)] flex items-center justify-center shadow-md">
-              <LayoutDashboard className="w-5 h-5 text-white" />
-            </div>
+            <Image src={logos.imago} alt="" width={30} height={40} className="h-10 w-auto" priority />
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-foreground">
-                Panel de Administración
-              </h1>
-              <p className="text-xs text-muted-foreground font-medium">
-                Gestión integral de tu negocio
-              </p>
+              <h1 className="font-display text-base font-semibold leading-tight text-foreground sm:text-lg">Panel de administración</h1>
+              <p className="hidden text-xs text-muted-foreground sm:block">Eveline Dublán</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex flex-col items-end">
-              <span className="text-sm font-semibold text-foreground">
-                {user?.correo}
-              </span>
-              <span className="text-[11px] text-muted-foreground font-medium">
-                Administrador
-              </span>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLogout}
-              className="font-medium"
-            >
-              <LogOut className="w-4 h-4 mr-1" /> Salir
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
+              <Link href="/" target="_blank" rel="noopener">
+                <ExternalLink className="h-4 w-4" /> Ver sitio
+              </Link>
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2 pl-1.5">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
+                    {iniciales(user.nombre || user.correo)}
+                  </span>
+                  <span className="hidden max-w-[10rem] truncate sm:inline">{user.nombre || user.correo}</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="font-normal">
+                  <p className="text-sm font-medium">{user.nombre || "Administración"}</p>
+                  <p className="truncate text-xs text-muted-foreground">{user.correo}</p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/" target="_blank" rel="noopener">
+                    <ExternalLink className="mr-2 h-4 w-4" /> Ver sitio público
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={fetchTodo}>
+                  <RefreshCw className="mr-2 h-4 w-4" /> Recargar todo
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleLogout} className="text-destructive focus:text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" /> Cerrar sesión
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Users className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Clientes
-                </p>
-                <p className="text-2xl font-bold text-foreground">
-                  {clientes.length}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
-                <FileText className="w-6 h-6 text-accent" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Posts del Blog
-                </p>
-                <p className="text-2xl font-bold text-foreground">
-                  {posts.length}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-                <Briefcase className="w-6 h-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Servicios
-                </p>
-                <p className="text-2xl font-bold text-foreground">
-                  {servicios.length}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Citas
-                </p>
-                <p className="text-2xl font-bold text-foreground">
-                  {citas.length}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <Tabs defaultValue="posts" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl h-12 bg-muted/50 p-1">
-            <TabsTrigger
-              value="clientes"
-              className="flex items-center gap-2 h-full data-[state=active]:bg-background data-[state=active]:shadow-sm font-semibold text-xs"
-            >
-              <Users className="w-4 h-4" /> Clientes
-            </TabsTrigger>
-            <TabsTrigger
-              value="posts"
-              className="flex items-center gap-2 h-full data-[state=active]:bg-background data-[state=active]:shadow-sm font-semibold text-xs"
-            >
-              <FileText className="w-4 h-4" /> Blog Posts
-            </TabsTrigger>
-            <TabsTrigger
-              value="servicios"
-              className="flex items-center gap-2 h-full data-[state=active]:bg-background data-[state=active]:shadow-sm font-semibold text-xs"
-            >
-              <Briefcase className="w-4 h-4" /> Servicios
-            </TabsTrigger>
-            <TabsTrigger
-              value="citas"
-              className="flex items-center gap-2 h-full data-[state=active]:bg-background data-[state=active]:shadow-sm font-semibold text-xs"
-            >
-              <Calendar className="w-4 h-4" /> Citas
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="clientes">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 bg-gradient-to-r from-card to-muted/20 py-4">
-                <CardTitle className="text-base font-semibold">
-                  Clientes
-                </CardTitle>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={fetchClientes}
-                    disabled={loadingClientes}
-                    className="font-medium text-xs h-8"
-                  >
-                    <RefreshCw
-                      className={`w-3.5 h-3.5 mr-1 ${loadingClientes ? "animate-spin" : ""}`}
-                    />{" "}
-                    Actualizar
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleNewCliente}
-                    className="font-medium text-xs h-8"
-                  >
-                    <Plus className="w-3.5 h-3.5 mr-1" /> Nuevo Cliente
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                {loadingClientes ? (
-                  <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-                  </div>
-                ) : clientes.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">
-                    Aún no hay clientes. Se crean solos al reservar una cita.
-                  </p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-muted/30 hover:bg-muted/30">
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Nombre
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Email
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Teléfono
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Desde
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-right">
-                            Acciones
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {clientes.map((c) => (
-                          <TableRow key={c.id} className="hover:bg-muted/20">
-                            <TableCell className="font-medium text-sm">
-                              {c.nombre || "—"}
-                            </TableCell>
-                            <TableCell className="text-sm text-muted-foreground">
-                              {c.correo}
-                            </TableCell>
-                            <TableCell className="text-sm text-muted-foreground">
-                              {c.telefono || "—"}
-                            </TableCell>
-                            <TableCell className="text-sm text-muted-foreground">
-                              {new Date(c.creado_en).toLocaleDateString("es-ES")}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleEditCliente(c)}
-                                  title="Editar"
-                                  className="h-8 w-8"
-                                >
-                                  <Pencil className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDeleteCliente(c)}
-                                  title="Eliminar"
-                                  className="h-8 w-8 text-destructive hover:text-destructive"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        {/* Resumen: cada tarjeta lleva a su pestaña */}
+        <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {resumen.map(({ id, etiqueta, icono: Icono, valor, detalle, cargando }) => {
+            const activa = pestana === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => cambiarPestana(id)}
+                aria-pressed={activa}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl border bg-card p-4 text-left shadow-sm transition-all hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  activa ? "border-primary/50 ring-1 ring-primary/30" : "border-border",
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="posts">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 bg-gradient-to-r from-card to-muted/20 py-4">
-                <CardTitle className="text-base font-semibold">
-                  Posts del Blog
-                </CardTitle>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={fetchPosts}
-                    disabled={loadingPosts}
-                    className="font-medium text-xs h-8"
-                  >
-                    <RefreshCw
-                      className={`w-3.5 h-3.5 mr-1 ${loadingPosts ? "animate-spin" : ""}`}
-                    />{" "}
-                    Actualizar
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleNewPost}
-                    className="font-medium text-xs h-8"
-                  >
-                    <Plus className="w-3.5 h-3.5 mr-1" /> Nuevo Post
-                  </Button>
+              >
+                <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg", activa ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary")}>
+                  <Icono className="h-5 w-5" />
                 </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                {loadingPosts ? (
-                  <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-                  </div>
-                ) : posts.length === 0 ? (
-                  <div className="text-center py-8 space-y-3">
-                    <p className="text-muted-foreground">
-                      No hay posts aún.
-                    </p>
-                    <Button onClick={handleNewPost}>
-                      <Plus className="w-4 h-4 mr-1" /> Crear Primer Post
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{etiqueta}</p>
+                  {cargando ? (
+                    <Skeleton className="mt-1 h-6 w-12" />
+                  ) : (
+                    <p className="font-display text-2xl font-semibold leading-tight text-foreground">{valor}</p>
+                  )}
+                  <p className="truncate text-xs text-muted-foreground">{cargando ? "Cargando…" : detalle}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <Tabs value={pestana} onValueChange={cambiarPestana} className="space-y-4">
+          <div className="overflow-x-auto pb-1">
+            <TabsList className="h-11 w-max bg-muted/60 p-1">
+              {resumen.map(({ id, etiqueta, icono: Icono }) => (
+                <TabsTrigger key={id} value={id} className="h-full gap-2 px-4 text-sm font-medium">
+                  <Icono className="h-4 w-4" /> {etiqueta}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
+
+          {/* Citas */}
+          <TabsContent value="citas" className="mt-0">
+            <Seccion
+              titulo="Citas"
+              descripcion="Las más recientes primero. Confirma o cancela desde la fila."
+              total={citas.length}
+              busqueda={busqueda}
+              onBusqueda={setBusqueda}
+              placeholder="Buscar por nombre, correo o servicio"
+              cargando={loadingCitas}
+              onActualizar={fetchCitas}
+              onNuevo={handleNewCita}
+              etiquetaNuevo="Nueva cita"
+              filtros={
+                <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filtrar por estado">
+                  {(["todas", ...ESTADOS_CITA] as const).map((estado) => (
+                    <button
+                      key={estado}
+                      type="button"
+                      onClick={() => setFiltroEstado(estado)}
+                      aria-pressed={filtroEstado === estado}
+                      className={cn(
+                        "rounded-full border px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        filtroEstado === estado
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground",
+                      )}
+                    >
+                      {estado === "todas" ? "Todas" : ETIQUETA_ESTADO[estado]}
+                      <span className="ml-1 opacity-70">{conteoEstado[estado]}</span>
+                    </button>
+                  ))}
+                </div>
+              }
+            >
+              {!loadingCitas && citas.length === 0 ? (
+                <Vacio
+                  icono={Calendar}
+                  titulo="Aún no hay citas"
+                  texto="Aparecerán aquí cuando alguien reserve desde el sitio o cuando registres una a mano."
+                  accion={
+                    <Button size="sm" onClick={handleNewCita}>
+                      <Plus className="h-4 w-4" /> Registrar una cita
                     </Button>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-muted/30 hover:bg-muted/30">
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Título
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Categoría
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-center">
-                            Estado
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Fecha
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-right">
-                            Acciones
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {posts.map((post) => (
-                          <TableRow key={post.id} className="hover:bg-muted/20">
-                            <TableCell className="font-medium text-sm">
-                              {post.title}
+                  }
+                />
+              ) : !loadingCitas && citasFiltradas.length === 0 ? (
+                <Vacio icono={Search} titulo="Sin resultados" texto="Prueba con otra búsqueda o cambia el filtro de estado." />
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30 hover:bg-muted/30">
+                      <Th>Cliente</Th>
+                      <Th>Servicio</Th>
+                      <Th>Fecha</Th>
+                      <Th>Estado</Th>
+                      <Th className="text-right">Acciones</Th>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loadingCitas ? (
+                      <FilasCargando columnas={5} />
+                    ) : (
+                      citasFiltradas.map((cita) => {
+                        const servicio = cita.servicioNombre || servicios.find((s) => s.id === cita.servicio)?.titulo || cita.servicio || "—";
+                        const ocupada = cambiandoEstado === cita.id;
+                        return (
+                          <TableRow key={cita.id} className="hover:bg-muted/20">
+                            <TableCell>
+                              <p className="font-medium text-foreground">{cita.nombre || "—"}</p>
+                              <p className="text-xs text-muted-foreground">{cita.email || cita.telefono || "—"}</p>
+                            </TableCell>
+                            <TableCell className="min-w-[10rem] text-sm">{servicio}</TableCell>
+                            <TableCell>
+                              <p className="whitespace-nowrap text-sm text-foreground">{cita.fecha ? fechaCita(cita.fecha) : "—"}</p>
+                              <p className="text-xs text-muted-foreground">{cita.hora || "—"}</p>
                             </TableCell>
                             <TableCell>
-                              <Badge
-                                variant="secondary"
-                                className="text-[11px] font-semibold"
-                              >
-                                {POST_CATEGORIES.find(
-                                  (c) => c.value === post.category,
-                                )?.label ||
-                                  post.category ||
-                                  "—"}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <Badge
-                                variant={post.published ? "default" : "outline"}
-                                className="text-[11px] font-semibold"
-                              >
-                                {post.published ? "Publicado" : "Borrador"}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-sm text-muted-foreground">
-                              {new Date(post.date || post.created || Date.now()).toLocaleDateString(
-                                "es-ES",
-                              )}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleEditPost(post)}
-                                  title="Editar"
-                                  className="h-8 w-8"
-                                >
-                                  <Pencil className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDeletePost(post)}
-                                  title="Eliminar"
-                                  className="h-8 w-8 text-destructive hover:text-destructive"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="servicios">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 bg-gradient-to-r from-card to-muted/20 py-4">
-                <CardTitle className="text-base font-semibold">
-                  Servicios
-                </CardTitle>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={fetchServicios}
-                    disabled={loadingServicios}
-                    className="font-medium text-xs h-8"
-                  >
-                    <RefreshCw
-                      className={`w-3.5 h-3.5 mr-1 ${loadingServicios ? "animate-spin" : ""}`}
-                    />{" "}
-                    Actualizar
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleNewServicio}
-                    className="font-medium text-xs h-8"
-                  >
-                    <Plus className="w-3.5 h-3.5 mr-1" /> Nuevo Servicio
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                {loadingServicios ? (
-                  <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-                  </div>
-                ) : servicios.length === 0 ? (
-                  <div className="text-center py-8 space-y-3">
-                    <p className="text-muted-foreground">
-                      No hay servicios aún.
-                    </p>
-                    <Button onClick={handleNewServicio}>
-                      <Plus className="w-4 h-4 mr-1" /> Crear Primer Servicio
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-muted/30 hover:bg-muted/30">
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Título
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Descripción
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-center">
-                            Duración
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-right">
-                            Precio
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-center">
-                            Activo
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-right">
-                            Acciones
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {servicios.map((servicio) => (
-                          <TableRow
-                            key={servicio.id}
-                            className="hover:bg-muted/20"
-                          >
-                            <TableCell className="font-semibold text-sm">
-                              {servicio.titulo || "—"}
-                            </TableCell>
-                            <TableCell className="text-sm text-muted-foreground max-w-xs truncate">
-                              {servicio.descripcion || "—"}
-                            </TableCell>
-                            <TableCell className="text-center text-sm text-muted-foreground">
-                              {servicio.duracion
-                                ? `${servicio.duracion} min`
-                                : "—"}
-                            </TableCell>
-                            <TableCell className="text-right font-semibold text-sm">
-                              ${servicio.precio || "0"}
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <Badge
-                                variant={
-                                  servicio.activo !== false
-                                    ? "default"
-                                    : "secondary"
-                                }
-                                className="text-[11px] font-semibold"
-                              >
-                                {servicio.activo !== false ? "Sí" : "No"}
+                              <Badge variant="outline" className={cn("font-medium", ESTILO_ESTADO[cita.estado])}>
+                                {ETIQUETA_ESTADO[cita.estado] ?? cita.estado}
                               </Badge>
                             </TableCell>
                             <TableCell className="text-right">
-                              <div className="flex justify-end gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleEditServicio(servicio)}
-                                  title="Editar"
-                                  className="h-8 w-8"
-                                >
-                                  <Pencil className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDeleteServicio(servicio)}
-                                  title="Eliminar"
-                                  className="h-8 w-8 text-destructive hover:text-destructive"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </div>
+                              <AccionesFila onEditar={() => handleEditCita(cita)} onBorrar={() => handleDeleteCita(cita)}>
+                                {ocupada ? (
+                                  <span className="inline-flex h-8 w-8 items-center justify-center">
+                                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                                  </span>
+                                ) : (
+                                  <>
+                                    {cita.estado === "pendiente" && (
+                                      <AccionIcono etiqueta="Confirmar" onClick={() => cambiarEstadoCita(cita, "confirmada")}>
+                                        <Check className="h-4 w-4 text-emerald-600" />
+                                      </AccionIcono>
+                                    )}
+                                    {cita.estado === "confirmada" && (
+                                      <AccionIcono etiqueta="Marcar completada" onClick={() => cambiarEstadoCita(cita, "completada")}>
+                                        <Check className="h-4 w-4 text-primary" />
+                                      </AccionIcono>
+                                    )}
+                                    {(cita.estado === "pendiente" || cita.estado === "confirmada") && (
+                                      <AccionIcono etiqueta="Cancelar cita" onClick={() => cambiarEstadoCita(cita, "cancelada")} destructiva>
+                                        <X className="h-4 w-4" />
+                                      </AccionIcono>
+                                    )}
+                                  </>
+                                )}
+                              </AccionesFila>
                             </TableCell>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                        );
+                      })
+                    )}
+                  </TableBody>
+                </Table>
+              )}
+            </Seccion>
           </TabsContent>
-          <TabsContent value="citas">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 bg-gradient-to-r from-card to-muted/20 py-4">
-                <CardTitle className="text-base font-semibold">
-                  Citas Agendadas
-                </CardTitle>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={fetchCitas}
-                    disabled={loadingCitas}
-                    className="font-medium text-xs h-8"
-                  >
-                    <RefreshCw
-                      className={`w-3.5 h-3.5 mr-1 ${loadingCitas ? "animate-spin" : ""}`}
-                    />{" "}
-                    Actualizar
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleNewCita}
-                    className="font-medium text-xs h-8"
-                  >
-                    <Plus className="w-3.5 h-3.5 mr-1" /> Nueva Cita
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                {loadingCitas ? (
-                  <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-                  </div>
-                ) : citas.length === 0 ? (
-                  <div className="text-center py-8 space-y-3">
-                    <p className="text-muted-foreground">
-                      No hay citas aún.
-                    </p>
-                    <Button onClick={handleNewCita}>
-                      <Plus className="w-4 h-4 mr-1" /> Crear Primera Cita
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-muted/30 hover:bg-muted/30">
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Cliente
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Email
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Servicio
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
-                            Fecha
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-center">
-                            Hora
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-center">
-                            Estado
-                          </TableHead>
-                          <TableHead className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground text-right">
-                            Acciones
-                          </TableHead>
+
+          {/* Clientes */}
+          <TabsContent value="clientes" className="mt-0">
+            <Seccion
+              titulo="Clientes"
+              descripcion="Se crean solos al reservar una cita; también puedes darlos de alta."
+              total={clientes.length}
+              busqueda={busqueda}
+              onBusqueda={setBusqueda}
+              placeholder="Buscar por nombre, correo o teléfono"
+              cargando={loadingClientes}
+              onActualizar={fetchClientes}
+              onNuevo={handleNewCliente}
+              etiquetaNuevo="Nuevo cliente"
+            >
+              {!loadingClientes && clientes.length === 0 ? (
+                <Vacio icono={Users} titulo="Aún no hay clientes" texto="Se registran solos con la primera cita que reserven." />
+              ) : !loadingClientes && clientesFiltrados.length === 0 ? (
+                <Vacio icono={Search} titulo="Sin resultados" texto="Ningún cliente coincide con la búsqueda." />
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30 hover:bg-muted/30">
+                      <Th>Nombre</Th>
+                      <Th>Contacto</Th>
+                      <Th>Cliente desde</Th>
+                      <Th className="text-right">Acciones</Th>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loadingClientes ? (
+                      <FilasCargando columnas={4} />
+                    ) : (
+                      clientesFiltrados.map((c) => (
+                        <TableRow key={c.id} className="hover:bg-muted/20">
+                          <TableCell className="font-medium">{c.nombre || "—"}</TableCell>
+                          <TableCell>
+                            <p className="text-sm">{c.correo}</p>
+                            <p className="text-xs text-muted-foreground">{c.telefono || "Sin teléfono"}</p>
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap text-sm text-muted-foreground">{fechaCorta(c.creado_en)}</TableCell>
+                          <TableCell className="text-right">
+                            <AccionesFila onEditar={() => handleEditCliente(c)} onBorrar={() => handleDeleteCliente(c)} />
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {citas.map((cita) => {
-                          const servicioSeleccionado = servicios.find(
-                            (s) => s.id === cita.servicio,
-                          );
-                          return (
-                            <TableRow
-                              key={cita.id}
-                              className="hover:bg-muted/20"
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              )}
+            </Seccion>
+          </TabsContent>
+
+          {/* Blog */}
+          <TabsContent value="posts" className="mt-0">
+            <Seccion
+              titulo="Blog"
+              descripcion="Los borradores no se ven en el sitio hasta que los publiques."
+              total={posts.length}
+              busqueda={busqueda}
+              onBusqueda={setBusqueda}
+              placeholder="Buscar por título o categoría"
+              cargando={loadingPosts}
+              onActualizar={fetchPosts}
+              onNuevo={handleNewPost}
+              etiquetaNuevo="Nuevo post"
+            >
+              {!loadingPosts && posts.length === 0 ? (
+                <Vacio
+                  icono={FileText}
+                  titulo="Aún no hay artículos"
+                  texto="Escribe el primero y publícalo cuando esté listo."
+                  accion={
+                    <Button size="sm" onClick={handleNewPost}>
+                      <Plus className="h-4 w-4" /> Escribir el primer post
+                    </Button>
+                  }
+                />
+              ) : !loadingPosts && postsFiltrados.length === 0 ? (
+                <Vacio icono={Search} titulo="Sin resultados" texto="Ningún artículo coincide con la búsqueda." />
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30 hover:bg-muted/30">
+                      <Th>Título</Th>
+                      <Th>Categoría</Th>
+                      <Th>Estado</Th>
+                      <Th>Fecha</Th>
+                      <Th className="text-right">Acciones</Th>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loadingPosts ? (
+                      <FilasCargando columnas={5} />
+                    ) : (
+                      postsFiltrados.map((post) => (
+                        <TableRow key={post.id} className="hover:bg-muted/20">
+                          <TableCell className="max-w-md">
+                            <p className="truncate font-medium">{post.title}</p>
+                            {post.published && (
+                              <Link
+                                href={`/blog/${post.slug}`}
+                                target="_blank"
+                                rel="noopener"
+                                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+                              >
+                                Ver en el sitio <ExternalLink className="h-3 w-3" />
+                              </Link>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary" className="font-medium">
+                              {POST_CATEGORIES.find((c) => c.value === post.category)?.label || post.category || "—"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant="outline"
+                              className={cn("font-medium", post.published ? ESTILO_ESTADO.confirmada : "border-border bg-muted text-muted-foreground")}
                             >
-                              <TableCell className="font-semibold text-sm">
-                                {cita.nombre || "—"}
-                              </TableCell>
-                              <TableCell className="text-sm text-muted-foreground">
-                                {cita.email || "—"}
-                              </TableCell>
-                              <TableCell className="text-sm">
-                                {cita.servicioNombre ||
-                                  servicioSeleccionado?.titulo ||
-                                  cita.servicio ||
-                                  "—"}
-                              </TableCell>
-                              <TableCell className="text-sm text-muted-foreground">
-                                {cita.fecha
-                                  ? new Date(
-                                      cita.fecha + "T00:00:00",
-                                    ).toLocaleDateString("es-ES")
-                                  : "—"}
-                              </TableCell>
-                              <TableCell className="text-center text-sm text-muted-foreground">
-                                {cita.hora || "—"}
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <Badge
-                                  variant={
-                                    cita.estado === "confirmada" || cita.estado === "completada"
-                                      ? "default"
-                                      : cita.estado === "cancelada"
-                                        ? "destructive"
-                                        : "secondary"
-                                  }
-                                  className="text-[11px] font-semibold"
-                                >
-                                  {ETIQUETA_ESTADO[cita.estado] ?? cita.estado}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-right">
-                                <div className="flex justify-end gap-1">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleEditCita(cita)}
-                                    title="Editar"
-                                    className="h-8 w-8"
-                                  >
-                                    <Pencil className="w-4 h-4" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleDeleteCita(cita)}
-                                    title="Eliminar"
-                                    className="h-8 w-8 text-destructive hover:text-destructive"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                              {post.published ? "Publicado" : "Borrador"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap text-sm text-muted-foreground">{fechaCorta(post.date || post.created || new Date().toISOString())}</TableCell>
+                          <TableCell className="text-right">
+                            <AccionesFila onEditar={() => handleEditPost(post)} onBorrar={() => handleDeletePost(post)} />
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              )}
+            </Seccion>
+          </TabsContent>
+
+          {/* Servicios */}
+          <TabsContent value="servicios" className="mt-0">
+            <Seccion
+              titulo="Servicios"
+              descripcion="Solo los activos se pueden reservar desde el sitio."
+              total={servicios.length}
+              busqueda={busqueda}
+              onBusqueda={setBusqueda}
+              placeholder="Buscar servicio"
+              cargando={loadingServicios}
+              onActualizar={fetchServicios}
+              onNuevo={handleNewServicio}
+              etiquetaNuevo="Nuevo servicio"
+            >
+              {!loadingServicios && servicios.length === 0 ? (
+                <Vacio
+                  icono={Briefcase}
+                  titulo="Aún no hay servicios"
+                  texto="Sin servicios activos nadie puede reservar una cita."
+                  accion={
+                    <Button size="sm" onClick={handleNewServicio}>
+                      <Plus className="h-4 w-4" /> Crear el primer servicio
+                    </Button>
+                  }
+                />
+              ) : !loadingServicios && serviciosFiltrados.length === 0 ? (
+                <Vacio icono={Search} titulo="Sin resultados" texto="Ningún servicio coincide con la búsqueda." />
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30 hover:bg-muted/30">
+                      <Th>Servicio</Th>
+                      <Th>Duración</Th>
+                      <Th className="text-right">Precio</Th>
+                      <Th>Estado</Th>
+                      <Th className="text-right">Acciones</Th>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loadingServicios ? (
+                      <FilasCargando columnas={5} />
+                    ) : (
+                      serviciosFiltrados.map((servicio) => {
+                        const activo = servicio.activo !== false;
+                        return (
+                          <TableRow key={servicio.id} className={cn("hover:bg-muted/20", !activo && "opacity-70")}>
+                            <TableCell className="max-w-md">
+                              <p className="font-medium">{servicio.titulo || "—"}</p>
+                              <p className="truncate text-xs text-muted-foreground">{servicio.descripcion || "Sin descripción"}</p>
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">{servicio.duracion ? `${servicio.duracion} min` : "—"}</TableCell>
+                            <TableCell className="text-right text-sm font-medium tabular-nums">{precioMXN.format(servicio.precio || 0)}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className={cn("font-medium", activo ? ESTILO_ESTADO.confirmada : "border-border bg-muted text-muted-foreground")}>
+                                {activo ? "Activo" : "Inactivo"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <AccionesFila onEditar={() => handleEditServicio(servicio)} onBorrar={() => handleDeleteServicio(servicio)} />
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                    )}
+                  </TableBody>
+                </Table>
+              )}
+            </Seccion>
           </TabsContent>
         </Tabs>
+
+        {cargandoTodo && <p className="sr-only" aria-live="polite">Cargando el panel…</p>}
       </main>
-      <PostFormDialog
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        post={editingPost}
-        onSave={handleSavePost}
-      />
-      <DeletePostDialog
+
+      <PostFormDialog open={formOpen} onOpenChange={setFormOpen} post={editingPost} onSave={handleSavePost} />
+      <ConfirmarBorradoDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        post={deletingPost}
+        titulo="¿Eliminar este post?"
+        descripcion={
+          <>
+            Se eliminará permanentemente «<strong>{deletingPost?.title}</strong>». Esta acción no se puede deshacer.
+          </>
+        }
         onConfirm={handleConfirmDelete}
       />
-      <ServicioFormDialog
-        open={servicioFormOpen}
-        onOpenChange={setServicioFormOpen}
-        servicio={editingServicio}
-        onSave={handleSaveServicio}
-      />
-      <AlertDialog
+      <ServicioFormDialog open={servicioFormOpen} onOpenChange={setServicioFormOpen} servicio={editingServicio} onSave={handleSaveServicio} />
+      <ConfirmarBorradoDialog
         open={deleteServicioOpen}
         onOpenChange={setDeleteServicioOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción no se puede deshacer. Se eliminará este servicio
-              permanentemente.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDeleteServicio}>
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      <CitaFormDialog
-        open={citaFormOpen}
-        onOpenChange={setCitaFormOpen}
-        cita={editingCita}
-        onSave={handleSaveCita}
-        servicios={servicios}
+        titulo="¿Eliminar este servicio?"
+        descripcion={
+          <>
+            Se eliminará «<strong>{deletingServicio?.titulo}</strong>». Si ya tiene citas no se podrá borrar: en ese caso mejor desactívalo.
+          </>
+        }
+        onConfirm={handleConfirmDeleteServicio}
       />
-      <ClienteFormDialog
-        open={clienteFormOpen}
-        onOpenChange={setClienteFormOpen}
-        cliente={editingCliente}
-        onSave={handleSaveCliente}
+      <CitaFormDialog open={citaFormOpen} onOpenChange={setCitaFormOpen} cita={editingCita} onSave={handleSaveCita} servicios={servicios} />
+      <ClienteFormDialog open={clienteFormOpen} onOpenChange={setClienteFormOpen} cliente={editingCliente} onSave={handleSaveCliente} />
+      <ConfirmarBorradoDialog
+        open={deleteClienteOpen}
+        onOpenChange={setDeleteClienteOpen}
+        titulo="¿Eliminar este cliente?"
+        descripcion={
+          <>
+            Se eliminará a <strong>{deletingCliente?.nombre || deletingCliente?.correo}</strong>. Solo se puede borrar un cliente sin citas; si tiene historial, consérvalo.
+          </>
+        }
+        onConfirm={handleConfirmDeleteCliente}
       />
-      <AlertDialog open={deleteClienteOpen} onOpenChange={setDeleteClienteOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar este cliente?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Solo se puede borrar un cliente sin citas. Si tiene historial,
-              consérvalo.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDeleteCliente}>
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      <AlertDialog open={deleteCitaOpen} onOpenChange={setDeleteCitaOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción no se puede deshacer. Se eliminará esta cita
-              permanentemente.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDeleteCita}>
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmarBorradoDialog
+        open={deleteCitaOpen}
+        onOpenChange={setDeleteCitaOpen}
+        titulo="¿Eliminar esta cita?"
+        descripcion={
+          <>
+            Se eliminará la cita de <strong>{deletingCita?.nombre}</strong>
+            {deletingCita?.fecha ? ` del ${fechaCita(deletingCita.fecha)}` : ""}. Si solo quieres anularla, cancélala en lugar de borrarla.
+          </>
+        }
+        onConfirm={handleConfirmDeleteCita}
+      />
     </div>
   );
 };
