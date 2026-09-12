@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
-import { CalendarDays, CheckCircle, Sparkles, ArrowLeft, ArrowRight, UserCheck, MapPin, Video } from 'lucide-react';
+import { CalendarDays, CheckCircle, Sparkles, ArrowLeft, ArrowRight, UserCheck, MapPin, Video, Flame } from 'lucide-react';
 import Calendar from './Calendar';
 import TimeSlotPicker from './TimeSlotPicker';
 import AppointmentForm from './AppointmentForm';
@@ -170,7 +170,7 @@ export default function AppointmentCalendar() {
     );
   }
 
-  const IconoModalidad = modalidad === 'presencial' ? MapPin : Video;
+  const IconoModalidad = modalidad === 'presencial' ? MapPin : modalidad === 'a_distancia' ? Flame : Video;
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -355,9 +355,10 @@ export default function AppointmentCalendar() {
                   )}
                 >
                   <IconoModalidad className="w-4 h-4 shrink-0" />
-                  {modalidad === 'presencial'
-                    ? 'Este día la sesión es presencial, en consultorio (solo los viernes).'
-                    : 'Este día la sesión es en línea, por videollamada.'}
+                  {modalidad === 'presencial' && 'Este día la sesión es presencial, en consultorio (solo los viernes).'}
+                  {modalidad === 'en_linea' && 'Este día la sesión es en línea, por videollamada.'}
+                  {modalidad === 'a_distancia' &&
+                    'Este servicio es a distancia y asíncrono: no necesitas conectarte; la hora elegida es cuando inicia el ritual.'}
                 </div>
               )}
               <TimeSlotPicker

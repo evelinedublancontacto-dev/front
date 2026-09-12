@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { User, Mail, Phone, FileText, Send, Loader2, AlertCircle, UserCheck, MapPin, Video } from "lucide-react";
+import { User, Mail, Phone, FileText, Send, Loader2, AlertCircle, UserCheck, MapPin, Video, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { api, ErrorApi, mensajeDeError } from "@/lib/api";
 import { AVISO_QUIEN_AGENDA, ETIQUETA_MODALIDAD, type Modalidad } from "@/lib/tipos";
@@ -102,7 +102,7 @@ export default function AppointmentForm({
   };
 
   const servicioSeleccionado = servicios.find((s) => s.id === servicioId);
-  const IconoModalidad = modalidad === "presencial" ? MapPin : Video;
+  const IconoModalidad = modalidad === "presencial" ? MapPin : modalidad === "a_distancia" ? Flame : Video;
 
   return (
     <div

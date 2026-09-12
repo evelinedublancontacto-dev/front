@@ -11,11 +11,14 @@ export const ETIQUETA_ESTADO: Record<EstadoCita, string> = {
   completada: "Completada",
 };
 
-export type Modalidad = "presencial" | "en_linea";
+/* La manda el back: la del día (viernes presencial, resto en línea) o la
+   fija del servicio (las velas son siempre a distancia). */
+export type Modalidad = "presencial" | "en_linea" | "a_distancia";
 
 export const ETIQUETA_MODALIDAD: Record<Modalidad, string> = {
   presencial: "Presencial, en consultorio",
   en_linea: "En línea (videollamada)",
+  a_distancia: "A distancia, asíncrona (no necesitas conectarte)",
 };
 
 /** Aviso que Eveline pide mostrar en toda la reserva. */
@@ -30,7 +33,7 @@ export interface Servicio {
   precio: number;
   activo?: boolean;
   orden?: number;
-  reglas?: { dias_permitidos?: number[]; modalidad?: string; mensaje_dias?: string };
+  reglas?: { dias_permitidos?: number[]; modalidad?: Modalidad | "ambas"; mensaje_dias?: string };
 }
 
 export interface Cita {
